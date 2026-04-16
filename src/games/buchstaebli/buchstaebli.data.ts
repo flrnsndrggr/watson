@@ -20,7 +20,7 @@ export const SAMPLE_BUCHSTAEBLI: BuchstaebliPuzzle = {
 export const DEMO_VALID_WORDS: Record<string, { is_pangram: boolean; is_mundart: boolean; points: number }> = {
   'raten': { is_pangram: false, is_mundart: false, points: 5 },
   'raste': { is_pangram: false, is_mundart: false, points: 5 },
-  'stern': { is_pangram: false, is_mundart: false, points: 5 },
+  'laterne': { is_pangram: false, is_mundart: false, points: 7 },
   'laster': { is_pangram: false, is_mundart: false, points: 6 },
   'ateral': { is_pangram: false, is_mundart: false, points: 7 },
   'trans': { is_pangram: false, is_mundart: false, points: 5 },
@@ -29,12 +29,11 @@ export const DEMO_VALID_WORDS: Record<string, { is_pangram: boolean; is_mundart:
   'altern': { is_pangram: false, is_mundart: false, points: 6 },
   'anlass': { is_pangram: false, is_mundart: false, points: 6 },
   'atlas': { is_pangram: false, is_mundart: false, points: 5 },
-  'anlage': { is_pangram: false, is_mundart: false, points: 6 },
   'arena': { is_pangram: false, is_mundart: false, points: 5 },
   'alert': { is_pangram: false, is_mundart: false, points: 5 },
   'stall': { is_pangram: false, is_mundart: false, points: 5 },
   'narr': { is_pangram: false, is_mundart: false, points: 1 },
   'least': { is_pangram: false, is_mundart: false, points: 5 },
   'sterntal': { is_pangram: true, is_mundart: false, points: 15 },
-  'znacht': { is_pangram: false, is_mundart: true, points: 12 },
+  'natel': { is_pangram: false, is_mundart: true, points: 10 },
 };

@@ -81,7 +81,7 @@ _Items from watson-qa-buchstaebli agent_
    - Files: `src/pages/LandingPage.tsx`, `src/pages/Layout.tsx` (or wherever nav links live)
    - Evidence: Accessibility tree of https://games-watson.netlify.app shows nav with only `/verbindige`, `/zaemesetzli`, `/schlagziil`. No Buchstäbli card in main landmark. Observed 2026-04-16.
 
-3. [ ] P1 - Demo word list contains entries that violate puzzle letter constraints
+3. [x] P1 - Demo word list contains entries that violate puzzle letter constraints
    - Agent: watson-qa-buchstaebli
    - Scenario: Word Entry / Validation Responses — code review of demo data
    - Problem: `DEMO_VALID_WORDS` in `buchstaebli.data.ts` includes three invalid entries for the puzzle (center A, outer R/E/T/N/S/L): `stern` (no center letter A), `anlage` (contains G, not in puzzle), `znacht` (Mundart example — contains Z, C, H, none in puzzle). These entries are unreachable through normal input (keyboard filter + hex buttons both restrict to puzzle letters) but the data is incorrect and will cause issues if validation ever moves server-side against this word list.
