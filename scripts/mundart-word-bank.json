@@ -1,0 +1,634 @@
+[
+  {
+    "mundart_word": "g(e)ring",
+    "hochdeutsch": "leicht beweglich",
+    "full_description": "leicht beweglich",
+    "idiotikon_id": 122907,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/122907",
+    "meanings_count": 6
+  },
+  {
+    "mundart_word": "Grind",
+    "hochdeutsch": "Ausschlag auf dem Kopfe, eine harte Kruste bildend",
+    "full_description": "",
+    "idiotikon_id": 127663,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/127663",
+    "meanings_count": 8
+  },
+  {
+    "mundart_word": "bireⁿ",
+    "hochdeutsch": "Birnen lesen",
+    "full_description": "Birnen lesen",
+    "idiotikon_id": 166743,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/166743",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Pirreⁿ",
+    "hochdeutsch": "porro, Lauch",
+    "full_description": "porro, Lauch",
+    "idiotikon_id": 166832,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/166832",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Fudli",
+    "hochdeutsch": "'heimtückischer Mensch'",
+    "full_description": "'heimtückischer Mensch'",
+    "idiotikon_id": 117658,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/117658",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Füdloch",
+    "hochdeutsch": "cunnus",
+    "full_description": "Öffnung im After, in der lebenden MA. nur noch sehr abgeblasst in RAA., dafür die eig. tautologische Zss. «Füdleⁿ- («Füdli-»)Loch»",
+    "idiotikon_id": 117660,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/117660",
+    "meanings_count": 14
+  },
+  {
+    "mundart_word": "Hals",
+    "hochdeutsch": "Hals; mit bes. Bed.",
+    "full_description": "Hals; als Körperteil übh., ohne bes. Bed.; in der ä. Spr. zuweilen auf angrenzende Körperteile ausgedehnt",
+    "idiotikon_id": 130292,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/130292",
+    "meanings_count": 10
+  },
+  {
+    "mundart_word": "Būch I",
+    "hochdeutsch": "Bauch, im eig. S.",
+    "full_description": "Bauch, im eig. S.",
+    "idiotikon_id": 244625,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244625",
+    "meanings_count": 9
+  },
+  {
+    "mundart_word": "Būch II",
+    "hochdeutsch": "das Waschen in Lauge, Wäsche",
+    "full_description": "das Waschen in Lauge, Wäsche",
+    "idiotikon_id": 247501,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247501",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Buech II",
+    "hochdeutsch": "Buchengehölz, -Hain; jetzt meist zum Orts- oder Flurnamen geworden",
+    "full_description": "Buchengehölz, -Hain; jetzt meist zum Orts- oder Flurnamen geworden",
+    "idiotikon_id": 247509,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247509",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Buech IV",
+    "hochdeutsch": "coll., Bucheckern",
+    "full_description": "coll., Bucheckern",
+    "idiotikon_id": 251561,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/251561",
+    "meanings_count": 2
+  },
+  {
+    "mundart_word": "Buech V",
+    "hochdeutsch": "Buch, gedrucktes Buch übh.",
+    "full_description": "Buch, gedrucktes Buch übh.",
+    "idiotikon_id": 242342,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/242342",
+    "meanings_count": 10
+  },
+  {
+    "mundart_word": "Ërdepfel",
+    "hochdeutsch": "«amerikanische H.», eine Sorte Erdäpfel, rot, rundlich, mit tiefliegenden Augen",
+    "full_description": "Kartoffel, Solanum tuberosum, schon 1730 auftauchend, aber erst durch die Fehljahre 1770/71 und besonders durch die die Zehntenpflicht wegräumende Revolution von 1798 zu allgemeiner Geltung gebracht",
+    "idiotikon_id": 107735,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/107735",
+    "meanings_count": 3
+  },
+  {
+    "mundart_word": "Chabis",
+    "hochdeutsch": "weisser Kopfkohl, brass. capit. alba, brass. olerac.",
+    "full_description": "weisser Kopfkohl, brass. capit. alba, brass. olerac.",
+    "idiotikon_id": 139610,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/139610",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Chǟs",
+    "hochdeutsch": "Käse, in eig. Bed.",
+    "full_description": "Käse, in eig. Bed.",
+    "idiotikon_id": 140845,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/140845",
+    "meanings_count": 17
+  },
+  {
+    "mundart_word": "Chǟslab",
+    "hochdeutsch": "der Stoff, den man der Milch zusetzt, um sie zum Zweck der Bereitung von Käse gerinnen zu machen. Er wird aus dem mit etwas Salz und Gewürzen gemischten und eine Zeit lang in säuerlicher 'Schotte' eingeweichten Magen junger Kälber oder Ziegen gewonnen, der im Kamin geräuchert, dann klein gehackt und in einem gedeckten Behälter («Lupp-Täusli»), einer Flasche, einem Leinlappen oder einer Schweinsblase gegohren längere Zeit aufbewahrt wird",
+    "full_description": "der Stoff, den man der Milch zusetzt, um sie zum Zweck der Bereitung von Käse gerinnen zu machen. Er wird aus dem mit etwas Salz und Gewürzen gemischten und eine Zeit lang in säuerlicher 'Schotte' eingeweichten Magen junger Kälber oder Ziegen gewonnen, der im Kamin geräuchert, dann klein gehackt und in einem gedeckten Behälter («Lupp-Täusli»), einer Flasche, einem Leinlappen oder einer Schweinsblase gegohren längere Zeit aufbewahrt wird",
+    "idiotikon_id": 140955,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/140955",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Brāt I",
+    "hochdeutsch": "eig. Vorgang oder Zustand des 'Bratens',",
+    "full_description": "eig. Vorgang oder Zustand des 'Bratens',",
+    "idiotikon_id": 244569,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244569",
+    "meanings_count": 2
+  },
+  {
+    "mundart_word": "Brāt II",
+    "hochdeutsch": "weiches Fleisch (zu Würsten)",
+    "full_description": "weiches Fleisch (zu Würsten)",
+    "idiotikon_id": 247445,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247445",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Brōt",
+    "hochdeutsch": "im Wesentl. wie nhd. Brot, das Brot nach seiner stofflichen Beschaffenheit",
+    "full_description": "im Wesentl. wie nhd. Brot, das Brot nach seiner stofflichen Beschaffenheit",
+    "idiotikon_id": 171194,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/171194",
+    "meanings_count": 65
+  },
+  {
+    "mundart_word": "Z(e)nǖni",
+    "hochdeutsch": "«Z' N. nëⁿ, ësseⁿ», das zweite Frühstück auf dem Lande, gewöhnlich bestehend aus Brot mit Wein, Most (oder Schnaps), bei strengern Arbeiten unter Zugabe von Käse, Speck u. ä.; ohne Rücksicht auf die Tageszeit übh. s. v. a. Wein und Brot geniessen, zumal als letzte Mahlzeit des Tages; auch subst. «'s (auch «deʳ») Z' Nǖni», das betr. Frühstück selbst",
+    "full_description": "«Z' N. nëⁿ, ësseⁿ», das zweite Frühstück auf dem Lande, gewöhnlich bestehend aus Brot mit Wein, Most (oder Schnaps), bei strengern Arbeiten unter Zugabe von Käse, Speck u. ä.; ohne Rücksicht auf die Tageszeit übh. s. v. a. Wein und Brot geniessen, zumal als letzte Mahlzeit des Tages; auch subst. «'s (auch «deʳ») Z' Nǖni», das betr. Frühstück selbst",
+    "idiotikon_id": 211933,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/211933",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Z(e)vieri",
+    "hochdeutsch": "{Zwischenmahlzeit, Abendessen, um 4 Uhr Nachmittags}",
+    "full_description": "{Zwischenmahlzeit, Abendessen, um 4 Uhr Nachmittags}",
+    "idiotikon_id": 300642,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/300642",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Muesli",
+    "hochdeutsch": "unordentlicher Esser, bes. von Kindern",
+    "full_description": "unordentlicher Esser, bes. von Kindern",
+    "idiotikon_id": 155265,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/155265",
+    "meanings_count": 3
+  },
+  {
+    "mundart_word": "Welo",
+    "hochdeutsch": "Fahrrad; spez. Dim., Kinderrad, oft dreiräderig",
+    "full_description": "Fahrrad; spez. Dim., Kinderrad, oft dreiräderig",
+    "idiotikon_id": 237297,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/237297",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Tram I",
+    "hochdeutsch": "Tram, (städt.) Strassenbahn, Strassenbahnwagen",
+    "full_description": "Tram, (städt.) Strassenbahn, Strassenbahnwagen",
+    "idiotikon_id": 245824,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/245824",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Trām",
+    "hochdeutsch": "Bauholz, Balken, meist schon Kantholz (behauen oder gesägt)",
+    "full_description": "Bauholz, Balken, meist schon Kantholz (behauen oder gesägt)",
+    "idiotikon_id": 231456,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/231456",
+    "meanings_count": 5
+  },
+  {
+    "mundart_word": "Trǟm",
+    "hochdeutsch": "Baumstamm, 'Sägeholz'",
+    "full_description": "Baumstamm, 'Sägeholz'",
+    "idiotikon_id": 231457,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/231457",
+    "meanings_count": 5
+  },
+  {
+    "mundart_word": "träm",
+    "hochdeutsch": "wiederholt, als Untermalung einer Marschmelodie",
+    "full_description": "wiederholt, als Untermalung einer Marschmelodie",
+    "idiotikon_id": 231458,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/231458",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Lōli I N.",
+    "hochdeutsch": "Kolumbine",
+    "full_description": "Kolumbine",
+    "idiotikon_id": 150444,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/150444",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Lōli II",
+    "hochdeutsch": "Lutschbeutel",
+    "full_description": "Lutschbeutel",
+    "idiotikon_id": 251237,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/251237",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Lōli III",
+    "hochdeutsch": "Gemeindegefängniss, Arrestlokal für Vagabunden",
+    "full_description": "Gemeindegefängniss, Arrestlokal für Vagabunden",
+    "idiotikon_id": 251300,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/251300",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Lȫli",
+    "hochdeutsch": "maskierte Person, Fasnachtsnarr",
+    "full_description": "im Allg. Dummkopf, Einfaltspinsel und junger, unverständiger Mensch; dummer, nichtsnutziger Bursche; Dummkopf, einfältiger Gaffer, Laffe, Lümmel übh., oft bloss scherzhafter Titel",
+    "idiotikon_id": 150445,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/150445",
+    "meanings_count": 4
+  },
+  {
+    "mundart_word": "Tubel I",
+    "hochdeutsch": "kleineres, meist sorgfältig zugeschnittenes Holzstück",
+    "full_description": "kleineres, meist sorgfältig zugeschnittenes Holzstück",
+    "idiotikon_id": 233843,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/233843",
+    "meanings_count": 13
+  },
+  {
+    "mundart_word": "Tubel II",
+    "hochdeutsch": "Mensch von störrischer oder beschränkter Geistesart, insbes., Starr-, Steckkopf",
+    "full_description": "Mensch von störrischer oder beschränkter Geistesart, insbes., Starr-, Steckkopf",
+    "idiotikon_id": 242389,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/242389",
+    "meanings_count": 6
+  },
+  {
+    "mundart_word": "Tubel III",
+    "hochdeutsch": "Stier, 'Bulle, der nach dem 1. oder 2. Jahr ist verschnitten worden'",
+    "full_description": "Stier, 'Bulle, der nach dem 1. oder 2. Jahr ist verschnitten worden'",
+    "idiotikon_id": 242390,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/242390",
+    "meanings_count": 2
+  },
+  {
+    "mundart_word": "Tubel IV",
+    "hochdeutsch": "mit Bez. auf die Herkunft",
+    "full_description": "schwere alte Goldmünze versch. lateinischer Staaten sowie einiger eidg. Orte, in neuerer Zeit Goldstück übh.",
+    "idiotikon_id": 242391,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/242391",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Sürmel",
+    "hochdeutsch": "als Schimpfwort allgemeinerer Bed.",
+    "full_description": "mürrischer, unfreundlicher, sauertöpfischer Mensch; unzufriedener, launenhafter Mensch; missmutiger Mensch, der in den Bart brummt; schmollendes, seufzendes, murrendes Kind",
+    "idiotikon_id": 196709,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/196709",
+    "meanings_count": 4
+  },
+  {
+    "mundart_word": "Tschumpel",
+    "hochdeutsch": "von Personen",
+    "full_description": "von Personen",
+    "idiotikon_id": 233688,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/233688",
+    "meanings_count": 9
+  },
+  {
+    "mundart_word": "Chalb",
+    "hochdeutsch": "übertr. auf Sachen",
+    "full_description": "zunächst das Junge des Rindviehs in der ersten Lebenszeit, ohne Unterschied des Geschlechts, dann aber auch mit Einschränkung spec. auf das weibliche Tier, dagegen auf das männliche",
+    "idiotikon_id": 139878,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/139878",
+    "meanings_count": 6
+  },
+  {
+    "mundart_word": "Siech I",
+    "hochdeutsch": "im eig. S.",
+    "full_description": "im eig. S.",
+    "idiotikon_id": 245234,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/245234",
+    "meanings_count": 5
+  },
+  {
+    "mundart_word": "Siech II",
+    "hochdeutsch": "«Der falleⁿd S.», 'St Valentins Siechtag', Fallsucht, Epilepsie",
+    "full_description": "«Der falleⁿd S.», 'St Valentins Siechtag', Fallsucht, Epilepsie",
+    "idiotikon_id": 248110,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/248110",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "siech",
+    "hochdeutsch": "vom Menschen",
+    "full_description": "vom Menschen",
+    "idiotikon_id": 189027,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/189027",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Sǖch",
+    "hochdeutsch": "Seuche",
+    "full_description": "Seuche",
+    "idiotikon_id": 195908,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/195908",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Bīs I",
+    "hochdeutsch": "schneidend kalter, trockener, aufhellender Wind",
+    "full_description": "",
+    "idiotikon_id": 242581,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/242581",
+    "meanings_count": 9
+  },
+  {
+    "mundart_word": "Bīs II",
+    "hochdeutsch": "das Schwärmen und Stechen der Insekten während der heissen Tageszeit im Sommer, worunter das Vieh sehr zu leiden hat; seltener übertr. auf die grosse Hitze selbst",
+    "full_description": "das Schwärmen und Stechen der Insekten während der heissen Tageszeit im Sommer, worunter das Vieh sehr zu leiden hat; seltener übertr. auf die grosse Hitze selbst",
+    "idiotikon_id": 242848,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/242848",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "bīseⁿ I",
+    "hochdeutsch": "unpers.",
+    "full_description": "unpers.",
+    "idiotikon_id": 244458,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244458",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Fȫ(n)",
+    "hochdeutsch": "eine vorzugsweise süd-östl. bis südliche stürmische Windströmung, welche die Temperatur bedeutend erhöht, den Druck der Luft vermindert und diese austrocknet, etwa auch der gewöhnliche Südwest (Äquatorialstrom)",
+    "full_description": "eine vorzugsweise süd-östl. bis südliche stürmische Windströmung, welche die Temperatur bedeutend erhöht, den Druck der Luft vermindert und diese austrocknet, etwa auch der gewöhnliche Südwest (Äquatorialstrom)",
+    "idiotikon_id": 115973,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/115973",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Nabel",
+    "hochdeutsch": "Nabel, umbilicus, spec. Schweinsnabel zum Schmieren",
+    "full_description": "Nabel, umbilicus, spec. Schweinsnabel zum Schmieren",
+    "idiotikon_id": 156501,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/156501",
+    "meanings_count": 2
+  },
+  {
+    "mundart_word": "Napel N.",
+    "hochdeutsch": "Neapel",
+    "full_description": "Neapel",
+    "idiotikon_id": 157393,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/157393",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Nëbel",
+    "hochdeutsch": "Nebel",
+    "full_description": "Nebel",
+    "idiotikon_id": 157697,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/157697",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Schnē(w)",
+    "hochdeutsch": "eig., Schnee; vom Stoff an sich wie von dessen einzelner Erscheinungsform",
+    "full_description": "eig., Schnee; vom Stoff an sich wie von dessen einzelner Erscheinungsform",
+    "idiotikon_id": 184621,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/184621",
+    "meanings_count": 10
+  },
+  {
+    "mundart_word": "Z(e)nacht",
+    "hochdeutsch": "Abendessen",
+    "full_description": "Abendessen",
+    "idiotikon_id": 211916,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/211916",
+    "meanings_count": 2
+  },
+  {
+    "mundart_word": "z(e)nacht",
+    "hochdeutsch": "Nacht, in mehr oder weniger festen adv. Verbindungen, «z' N.», Nachts",
+    "full_description": "Nacht, in mehr oder weniger festen adv. Verbindungen, «z' N.», Nachts",
+    "idiotikon_id": 211917,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/211917",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Z(e)morgeⁿ",
+    "hochdeutsch": "«s z' M. = 's Morgenëssen», {Frühstück}",
+    "full_description": "«s z' M. = 's Morgenëssen», {Frühstück}",
+    "idiotikon_id": 298591,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/298591",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Z(e)morgeⁿ",
+    "hochdeutsch": "«Z' M. ësseⁿ (trinkeⁿ, nëⁿ)», die Morgenmahlzeit, die Mittagsmahlzeit einnehmen",
+    "full_description": "«Z' M. ësseⁿ (trinkeⁿ, nëⁿ)», die Morgenmahlzeit, die Mittagsmahlzeit einnehmen",
+    "idiotikon_id": 300645,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/300645",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Stub(eⁿ)",
+    "hochdeutsch": "wesentl. wie nhd. Stube",
+    "full_description": "wesentl. wie nhd. Stube",
+    "idiotikon_id": 195112,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/195112",
+    "meanings_count": 29
+  },
+  {
+    "mundart_word": "Stǖb(eⁿ)",
+    "hochdeutsch": "'Blaufelchen, Salmo [Coregonus] Wartmanni im zweiten Jahre', auch Coreg. Schinzii helv.",
+    "full_description": "",
+    "idiotikon_id": 195115,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/195115",
+    "meanings_count": 5
+  },
+  {
+    "mundart_word": "stubeⁿ",
+    "hochdeutsch": "vom Wein, ihn im Winter vor dem Genuss einige Zeit der Zimmerwärme aussetzen",
+    "full_description": "vom Wein, ihn im Winter vor dem Genuss einige Zeit der Zimmerwärme aussetzen",
+    "idiotikon_id": 195113,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/195113",
+    "meanings_count": 3
+  },
+  {
+    "mundart_word": "Chuchi",
+    "hochdeutsch": "Küche",
+    "full_description": "Küche",
+    "idiotikon_id": 146342,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/146342",
+    "meanings_count": 10
+  },
+  {
+    "mundart_word": "Bett",
+    "hochdeutsch": "Bett, für Menschen",
+    "full_description": "",
+    "idiotikon_id": 164488,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/164488",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Bëtt I",
+    "hochdeutsch": "Bitte",
+    "full_description": "Bitte",
+    "idiotikon_id": 244415,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244415",
+    "meanings_count": 9
+  },
+  {
+    "mundart_word": "Bëtt II",
+    "hochdeutsch": "(erbetene) Steuer, Abgabe",
+    "full_description": "Bitte; wenn von einem höher Gestellten ausgehend auch Geheiss; in der lebenden Spr. nur noch in der Formel «mit Bitt und Bëtt», mit vielem Bitten",
+    "idiotikon_id": 247291,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247291",
+    "meanings_count": 4
+  },
+  {
+    "mundart_word": "Bach I",
+    "hochdeutsch": "übertr.",
+    "full_description": "Bach; als Sinnbild gleichs. reichlich strömender Fülle, zunächst von Getränken, in der Formel «wie B.»; endlich übh.: in Menge, reichlich",
+    "idiotikon_id": 244324,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244324",
+    "meanings_count": 5
+  },
+  {
+    "mundart_word": "Bach II",
+    "hochdeutsch": "so viel Mehl, als auf ein Mal verbacken wird, auch das daraus gebackene Brot, 10-12 Laibe",
+    "full_description": "so viel Mehl, als auf ein Mal verbacken wird, auch das daraus gebackene Brot, 10-12 Laibe",
+    "idiotikon_id": 247200,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247200",
+    "meanings_count": 2
+  },
+  {
+    "mundart_word": "Bäch",
+    "hochdeutsch": "Örtlichkeit, wo mehrere Bäche fliessen, Name der Allmend bei Schwyz",
+    "full_description": "Örtlichkeit, wo mehrere Bäche fliessen, Name der Allmend bei Schwyz",
+    "idiotikon_id": 244325,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244325",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Bäch",
+    "hochdeutsch": "Mutterschwein",
+    "full_description": "Mutterschwein",
+    "idiotikon_id": 247201,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247201",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Bërg",
+    "hochdeutsch": "Berg",
+    "full_description": "Berg",
+    "idiotikon_id": 163274,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/163274",
+    "meanings_count": 21
+  },
+  {
+    "mundart_word": "Wald",
+    "hochdeutsch": "Wald",
+    "full_description": "",
+    "idiotikon_id": 236753,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/236753",
+    "meanings_count": 8
+  },
+  {
+    "mundart_word": "Wëlt",
+    "hochdeutsch": "wesentl. wie nhd. Welt",
+    "full_description": "wesentl. wie nhd. Welt",
+    "idiotikon_id": 237306,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/237306",
+    "meanings_count": 50
+  },
+  {
+    "mundart_word": "Stei(n)",
+    "hochdeutsch": "Gestein, Mineral",
+    "full_description": "Gestein, Mineral",
+    "idiotikon_id": 192856,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/192856",
+    "meanings_count": 112
+  },
+  {
+    "mundart_word": "Flueh",
+    "hochdeutsch": "Felsabsturz, Felswand; einzelner grosser, schroffer, kahler Fels, Felsblock, Felsbruchstück; zur Bezeichnung grosser Körperfülle, fester, starker Statur von Tieren und Menschen, in Vergleichungen beliebt",
+    "full_description": "Felsabsturz, Felswand; einzelner grosser, schroffer, kahler Fels, Felsblock, Felsbruchstück; zur Bezeichnung grosser Körperfülle, fester, starker Statur von Tieren und Menschen, in Vergleichungen beliebt",
+    "idiotikon_id": 115584,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/115584",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Hei(m)wē",
+    "hochdeutsch": "Sehnsucht nach der Heimat, der vertrauten Umgebung bzw. nach (verstorbenen) Angehörigen",
+    "full_description": "Sehnsucht nach der Heimat, der vertrauten Umgebung bzw. nach (verstorbenen) Angehörigen",
+    "idiotikon_id": 219470,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/219470",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "Freud",
+    "hochdeutsch": "abstr. und allg., Freud",
+    "full_description": "abstr. und allg., Freud",
+    "idiotikon_id": 117070,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/117070",
+    "meanings_count": 5
+  },
+  {
+    "mundart_word": "müed",
+    "hochdeutsch": "müde, gesteigert «hund-erdeⁿ, tod-erdeⁿ, hunds-(tod-)», übertr.",
+    "full_description": "müde, gesteigert «hund-erdeⁿ, tod-erdeⁿ, hunds-(tod-)», übertr.",
+    "idiotikon_id": 155141,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/155141",
+    "meanings_count": 6
+  },
+  {
+    "mundart_word": "Muelt(eⁿ)",
+    "hochdeutsch": "Mulde, als Gefäss",
+    "full_description": "Mulde, als Gefäss",
+    "idiotikon_id": 155174,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/155174",
+    "meanings_count": 11
+  },
+  {
+    "mundart_word": "Muet I",
+    "hochdeutsch": "Gemüt, Gefühl, Stimmung",
+    "full_description": "Gemüt, Gefühl, Stimmung",
+    "idiotikon_id": 244232,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/244232",
+    "meanings_count": 7
+  },
+  {
+    "mundart_word": "Muet II",
+    "hochdeutsch": "«Deʳ M. mit dem breiteⁿ Huet het mēʳ Gäst wëder deʳ Wald Tannäst», Rätsel vom Sternenhimmel",
+    "full_description": "«Deʳ M. mit dem breiteⁿ Huet het mēʳ Gäst wëder deʳ Wald Tannäst», Rätsel vom Sternenhimmel",
+    "idiotikon_id": 247108,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/247108",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "wüedig",
+    "hochdeutsch": "gut gedeihend, mastig, von Pflanzen; von Menschen, Tieren, stark wachsend",
+    "full_description": "gut gedeihend, mastig, von Pflanzen; von Menschen, Tieren, stark wachsend",
+    "idiotikon_id": 238200,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/238200",
+    "meanings_count": 1
+  },
+  {
+    "mundart_word": "wüetig",
+    "hochdeutsch": "zornig, wütend",
+    "full_description": "",
+    "idiotikon_id": 300184,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/300184",
+    "meanings_count": 9
+  },
+  {
+    "mundart_word": "Wüetung",
+    "hochdeutsch": "heftige Erregung oä.",
+    "full_description": "heftige Erregung oä.",
+    "idiotikon_id": 300188,
+    "idiotikon_url": "https://digital.idiotikon.ch/p/lem/300188",
+    "meanings_count": 1
+  }
+]

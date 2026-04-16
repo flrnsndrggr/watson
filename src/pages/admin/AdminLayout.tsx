@@ -1,0 +1,72 @@
+import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
+import { useAuth } from '@/lib/auth';
+
+const ADMIN_NAV = [
+  { path: '/admin', label: 'Dashboard', end: true },
+  { path: '/admin/verbindige', label: 'Verbindige' },
+  { path: '/admin/zaemesetzli', label: 'Zaemesetzli' },
+  { path: '/admin/schlagziil', label: 'Schlagziil' },
+];
+
+export function AdminLayout() {
+  const { isLoggedIn, logout, username } = useAuth();
+  const location = useLocation();
+
+  if (!isLoggedIn) return <Navigate to="/" replace />;
+
+  return (
+    <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Admin header */}
+      <header className="sticky top-0 z-40 bg-[var(--color-nav-bg)] border-b border-white/10">
+        <div className="mx-auto flex h-[56px] max-w-[1200px] items-center px-4">
+          <Link to="/admin" className="mr-6 flex items-center gap-2">
+            <span className="text-lg font-bold text-[var(--color-cyan)]">watson</span>
+            <span className="rounded bg-[var(--color-blue)] px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
+              Admin
+            </span>
+          </Link>
+          <nav className="flex gap-1 overflow-x-auto">
+            {ADMIN_NAV.map((item) => {
+              const isActive = item.end
+                ? location.pathname === item.path
+                : location.pathname.startsWith(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`whitespace-nowrap rounded px-3 py-1.5 text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="ml-auto flex items-center gap-3">
+            <span className="text-xs text-white/50">{username}</span>
+            <Link
+              to="/"
+              className="text-xs text-white/50 hover:text-white transition-colors"
+            >
+              Zur Seite
+            </Link>
+            <button
+              onClick={logout}
+              className="rounded bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20 transition-colors cursor-pointer"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="mx-auto max-w-[1200px] px-4 py-6">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
