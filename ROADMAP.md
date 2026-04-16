@@ -33,6 +33,14 @@ _Items from watson-qa-verbindige agent_
 
 _Items from watson-qa-buchstaebli agent_
 
+1. [ ] P0 - Route `/buchstaebli` does not exist — blank white screen
+   - Agent: watson-qa-buchstaebli
+   - Scenario: First Play — navigate directly to https://games-watson.netlify.app/buchstaebli
+   - Problem: The route `/buchstaebli` is not registered in the React Router config. Navigating to it produces a blank white page with no content or error message shown to the user.
+   - Suggested fix: Add a `<Route path="/buchstaebli" element={<BuchstaebliPage />} />` entry in the router (likely `src/App.tsx` or equivalent routing file). The game files exist at `src/games/buchstaebli/` per AGENTS.md but the route is missing.
+   - Files: `src/App.tsx` (or router config), `src/games/buchstaebli/`
+   - Evidence: Console warning "No routes matched location '/buchstaebli'" (React Router). Page renders empty white body. Observed 2026-04-16.
+
 ---
 
 ## Schlagziil QA Findings
