@@ -33,13 +33,19 @@ src/
   components/shared/    # Shared UI (GameShell, Toast, ShareButton, etc.)
   games/<game>/         # Game-specific components + hooks + data
   pages/                # Layout, LandingPage
-  lib/                  # Supabase client, share utils
+  pages/admin/          # Admin panel (AdminLayout, AdminDashboard, per-game editors)
+  lib/                  # Supabase client, auth context, Idiotikon API client, share utils
   styles/               # Design tokens
   types/                # Shared TypeScript types
 docs/
+  CHANGELOG.md          # Changelog maintained by watson-docs agent
   polish-checklist.md   # UX polish items for watson-game-polish agent
   feature-backlog.md    # Feature backlog for watson-feature-worker agent
 ROADMAP.md              # QA findings + issue tracker
+MUNDART-SOURCING.md     # Mundart word sourcing pipeline (Idiotikon → word bank → puzzles)
+scripts/
+  seed-from-idiotikon.ts   # Fetches verified Mundart words from Idiotikon API
+  mundart-word-bank.json   # 79+ pre-fetched verified words
 ```
 
 ## Git Rules
@@ -72,12 +78,12 @@ If any fails, revert changes and mark the item with `[!]` + reason.
 
 ## Game Types
 
-| Game | Route | Key Files |
-|---|---|---|
-| Verbindige | `/verbindige` | `src/games/verbindige/` |
-| Buchstäbli | `/buchstaebli` | `src/games/buchstaebli/` (note: no route yet) |
-| Schlagziil | `/schlagziil` | `src/games/schlagziil/` |
-| Zämesetzli | `/zaemesetzli` | `src/games/zaemesetzli/` |
+| Game | Route | Admin Route | Key Files |
+|---|---|---|---|
+| Verbindige | `/verbindige` | `/admin/verbindige` | `src/games/verbindige/` |
+| Buchstäbli | `/buchstaebli` | _(no admin yet)_ | `src/games/buchstaebli/` (note: no player route yet — P0) |
+| Schlagziil | `/schlagziil` | `/admin/schlagziil` | `src/games/schlagziil/` |
+| Zämesetzli | `/zaemesetzli` | `/admin/zaemesetzli` | `src/games/zaemesetzli/` |
 
 ## Supabase Tables
 

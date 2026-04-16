@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# games-watson
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Daily word games in Swiss German for watson.ch readers.
 
-Currently, two official plugins are available:
+## Games
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Game | Route | Description |
+|---|---|---|
+| Verbindige | `/verbindige` | Group 16 Swiss German words into 4 thematic categories |
+| Buchstäbli | `/buchstaebli` | Spelling Bee in Mundart — find words using 7 letters |
+| Schlagziil | `/schlagziil` | Guess the watson.ch headline from a partial reveal |
+| Zämesetzli | `/zaemesetzli` | Combine emoji pairs to form Swiss German compound words |
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React 19 + TypeScript + Vite + Tailwind CSS
+- **Backend:** Supabase (Postgres, Auth, Edge Functions)
+- **Deployment:** Netlify (`games-watson.netlify.app`)
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Requires a `.env.local` with Supabase credentials:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```
+
+## Admin Panel
+
+Protected at `/admin` — requires Supabase auth. Includes puzzle editors for Verbindige, Schlagziil, and Zämesetzli.
+
+## Mundart Word Sourcing
+
+All Swiss German words trace to the [Schweizerisches Idiotikon](https://digital.idiotikon.ch). See [MUNDART-SOURCING.md](MUNDART-SOURCING.md) for the data pipeline.
+
+## Docs
+
+- [AGENTS.md](AGENTS.md) — agent operating contract (conventions, brand tokens, git rules)
+- [ROADMAP.md](ROADMAP.md) — QA findings and issue tracker
+- [docs/feature-backlog.md](docs/feature-backlog.md) — feature work queue
+- [docs/polish-checklist.md](docs/polish-checklist.md) — UX polish queue
+- [docs/CHANGELOG.md](docs/CHANGELOG.md) — changelog
