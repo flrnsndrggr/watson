@@ -97,6 +97,34 @@ _Critical findings from watson-code-reviewer_
 
 _Weekly architecture review findings from watson-architect_
 
+1. [ ] P1 - Deduplicate `shuffleArray` and `getRank` utility functions
+   - Agent: watson-architect
+   - Scenario: Cross-game code duplication audit (2026-04-16)
+   - Problem: `shuffleArray<T>` is copy-pasted in `useVerbindige.ts:26` and `useBuchstaebli.ts:38`. `getRank()` is copy-pasted in `useBuchstaebli.ts:30` and `useZaemesetzli.ts:28`. Both pairs are semantically identical.
+   - Suggested fix: Extract both to `src/lib/utils.ts`. Add `RankThresholds` type to `src/types/index.ts` so `getRank` is typesafe across games.
+   - Files: `src/lib/utils.ts` (create), `src/types/index.ts`, `src/games/verbindige/useVerbindige.ts`, `src/games/buchstaebli/useBuchstaebli.ts`, `src/games/zaemesetzli/useZaemesetzli.ts`
+
+2. [ ] P1 - Add keyboard navigation to Verbindige and Zaemesetzli
+   - Agent: watson-architect
+   - Scenario: Accessibility audit (2026-04-16)
+   - Problem: Only Buchstaebli has keyboard support (`BuchstaebliPage.tsx:55-70`). Verbindige and Zaemesetzli have no keyboard interaction — keyboard-only users cannot play.
+   - Suggested fix: Add `window.addEventListener('keydown', ...)` in VerbindigePage and ZaemesetzliPage following the Buchstaebli pattern. Verbindige: Enter=submitGuess, Backspace=clearSelection. Zaemesetzli: Enter=submitWord, Backspace=clearEmojiSelection.
+   - Files: `src/games/verbindige/VerbindigePage.tsx`, `src/games/zaemesetzli/ZaemesetzliPage.tsx`
+
+3. [ ] P1 - Add ARIA labels to interactive game elements
+   - Agent: watson-architect
+   - Scenario: Accessibility audit (2026-04-16)
+   - Problem: Only 1 `aria-label` found across all 4 game directories (`EmojiPool.tsx:30`). Tile buttons, hex letter buttons, combine slots, and action buttons across all games lack ARIA labels — screen reader inaccessible.
+   - Suggested fix: Add `aria-label` to all interactive button-like elements. Minimum viable: VerbindigeTile, HexGrid letters, CombineSlots, game action buttons.
+   - Files: `src/games/verbindige/VerbindigeTile.tsx`, `src/games/buchstaebli/HexGrid.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
+
+4. [ ] P1 - Create AdminBuchstaebli page and route
+   - Agent: watson-architect
+   - Scenario: Cross-game consistency audit (2026-04-16)
+   - Problem: All other games have admin pages (AdminVerbindige, AdminZaemesetzli, AdminSchlagziil) but Buchstaebli has none. No `/admin/buchstaebli` route in App.tsx.
+   - Suggested fix: Create `src/pages/admin/AdminBuchstaebli.tsx` following `AdminZaemesetzli.tsx` pattern. Add route inside admin block in `src/App.tsx`.
+   - Files: `src/pages/admin/AdminBuchstaebli.tsx` (create), `src/App.tsx`
+
 ---
 
 ## Content Gaps
