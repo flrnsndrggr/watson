@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
+import { PostGameSection } from '@/components/shared/PostGameSection';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
 import { RankBar } from '@/games/buchstaebli/RankBar';
@@ -152,6 +153,8 @@ export function ZaemesetzliPage() {
       <div className="mt-6 text-center">
         <ShareButton text={shareText} />
       </div>
+
+      <PostGameSection currentGame="zaemesetzli" />
     </GameShell>
   );
 }

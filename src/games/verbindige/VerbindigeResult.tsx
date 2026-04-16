@@ -1,4 +1,5 @@
 import { ShareButton } from '@/components/shared/ShareButton';
+import { PostGameSection } from '@/components/shared/PostGameSection';
 import { generateShareText } from '@/lib/share';
 import { useVerbindige } from './useVerbindige';
 
@@ -37,6 +38,8 @@ export function VerbindigeResult() {
           Verbindige #{puzzle.date}
         </p>
       )}
+
+      <PostGameSection currentGame="verbindige" />
     </div>
   );
 }
