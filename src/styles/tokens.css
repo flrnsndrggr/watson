@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+/* ===== WATSON GAMES DESIGN TOKENS ===== */
+
+@theme {
+  /* Typography */
+  --font-body: "Nunito Sans", "Adjusted Verdana Fallback", sans-serif;
+  --font-heading: "Onest", "Adjusted Verdana Fallback", sans-serif;
+
+  /* Watson brand colors */
+  --color-cyan: #00C6FF;
+  --color-pink: #F40F97;
+  --color-green: #7BD400;
+  --color-blue: #0F6CF5;
+
+  /* Neutrals */
+  --color-nav-bg: #1A1A1A;
+  --color-white: #FFFFFF;
+  --color-gray-bg: #ECECEC;
+  --color-black: #000000;
+  --color-gray-text: #777777;
+
+  /* Game-specific (Verbindige difficulty colors) */
+  --color-difficulty-1: #FFD700;
+  --color-difficulty-2: #7BD400;
+  --color-difficulty-3: #0F6CF5;
+  --color-difficulty-4: #9B59B6;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Game layout */
+  --game-max-width: 600px;
+  --game-tile-gap: 8px;
+  --game-tile-radius: 6px;
+
+  /* Animation */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease-out;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-20px); opacity: 0; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--progress); }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* ===== BASE STYLES ===== */
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-black);
+  background: var(--color-white);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
