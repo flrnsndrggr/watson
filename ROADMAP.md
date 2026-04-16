@@ -157,6 +157,46 @@ _Items from watson-qa-schlagziil agent_
 
 _Items from watson-qa-zaemesetzli agent_
 
+1. [ ] P1 - Silent failure on invalid combination — no error feedback
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Invalid Combinations — submitting a nonsense word for selected emojis
+   - Problem: When a user submits a word that does not match any valid compound for the selected emoji pair, the input field clears silently. No toast, no shake/error animation, no error text — the user has zero signal that their guess was rejected.
+   - Suggested fix: Show a brief error toast (e.g. "Nicht gefunden 🚫") or apply a shake animation + red border on the input on invalid submission. Mirror the feedback pattern used in Buchstäbli's error toast.
+   - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (submit handler), `src/components/shared/Toast.tsx`
+   - Evidence: Submitted "Haussonnen" for 🏠+☀️ pair. Input cleared, score unchanged (2/28), found list unchanged (2/16), no console errors, no visual change. Observed 2026-04-16.
+
+2. [ ] P1 - "Teilen" button provides no user feedback
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Combination Flow — clicking share mid-game
+   - Problem: Clicking "Teilen" while the game is in progress produces no visible result — no toast saying "Kopiert!", no share sheet, no animation. It is unclear if anything was copied to clipboard or if the action failed silently.
+   - Suggested fix: Show a "Kopiert! 📋" toast on clipboard copy success, and a fallback error toast if navigator.share / clipboard API fails. The Verbindige ShareButton already does this pattern — reuse it.
+   - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`, `src/components/shared/ShareButton.tsx`
+   - Evidence: Clicked "Teilen" at 2/16 found, 1/28 Pkt. Page state unchanged, no console output, no toast or modal. Observed 2026-04-16.
+
+3. [ ] P1 - Hint deducts a point but does not auto-select the hinted emojis
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Combination Flow — using the Tipp button with a different emoji pair active
+   - Problem: Clicking "💡 Tipp (-1 Pkt)" shows a tooltip like "Tipp: 🏠 + 🔑 = ?" and deducts 1 point, but the currently selected emoji pair in the combine slots is unchanged (was 🏠+☀️, stayed 🏠+☀️). The user paid a point for a hint but must manually deselect and reselect to use it.
+   - Suggested fix: When a hint is triggered, auto-update the combine slots to show the hinted emoji pair: clear current selection, then programmatically select the two hinted emojis. Optionally add a pulse highlight on those emoji tiles.
+   - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint handler logic)
+   - Evidence: Had 🏠+☀️ in slots. Clicked Tipp. Tooltip showed "🏠 + 🔑 = ?", score dropped 2→1, but slots still showed 🏠+☀️. Observed 2026-04-16.
+
+4. [ ] P2 - No success animation or celebration on correct compound
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Combination Flow — submitting a valid compound word
+   - Problem: After a correct answer (e.g. "Haustür"), the input clears and the word appears in the "Gefunden" list, but there is no immediate visual celebration: no toast, no color flash, no emoji animation. The feedback is purely textual and easy to miss.
+   - Suggested fix: Show a brief success toast (e.g. "✅ Haustür gefunden! +1 Pkt") that auto-dismisses after 1.5s, and/or a pulse animation on the newly added found-list row.
+   - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`, `src/components/shared/Toast.tsx`
+   - Evidence: Submitted "Haustür" → found list row appeared, score ticked to 1/28 Pkt. No toast or animation observed in screenshot taken immediately after submit. Observed 2026-04-16.
+
+5. [ ] P2 - No onboarding explaining the two-step mechanic
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: First Play — arriving at the game with no prior knowledge
+   - Problem: The only instruction is subtitle "Kombiniere Emojis zu deutschen Wörtern". The game has a two-step mechanic: (1) tap emojis to fill combine slots, then (2) type the German compound word. Step 2 is non-obvious — new players may expect clicking emojis to auto-reveal the answer. The placeholder "Wähle 2-3 Emojis..." does not hint that typing is required.
+   - Suggested fix: Add a dismissible "Wie geht's?" info modal on first visit (localStorage-gated) with 3 steps: tap emojis → type the word → submit. Alternatively, add a persistent one-liner below the combine area: "Emojis wählen, Wort eintippen, abschicken!"
+   - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`
+   - Evidence: Page loads with only subtitle as instruction. First click on emoji selected it in slot but revealed no next-step guidance. Placeholder changes to "Zusammengesetztes Wort..." only after 2 emojis are selected — too late. Observed 2026-04-16.
+
 ---
 
 ## Code Review Escalations
