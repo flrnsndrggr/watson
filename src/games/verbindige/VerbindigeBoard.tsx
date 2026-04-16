@@ -11,16 +11,19 @@ export function VerbindigeBoard() {
     status,
     toggleItem,
     lastGuessResult,
+    lastWrongItems,
     clearLastResult,
+    clearWrongItems,
   } = useVerbindige();
 
   const [wrongItems, setWrongItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (lastGuessResult === 'wrong' || lastGuessResult === 'one-away') {
-      setWrongItems(new Set(selected.map((s) => s.text)));
+      setWrongItems(new Set(lastWrongItems.map((s) => s.text)));
       const timer = setTimeout(() => {
         setWrongItems(new Set());
+        clearWrongItems();
         clearLastResult();
       }, 500);
       return () => clearTimeout(timer);
@@ -29,7 +32,7 @@ export function VerbindigeBoard() {
       const timer = setTimeout(() => clearLastResult(), 300);
       return () => clearTimeout(timer);
     }
-  }, [lastGuessResult, selected, clearLastResult]);
+  }, [lastGuessResult, lastWrongItems, clearLastResult, clearWrongItems]);
 
   const isPlaying = status === 'playing';
 

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle } from '@/types';
 import { SAMPLE_VERBINDIGE } from './verbindige.data';
+import { showToast } from '@/components/shared/Toast';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -15,12 +16,14 @@ interface VerbindigeState {
   status: 'loading' | 'playing' | 'won' | 'lost';
   remainingItems: VerbindigeItem[];
   lastGuessResult: 'correct' | 'wrong' | 'one-away' | null;
+  lastWrongItems: VerbindigeItem[];
 
   loadPuzzle: () => void;
   toggleItem: (item: VerbindigeItem) => void;
   clearSelection: () => void;
   submitGuess: () => void;
   clearLastResult: () => void;
+  clearWrongItems: () => void;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -41,6 +44,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   status: 'loading',
   remainingItems: [],
   lastGuessResult: null,
+  lastWrongItems: [],
 
   loadPuzzle: () => {
     const puzzle = SAMPLE_VERBINDIGE;
@@ -62,6 +66,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   clearSelection: () => set({ selected: [] }),
 
   clearLastResult: () => set({ lastGuessResult: null }),
+  clearWrongItems: () => set({ lastWrongItems: [] }),
 
   submitGuess: () => {
     const { selected, puzzle, solvedGroups, mistakes, maxMistakes, remainingItems } = get();
@@ -102,11 +107,17 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
 
       const newMistakes = mistakes + 1;
       const lost = newMistakes >= maxMistakes;
+      const result = isOneAway ? 'one-away' : 'wrong';
+
+      if (result === 'one-away') {
+        showToast('Fast! Nur 1 falsch.');
+      }
 
       set({
         mistakes: newMistakes,
         selected: [],
-        lastGuessResult: isOneAway ? 'one-away' : 'wrong',
+        lastWrongItems: selected,
+        lastGuessResult: result,
         status: lost ? 'lost' : 'playing',
       });
 

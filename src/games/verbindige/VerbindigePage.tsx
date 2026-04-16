@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
-import { showToast } from '@/components/shared/Toast';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
@@ -17,18 +16,11 @@ export function VerbindigePage() {
     clearSelection,
     mistakes,
     maxMistakes,
-    lastGuessResult,
   } = useVerbindige();
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
-
-  useEffect(() => {
-    if (lastGuessResult === 'one-away') {
-      showToast('Fast! Nur 1 falsch.');
-    }
-  }, [lastGuessResult]);
 
   useEffect(() => {
     if (status === 'won') {

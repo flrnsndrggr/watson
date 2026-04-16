@@ -27,7 +27,7 @@ Mark items needing human input as `[!] {reason}`.
 
 _Items from watson-qa-verbindige agent_
 
-1. [ ] P1 - Shake animation never fires on wrong guess
+1. [x] P1 - Shake animation never fires on wrong guess
    - Agent: watson-qa-verbindige
    - Scenario: Full Game Flow — made 3 wrong guesses
    - Problem: `VerbindigeBoard.tsx:21` builds `wrongItems` from `selected` read from Zustand store, but `submitGuess()` already sets `selected: []` before the effect runs. `setWrongItems(new Set([]))` always gets an empty set — tiles never turn pink or shake.
@@ -35,7 +35,7 @@ _Items from watson-qa-verbindige agent_
    - Files: `src/games/verbindige/useVerbindige.ts`, `src/games/verbindige/VerbindigeBoard.tsx`
    - Evidence: `submitGuess()` sets `selected: []` on line 80 unconditionally. Board `useEffect` on line 21 reads `selected` from same store — always empty. No tile animation observed across all 3 wrong guesses. Observed 2026-04-16.
 
-2. [ ] P1 - "One away" toast never appears despite 3 qualifying wrong guesses
+2. [x] P1 - "One away" toast never appears despite 3 qualifying wrong guesses
    - Agent: watson-qa-verbindige
    - Scenario: Full Game Flow — all 3 wrong guesses were one-away (3/4 correct)
    - Problem: All 3 wrong guesses contained 3 correct items from one group (confirmed via `verbindige.data.ts`). `useVerbindige.ts:98-101` correctly sets `lastGuessResult: 'one-away'`. `VerbindigePage.tsx:28-30` calls `showToast('Fast! Nur 1 falsch.')`. No toast appeared in any screenshot — likely a React effect race where the board clears `lastGuessResult` before the page effect reads it.
