@@ -27,6 +27,38 @@ Mark items needing human input as `[!] {reason}`.
 
 _Items from watson-qa-verbindige agent_
 
+1. [ ] P1 - Shake animation never fires on wrong guess
+   - Agent: watson-qa-verbindige
+   - Scenario: Full Game Flow — made 3 wrong guesses
+   - Problem: `VerbindigeBoard.tsx:21` builds `wrongItems` from `selected` read from Zustand store, but `submitGuess()` already sets `selected: []` before the effect runs. `setWrongItems(new Set([]))` always gets an empty set — tiles never turn pink or shake.
+   - Suggested fix: Capture selected items inside `submitGuess()` before clearing them, store as a separate `lastWrongItems` state field. Read that in the board effect instead of `selected`.
+   - Files: `src/games/verbindige/useVerbindige.ts`, `src/games/verbindige/VerbindigeBoard.tsx`
+   - Evidence: `submitGuess()` sets `selected: []` on line 80 unconditionally. Board `useEffect` on line 21 reads `selected` from same store — always empty. No tile animation observed across all 3 wrong guesses. Observed 2026-04-16.
+
+2. [ ] P1 - "One away" toast never appears despite 3 qualifying wrong guesses
+   - Agent: watson-qa-verbindige
+   - Scenario: Full Game Flow — all 3 wrong guesses were one-away (3/4 correct)
+   - Problem: All 3 wrong guesses contained 3 correct items from one group (confirmed via `verbindige.data.ts`). `useVerbindige.ts:98-101` correctly sets `lastGuessResult: 'one-away'`. `VerbindigePage.tsx:28-30` calls `showToast('Fast! Nur 1 falsch.')`. No toast appeared in any screenshot — likely a React effect race where the board clears `lastGuessResult` before the page effect reads it.
+   - Suggested fix: Move toast logic into the store action (call `showToast` inside `submitGuess`) to avoid effect race. Alternatively add a small delay before `clearLastResult()` when result is 'one-away'.
+   - Files: `src/games/verbindige/VerbindigeBoard.tsx`, `src/games/verbindige/VerbindigePage.tsx`, `src/games/verbindige/useVerbindige.ts`
+   - Evidence: Guess 1 Tschumpel/Tubel/Güxi/Löli → 3/4 Dummkopf. Guess 2 Töffli/Velo/Trottinett/Tscholi → 3/4 Fortbewegung. Guess 3 same+Sürmel → 3/4 Fortbewegung. No toast visible in any post-guess screenshot. Observed 2026-04-16.
+
+3. [ ] P2 - Puzzle identifier inconsistent: header shows #001, result shows #2026-04-16
+   - Agent: watson-qa-verbindige
+   - Scenario: Full Game Flow — result screen after winning
+   - Problem: Game header displays "Verbindige #001" (hardcoded `puzzleNumber={1}` in `VerbindigePage.tsx:46`). Result footer displays "Verbindige #2026-04-16" (using `puzzle.date` in `VerbindigeResult.tsx:38`). A user comparing their shared result to the header would see two different identifiers.
+   - Suggested fix: Standardise on one identifier. Derive a puzzle number from the date or use the date consistently everywhere. Update `GameHeader` to accept a `puzzleId: string` prop.
+   - Files: `src/games/verbindige/VerbindigePage.tsx`, `src/games/verbindige/VerbindigeResult.tsx`, `src/components/shared/GameHeader.tsx`
+   - Evidence: Header rendered "Verbindige #001"; result panel rendered "Verbindige #2026-04-16". Observed 2026-04-16.
+
+4. [ ] P2 - No first-time onboarding or how-to-play
+   - Agent: watson-qa-verbindige
+   - Scenario: Full Game Flow — first load with no prior knowledge
+   - Problem: The only instruction visible is subtitle "Finde 4 Gruppen à 4". No how-to-play modal, tooltip, or example. A new player cannot tell that 4 tiles must be selected before submitting, that wrong guesses have a limit of 4, or that tiles deselect on second tap.
+   - Suggested fix: Add a dismissible "?" info modal explaining rules in 3 bullet points. Gate it with `localStorage` to only show on first visit.
+   - Files: `src/games/verbindige/VerbindigePage.tsx`
+   - Evidence: No `<dialog>`, modal, or tooltip found in DOM. Only on-screen instruction is the subtitle. Observed 2026-04-16.
+
 ---
 
 ## Buchstäbli QA Findings
