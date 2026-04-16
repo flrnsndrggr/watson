@@ -33,7 +33,7 @@ _Items from watson-qa-verbindige agent_
 
 _Items from watson-qa-buchstaebli agent_
 
-1. [ ] P0 - Route `/buchstaebli` does not exist — blank white screen
+1. [x] P0 - Route `/buchstaebli` does not exist — blank white screen
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — navigate directly to https://games-watson.netlify.app/buchstaebli
    - Problem: The route `/buchstaebli` is not registered in the React Router config. Navigating to it produces a blank white page with no content or error message shown to the user.
@@ -41,7 +41,7 @@ _Items from watson-qa-buchstaebli agent_
    - Files: `src/App.tsx` (or router config), `src/games/buchstaebli/`
    - Evidence: Console warning "No routes matched location '/buchstaebli'" (React Router). Page renders empty white body. Observed 2026-04-16.
 
-2. [ ] P1 - Buchstäbli absent from landing page nav and game card list
+2. [x] P1 - Buchstäbli absent from landing page nav and game card list
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — navigating from landing page to discover games
    - Problem: The landing page shows Verbindige, Zämesetzli and Schlagziil as clickable game cards. The nav bar also links only to those three games. Buchstäbli has no card and no nav entry, so a real user can never discover it from the homepage.

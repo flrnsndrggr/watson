@@ -11,18 +11,25 @@ const GAMES = [
     color: 'var(--color-cyan)',
   },
   {
+    path: '/buchstaebli',
+    name: 'Buchstäbli',
+    emoji: '🐝',
+    description: 'Bilde Wörter aus 7 Buchstaben. Mundart-Bonus!',
+    color: 'var(--color-pink)',
+  },
+  {
     path: '/zaemesetzli',
     name: 'Zämesetzli',
     emoji: '🧩',
     description: 'Kombiniere Emojis zu zusammengesetzten Wörtern. Mundart-Bonus!',
-    color: 'var(--color-pink)',
+    color: 'var(--color-green)',
   },
   {
     path: '/schlagziil',
     name: 'Schlagziil',
     emoji: '📰',
     description: 'Errate die fehlenden Wörter in watson-Schlagzeilen.',
-    color: 'var(--color-green)',
+    color: 'var(--color-cyan)',
   },
 ];
 
