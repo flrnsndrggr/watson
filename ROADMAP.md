@@ -111,6 +111,46 @@ _Items from watson-qa-buchstaebli agent_
 
 _Items from watson-qa-schlagziil agent_
 
+1. [ ] P1 - Revealed answers show normalized non-German strings
+   - Agent: watson-qa-schlagziil
+   - Scenario: Error Counting — game-over after 3 total errors on headline 1
+   - Problem: When an answer is revealed (game-over), `revealedAnswers[i]` is set to `DEMO_ANSWERS[i][0]` which is the lowercase normalized form. `HeadlineCard` only uppercases the first character. Result: "Missstaende" instead of "Missstände", "Ubs" instead of "UBS", "Co2-gesetz" instead of "CO2-Gesetz".
+   - Suggested fix: Add a `display_answer` field alongside `DEMO_ANSWERS` for each headline holding the canonical display-ready string. Use that in `revealedAnswers` instead of the normalized key.
+   - Files: `src/games/schlagziil/schlagziil.data.ts`, `src/games/schlagziil/useSchlagziil.ts`
+   - Evidence: Results screen showed "Missstaende", "Ubs", "Co2-gesetz" live in production. Observed 2026-04-16.
+
+2. [ ] P1 - No visual feedback for wrong guesses below error limit
+   - Agent: watson-qa-schlagziil
+   - Scenario: Answer Validation — submitting wrong answers with totalErrors < 3
+   - Problem: After a wrong guess, `results[currentIndex]` stays `null` so the HeadlineCard border stays neutral. `lastGuessResult: 'wrong'` is set in the store but `SchlagziilPage` only reads `lastGuessResult` for the correct-answer auto-advance timer — it never triggers a red flash, shake, or toast. The user sees the input clear with no feedback beyond the error dot filling.
+   - Suggested fix: In `SchlagziilPage`, add a `useEffect` on `lastGuessResult === 'wrong'` to show a toast ("Falsch!") or pass a `wrongFlash` prop to `HeadlineCard` for a brief red-border animation.
+   - Files: `src/games/schlagziil/SchlagziilPage.tsx`, `src/games/schlagziil/HeadlineCard.tsx`
+   - Evidence: Submitted two wrong guesses — input cleared each time with no card colour change, no toast, only error dots updated. Confirmed via Zustand state: `totalErrors: 2, results: [null,null,null,null,null], lastGuessResult: 'wrong'`. Observed 2026-04-16.
+
+3. [ ] P1 - Share CTA text differs from brand spec ("Kennst du watson?" vs "Ich lese watson, und du?")
+   - Agent: watson-qa-schlagziil
+   - Scenario: Results Screen — share button
+   - Problem: `SchlagziilResult.tsx` passes `"Kennst du watson?"` as the CTA line in the share text. The expected brand CTA is "Ich lese watson, und du?".
+   - Suggested fix: Change the resultLines string from `"Kennst du watson?"` to `"Ich lese watson, und du?"`.
+   - Files: `src/games/schlagziil/SchlagziilResult.tsx`
+   - Evidence: Page text at game-over contained "Kennst du watson?". Observed 2026-04-16.
+
+4. [ ] P1 - Share link appends non-existent watson.ch URL
+   - Agent: watson-qa-schlagziil
+   - Scenario: Results Screen — share button
+   - Problem: `generateShareText` appends `watson.ch/spiele/schlagziil` to every share text. That URL does not exist — the game lives at `games-watson.netlify.app/schlagziil`. Anyone who taps the link in a shared message hits a 404.
+   - Suggested fix: Update `share.ts` to use the real base URL (env variable `VITE_SITE_URL` or hardcoded production domain).
+   - Files: `src/lib/share.ts`
+   - Evidence: Share text footer reads `watson.ch/spiele/schlagziil`. Same bug affects all games sharing via this util. Observed 2026-04-16.
+
+5. [ ] P2 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
+   - Agent: watson-qa-schlagziil
+   - Scenario: Article Links — results screen after game-over
+   - Problem: All 5 headlines in `SAMPLE_SCHLAGZIIL` have stub `article_url` values (`/energie/123`, `/migration/456`, etc.). Clicking "watson-Artikel lesen →" leads to a 404, breaking the core value prop of reading the real article after guessing.
+   - Suggested fix: Replace stub URLs with real watson.ch article URLs for each headline before launch.
+   - Files: `src/games/schlagziil/schlagziil.data.ts`
+   - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
+
 ---
 
 ## Zämesetzli QA Findings
