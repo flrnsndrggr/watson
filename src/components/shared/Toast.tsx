@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 interface ToastMessage {
   id: number;
   text: string;
+  fading?: boolean;
 }
 
 let toastId = 0;
@@ -20,8 +21,11 @@ export function ToastContainer() {
     const handler = (msg: ToastMessage) => {
       setToasts((prev) => [...prev, msg]);
       setTimeout(() => {
+        setToasts((prev) => prev.map((t) => t.id === msg.id ? { ...t, fading: true } : t));
+      }, 2500);
+      setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== msg.id));
-      }, 2000);
+      }, 3000);
     };
     listeners.add(handler);
     return () => { listeners.delete(handler); };
@@ -32,7 +36,11 @@ export function ToastContainer() {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="pointer-events-auto rounded bg-[var(--color-nav-bg)] px-4 py-2 text-sm font-semibold text-white animate-[popIn_var(--transition-normal)]"
+          className={`pointer-events-auto rounded bg-[var(--color-nav-bg)] px-4 py-2 text-sm font-semibold text-white ${
+            t.fading
+              ? 'animate-[fadeOut_500ms_ease-in_forwards]'
+              : 'animate-[popIn_var(--transition-normal)]'
+          }`}
         >
           {t.text}
         </div>
