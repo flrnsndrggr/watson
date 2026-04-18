@@ -7,6 +7,7 @@ import { generateShareText } from '@/lib/share';
 import { HexGrid } from './HexGrid';
 import { RankBar } from './RankBar';
 import { useBuchstaebli } from './useBuchstaebli';
+import confetti from 'canvas-confetti';
 
 const RESULT_MESSAGES: Record<string, string> = {
   'too-short': 'Mindestens 4 Buchstaben',
@@ -18,6 +19,13 @@ const RESULT_MESSAGES: Record<string, string> = {
   'mundart': 'Mundart-Bonus! 2× Punkte 🇨🇭',
 };
 
+const RANK_UP_MESSAGES: Record<string, string> = {
+  lehrling: 'Aufstieg: Lehrling!',
+  geselle: 'Aufstieg: Geselle!',
+  meister: 'Aufstieg: Meister!',
+  bundesrat: 'Bundesrat erreicht!',
+};
+
 export function BuchstaebliPage() {
   const {
     loadPuzzle,
@@ -26,6 +34,7 @@ export function BuchstaebliPage() {
     foundWords,
     score,
     currentRank,
+    lastRankUp,
     outerLetters,
     lastResult,
     addLetter,
@@ -34,6 +43,7 @@ export function BuchstaebliPage() {
     shuffleLetters,
     submitWord,
     clearLastResult,
+    clearRankUp,
   } = useBuchstaebli();
 
   useEffect(() => {
@@ -50,6 +60,22 @@ export function BuchstaebliPage() {
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
   }, [lastResult, puzzle, clearLastResult]);
+
+  // Rank-up celebration
+  useEffect(() => {
+    if (!lastRankUp) return;
+    const msg = RANK_UP_MESSAGES[lastRankUp];
+    if (msg) {
+      // Delay rank-up toast slightly so it doesn't collide with word-found toast
+      const timer = setTimeout(() => showToast(msg), 400);
+      if (lastRankUp === 'bundesrat') {
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+      }
+      const cleanup = setTimeout(clearRankUp, 2500);
+      return () => { clearTimeout(timer); clearTimeout(cleanup); };
+    }
+    clearRankUp();
+  }, [lastRankUp, clearRankUp]);
 
   // Keyboard support
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -86,6 +112,7 @@ export function BuchstaebliPage() {
         score={score}
         maxScore={puzzle.max_score}
         thresholds={puzzle.rank_thresholds}
+        rankUpRank={lastRankUp}
       />
 
       <HexGrid
