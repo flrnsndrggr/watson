@@ -7,7 +7,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /** Returns today's date in YYYY-MM-DD format (Europe/Zurich timezone). */
-function getTodayDateCET(): string {
+export function getTodayDateCET(): string {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
 }
 

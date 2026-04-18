@@ -4,8 +4,10 @@ import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
+import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
+import { useDailyReset } from '@/lib/useDailyReset';
 import { RankBar } from '@/games/buchstaebli/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
@@ -37,6 +39,8 @@ export function ZaemesetzliPage() {
     useHint,
     clearLastResult,
   } = useZaemesetzli();
+
+  const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   useEffect(() => {
     loadPuzzle();
@@ -71,6 +75,7 @@ export function ZaemesetzliPage() {
 
   return (
     <GameShell>
+      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" />
 
       <RankBar

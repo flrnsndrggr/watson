@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
+import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { showToast } from '@/components/shared/Toast';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { generateShareText } from '@/lib/share';
+import { useDailyReset } from '@/lib/useDailyReset';
 import { HexGrid } from './HexGrid';
 import { RankBar } from './RankBar';
 import { useBuchstaebli } from './useBuchstaebli';
@@ -36,6 +38,8 @@ export function BuchstaebliPage() {
     submitWord,
     clearLastResult,
   } = useBuchstaebli();
+
+  const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   const [shufflePhase, setShufflePhase] = useState<'out' | 'in' | null>(null);
   const shuffleTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -102,6 +106,7 @@ export function BuchstaebliPage() {
 
   return (
     <GameShell>
+      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader title="Buchstäbli" puzzleNumber={1} />
 
       <RankBar

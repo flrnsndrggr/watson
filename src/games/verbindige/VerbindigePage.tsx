@@ -3,6 +3,8 @@ import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
+import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { useDailyReset } from '@/lib/useDailyReset';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
@@ -10,6 +12,7 @@ import { useVerbindige } from './useVerbindige';
 export function VerbindigePage() {
   const {
     loadPuzzle,
+    puzzle,
     status,
     selected,
     submitGuess,
@@ -17,6 +20,8 @@ export function VerbindigePage() {
     mistakes,
     maxMistakes,
   } = useVerbindige();
+
+  const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   useEffect(() => {
     loadPuzzle();
@@ -36,6 +41,7 @@ export function VerbindigePage() {
 
   return (
     <GameShell>
+      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Verbindige"
         puzzleNumber={1}

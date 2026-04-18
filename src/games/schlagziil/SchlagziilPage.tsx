@@ -3,6 +3,8 @@ import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
+import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { useDailyReset } from '@/lib/useDailyReset';
 import { HeadlineCard } from './HeadlineCard';
 import { SchlagziilResult } from './SchlagziilResult';
 import { useSchlagziil } from './useSchlagziil';
@@ -24,6 +26,8 @@ export function SchlagziilPage() {
     useHint,
   } = useSchlagziil();
 
+  const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
+
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
@@ -42,6 +46,7 @@ export function SchlagziilPage() {
 
   return (
     <GameShell>
+      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Schlagziil"
         puzzleNumber={1}
