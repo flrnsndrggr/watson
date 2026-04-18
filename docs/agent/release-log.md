@@ -1,5 +1,23 @@
 # Release Log
 
+## Release — 2026-04-18 20:15
+
+- Commits: b7fffbe..70ae58f
+- Netlify deploy: skipped (MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP not available)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
+
+### Notable commits
+- b20c579 fix: render rank threshold tick marks on RankBar progress bar
+- b1dbfd3 triage: buchstäbli QA findings from word nerd scenario
+- 70ae58f scripts: add launchd agent to regenerate dashboard HTML every 30s
+
+---
+
 ## Release — 2026-04-18 16:45
 
 - Commits: 044d701..b7fffbe
@@ -38,5 +56,5 @@ routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
 ## Last Verified
-- Commit: b7fffbe
+- Commit: 70ae58f
 - Date: 2026-04-18
