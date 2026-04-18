@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fs.claude-scheduler.watson-dashboard</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/fs/Code/game-watson/scripts/scheduler/dashboard.py</string>
+        <string>--html</string>
+        <string>/tmp/watson-scheduler-dashboard.html</string>
+    </array>
+    <!-- Regenerates the HTML dashboard every 30s; the HTML itself has <meta refresh 30> so the browser picks up new state without manual reloads. -->
+    <key>StartInterval</key>
+    <integer>30</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-dashboard/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-dashboard/launchd.err.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/fs/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/fs</string>
+        <key>LANG</key>
+        <string>en_US.UTF-8</string>
+        <key>LC_ALL</key>
+        <string>en_US.UTF-8</string>
+        <key>PYTHONIOENCODING</key>
+        <string>utf-8</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/fs/Code/game-watson</string>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
