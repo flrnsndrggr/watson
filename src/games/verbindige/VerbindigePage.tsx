@@ -6,7 +6,6 @@ import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
-import confetti from 'canvas-confetti';
 
 export function VerbindigePage() {
   const {
@@ -25,7 +24,9 @@ export function VerbindigePage() {
 
   useEffect(() => {
     if (status === 'won') {
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+      import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+      });
     }
   }, [status]);
 

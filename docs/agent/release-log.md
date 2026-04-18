@@ -1,5 +1,24 @@
 # Release Log
 
+## Release — 2026-04-18 16:45
+
+- Commits: 044d701..b7fffbe
+- Netlify deploy: skipped (MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP permission not granted)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
+
+### Notable commits
+- 6580a97 feat: rank-up celebrations with threshold markers on progress bar
+- 16fc3a5 polish: cap toast stack at 3 visible toasts
+- d1250ae feat: Supabase puzzle fetch with fallback to sample data
+- b7fffbe triage: deduplicate and clean up roadmap findings
+
+---
+
 ## Release — 2026-04-18 (initial verification)
 
 - Commits: d2de0ca..044d701 (first full verification, no prior baseline)
@@ -19,5 +38,5 @@ routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
 ## Last Verified
-- Commit: 044d701
+- Commit: b7fffbe
 - Date: 2026-04-18

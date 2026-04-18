@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Watson scheduler fleet dashboard — terminal + HTML.
+"""Watson Games Agent Team dashboard — terminal + HTML.
 
 Usage:
   dashboard.py                  # print terminal table
@@ -251,7 +251,7 @@ HTML_TEMPLATE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="30">
-<title>Watson scheduler fleet</title>
+<title>Watson Games Agent Team</title>
 <style>
   body { font: 14px -apple-system, system-ui, sans-serif; margin: 1.5rem; background: #0f1115; color: #e4e4e4; }
   h1 { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem; }
@@ -289,7 +289,7 @@ HTML_TEMPLATE = """<!doctype html>
 </style>
 </head>
 <body>
-<h1>Watson scheduler fleet</h1>
+<h1>Watson Games Agent Team</h1>
 <div class="meta">Generated __GENERATED__ · log dir: <code>__LOGS_ROOT__</code> · auto-refresh 30s</div>
 
 <h2>Fleet status</h2>

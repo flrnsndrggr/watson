@@ -32,6 +32,12 @@
         <string>/Users/fs/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
         <key>HOME</key>
         <string>/Users/fs</string>
+        <key>LANG</key>
+        <string>en_US.UTF-8</string>
+        <key>LC_ALL</key>
+        <string>en_US.UTF-8</string>
+        <key>PYTHONIOENCODING</key>
+        <string>utf-8</string>
     </dict>
     <key>WorkingDirectory</key>
     <string>/Users/fs/Code/game-watson-wt/main-shared</string>

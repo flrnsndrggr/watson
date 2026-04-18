@@ -28,6 +28,8 @@ Check deploy state:
 - `building`/`uploading`: Note "deploy in progress" and continue with current live version
 - `error`: ALERT — write P0 to ROADMAP.md and stop
 
+If the MCP is not available (permission denied, tool not loaded, etc.), record the Netlify check as `skipped` and degrade the overall verdict to UNKNOWN (see Step 5). Do not silently pretend the deploy is fine.
+
 ## Step 3: Smoke test production
 
 Use Chrome MCP:
@@ -48,10 +50,18 @@ Record results:
 - **DEGRADED**: Routes render but have console errors
 - **BROKEN**: One or more routes fail to render
 - **DOWN**: Site doesn't load at all
+- **UNKNOWN**: Browser MCP unavailable, or another required check skipped — HTTP 200 from `curl` is NOT enough to claim HEALTHY for an SPA (the server returns 200 even if the JS bundle is broken). `WebFetch` does not execute JS either and is not a substitute.
+
+If Chrome MCP is not available:
+- Fall back to `curl -sSf -o /dev/null -w "%{http_code}" <url>` for each route to at least confirm the server responds.
+- Record the JS-render and console checks as `skipped`.
+- The verdict becomes UNKNOWN (not HEALTHY), even if every route returns 200.
 
 ## Step 4: Check Supabase health
 
 Use `mcp__193c4c85-ef5f-4fb7-987d-79872f7a09e1__get_logs` with project_id `fosnshalcgwvatejpdok` and service `api` to check for recent errors.
+
+If the MCP is not available, record Supabase as `skipped` and degrade the verdict to UNKNOWN.
 
 ## Step 5: Write release log
 
@@ -61,24 +71,32 @@ Create/update `docs/agent/release-log.md`:
 ## Release — <YYYY-MM-DD HH:MM>
 
 - Commits: <sha-range>
-- Netlify deploy: <status>
-- Production health: <HEALTHY|DEGRADED|BROKEN|DOWN>
-- Console errors: <none | list>
-- Supabase: <healthy | errors found>
-- Routes checked: landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓, buchstaebli ✓/✗
+- Netlify deploy: <status | skipped: reason>
+- Production health: <HEALTHY|DEGRADED|BROKEN|DOWN|UNKNOWN>
+- Console errors: <none | list | skipped>
+- Supabase: <healthy | errors found | skipped>
+- Routes checked: landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓, buchstaebli ✓/✗ (note which were curl-only vs. JS-rendered)
+- Skipped checks: <list, with reason — e.g. "chrome MCP not granted", "netlify MCP not granted">
 
 ## Last Verified
 - Commit: <latest-sha>
 - Date: <YYYY-MM-DD>
 ```
 
-If BROKEN or DOWN, add P0 item to ROADMAP.md.
+Verdict rules (apply in order):
+1. If the site doesn't load at all → DOWN.
+2. If any route fails to render JS or throws a fatal error → BROKEN.
+3. If routes render but console has errors → DEGRADED.
+4. If any of {Netlify deploy, Chrome smoke, Supabase logs} was skipped → UNKNOWN.
+5. Otherwise → HEALTHY.
+
+If BROKEN or DOWN, add P0 item to ROADMAP.md. UNKNOWN does not warrant a P0 by itself, but note it in the log so the user can investigate missing permissions.
 
 ## Step 6: Commit
 
 Stage `docs/agent/release-log.md` (and ROADMAP.md if modified):
 ```
-release: verify deployment — {HEALTHY|DEGRADED|BROKEN|DOWN}
+release: verify deployment — {HEALTHY|DEGRADED|BROKEN|DOWN|UNKNOWN}
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 ```

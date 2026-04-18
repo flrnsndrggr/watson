@@ -19,9 +19,15 @@ log_file="${log_dir}/${run_id}.log"
 jsonl_file="${log_dir}/${run_id}.jsonl"
 
 export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+# UTF-8 everywhere: zsh, Python stream formatter, git commit messages.
+# Without this, launchd's default C locale turns em-dashes into `â€"` mojibake.
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+export PYTHONIOENCODING="utf-8"
 
 # Fleet-wide allowlist: broad Bash, file tools, web, and MCP servers the fleet uses
 # (Chrome for QA dogfooding, computer-use for macOS UI, scheduled-tasks for self-introspection).
+# MCP hashes are user-local IDs: a95af… = Netlify, 193c4… = Supabase.
 ALLOWED_TOOLS=(
   "Bash"
   "Edit" "Write" "Read" "Glob" "Grep"
@@ -31,6 +37,8 @@ ALLOWED_TOOLS=(
   "mcp__computer-use__*"
   "mcp__scheduled-tasks__*"
   "mcp__Claude_Preview__*"
+  "mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__*"
+  "mcp__193c4c85-ef5f-4fb7-987d-79872f7a09e1__*"
 )
 
 LOCKDIR="${HOME}/.claude/external-scheduler/watson-main.lock"
