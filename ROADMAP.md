@@ -206,6 +206,30 @@ _Items from watson-qa-schlagziil agent_
    - Files: `src/games/schlagziil/HeadlineCard.tsx`, `src/games/schlagziil/SchlagziilPage.tsx`
    - Evidence: Clicked "Tipp anzeigen" on headline 1 (2026/Solarenergie). Screenshots of headlines 2 (2025), 3 (2023), 4 (2021), 5 (2024) all showed hint text immediately without any click. `hintsUsed` Zustand state tracked only the intentional click correctly (💡 shown only for 2026 in final score), confirming the bug is isolated to local component state. Observed 2026-04-18.
 
+7. [ ] P2 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
+   - Agent: watson-qa-schlagziil
+   - Scenario: Mobile Input — page load on 390px viewport
+   - Problem: `HeadlineCard.tsx:122` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.
+   - Suggested fix: Remove `autoFocus` from the input. On desktop it can be re-added via a `useEffect` with `inputRef.focus()` guarded by `window.innerWidth > 768` or a media-query check.
+   - Files: `src/games/schlagziil/HeadlineCard.tsx` (line 122)
+   - Evidence: `autoFocus` attribute confirmed in source. Standard browser behaviour on iOS/Android: `autoFocus` on an `<input>` opens the soft keyboard on mount. Observed 2026-04-18.
+
+8. [ ] P2 - Buchstäbli absent from `PostGameSection` `ALL_GAMES` — never cross-promoted
+   - Agent: watson-qa-schlagziil
+   - Scenario: Results Screen — "Noch mehr zum Spielen" section after completing all 5 headlines
+   - Problem: `PostGameSection.tsx:3-28` defines `ALL_GAMES` with only three entries (verbindige, zaemesetzli, schlagziil). Buchstäbli is not in the list. The TypeScript prop type `PostGameSectionProps.currentGame` is typed as `'verbindige' | 'zaemesetzli' | 'schlagziil'` — Buchstäbli as a `currentGame` would be a compile error. Buchstäbli is never shown as a cross-promo suggestion after any game. Different surface from Buchstäbli finding #7 (nav bar) and Buchstäbli finding #2 (landing page card).
+   - Suggested fix: Add a Buchstäbli entry to `ALL_GAMES` and extend the `currentGame` union type to include `'buchstaebli'`. Update call sites in each game's result component.
+   - Files: `src/components/shared/PostGameSection.tsx` (lines 3-32)
+   - Evidence: `ALL_GAMES` array has 3 entries, no 'buchstaebli'. Results screen confirmed only Verbindige and Zämesetzli cards visible in "Noch mehr zum Spielen" after finishing Schlagziil. Observed 2026-04-18.
+
+9. [ ] P2 - Year line in results/share uses puzzle order, not chronological order
+   - Agent: watson-qa-schlagziil
+   - Scenario: Results Screen — completing all 5 headlines
+   - Problem: `SchlagziilResult.tsx:13-19` builds the year line by mapping `puzzle.headlines` in stored order. SAMPLE_SCHLAGZIIL stores headlines as 2026, 2025, 2023, 2021, 2024. The results panel and share text show "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — 2021 appears after 2023, breaking any readable timeline. A recipient reading a shared result cannot scan it as a chronology.
+   - Suggested fix: Sort entries by `article_year` before joining: map headlines+results to objects, sort ascending by year, then join. This decouples puzzle storage order from the user-facing output.
+   - Files: `src/games/schlagziil/SchlagziilResult.tsx` (lines 13-19)
+   - Evidence: Live results screen showed "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — out-of-order years confirmed by screenshot. Observed 2026-04-18.
+
 ---
 
 ## Zämesetzli QA Findings
