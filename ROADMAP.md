@@ -130,7 +130,7 @@ _Items from watson-qa-buchstaebli agent_
    - Files: `src/games/buchstaebli/BuchstaebliPage.tsx`, `src/games/buchstaebli/useBuchstaebli.ts`
    - Evidence: Submitted RATEN twice. Second submission: no fixed-position elements (toast container empty), wordCount unchanged at 1, score unchanged at 5/112 Pkt. Input cleared silently with zero user feedback. Observed 2026-04-18.
 
-7. [ ] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
+7. [x] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — navigating between games via the persistent nav bar
    - Problem: The nav bar on every page links only to Verbindige, Zämesetzli, and Schlagziil. Buchstäbli has no nav link. Issue #2 (landing page card) was marked resolved, but the nav entry was not added. A player on the Verbindige results screen has no way to navigate directly to Buchstäbli without going back to the landing page first.
