@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
+import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { showToast } from '@/components/shared/Toast';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { generateShareText } from '@/lib/share';
@@ -69,7 +70,7 @@ export function BuchstaebliPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  if (!puzzle) return null;
+  if (!puzzle) return <PuzzleLoading />;
 
   const shareText = generateShareText(
     'buchstaebli',

@@ -1,9 +1,15 @@
 import { create } from 'zustand';
 import type { SchlagziilPuzzle } from '@/types';
 import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS } from './schlagziil.data';
+import { fetchTodaysPuzzle } from '@/lib/supabase';
+
+interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
+  answers?: string[][];
+}
 
 interface SchlagziilState {
   puzzle: SchlagziilPuzzle | null;
+  answers: string[][];
   currentIndex: number;
   totalErrors: number;
   maxErrors: number;
@@ -13,7 +19,7 @@ interface SchlagziilState {
   status: 'loading' | 'playing' | 'finished';
   lastGuessResult: 'correct' | 'wrong' | null;
 
-  loadPuzzle: () => void;
+  loadPuzzle: () => Promise<void>;
   submitGuess: (guess: string) => void;
   advanceToNext: () => void;
   useHint: (index: number) => void;
@@ -51,6 +57,7 @@ function levenshtein(a: string, b: string): number {
 
 export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   puzzle: null,
+  answers: [],
   currentIndex: 0,
   totalErrors: 0,
   maxErrors: 3,
@@ -60,10 +67,14 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   status: 'loading',
   lastGuessResult: null,
 
-  loadPuzzle: () => {
-    const puzzle = SAMPLE_SCHLAGZIIL;
+  loadPuzzle: async () => {
+    set({ status: 'loading' });
+    const fetched = await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
+    const puzzle: SchlagziilPuzzle = fetched ?? SAMPLE_SCHLAGZIIL;
+    const answers = fetched?.answers ?? DEMO_ANSWERS;
     set({
       puzzle,
+      answers,
       currentIndex: 0,
       totalErrors: 0,
       results: Array(puzzle.headlines.length).fill(null),
@@ -81,8 +92,8 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   },
 
   submitGuess: (guess: string) => {
-    const { currentIndex, totalErrors, maxErrors, results, revealedAnswers } = get();
-    const answers = DEMO_ANSWERS[currentIndex];
+    const { currentIndex, totalErrors, maxErrors, results, revealedAnswers, answers: allAnswers } = get();
+    const answers = allAnswers[currentIndex];
     if (!answers) return;
 
     const normalizedGuess = normalize(guess);
@@ -107,7 +118,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         for (let i = currentIndex; i < newResults.length; i++) {
           if (newResults[i] === null) {
             newResults[i] = 'wrong';
-            newRevealed[i] = DEMO_ANSWERS[i]?.[0] ?? '';
+            newRevealed[i] = allAnswers[i]?.[0] ?? '';
           }
         }
         set({

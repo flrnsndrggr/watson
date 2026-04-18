@@ -3,6 +3,7 @@ import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
+import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
 import { RankBar } from '@/games/buchstaebli/RankBar';
@@ -60,7 +61,7 @@ export function ZaemesetzliPage() {
     else showToast('Alle Wörter gefunden!');
   }
 
-  if (!puzzle) return null;
+  if (!puzzle) return <PuzzleLoading />;
 
   const shareText = generateShareText(
     'zaemesetzli',

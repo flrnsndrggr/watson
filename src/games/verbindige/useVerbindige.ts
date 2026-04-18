@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle } from '@/types';
 import { SAMPLE_VERBINDIGE } from './verbindige.data';
+import { fetchTodaysPuzzle } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
 
 interface SolvedGroup extends VerbindigeGroup {
@@ -14,11 +15,12 @@ interface VerbindigeState {
   mistakes: number;
   maxMistakes: number;
   status: 'loading' | 'playing' | 'won' | 'lost';
+  error: string | null;
   remainingItems: VerbindigeItem[];
   lastGuessResult: 'correct' | 'wrong' | 'one-away' | null;
   lastWrongItems: VerbindigeItem[];
 
-  loadPuzzle: () => void;
+  loadPuzzle: () => Promise<void>;
   toggleItem: (item: VerbindigeItem) => void;
   clearSelection: () => void;
   submitGuess: () => void;
@@ -42,12 +44,15 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   mistakes: 0,
   maxMistakes: 4,
   status: 'loading',
+  error: null,
   remainingItems: [],
   lastGuessResult: null,
   lastWrongItems: [],
 
-  loadPuzzle: () => {
-    const puzzle = SAMPLE_VERBINDIGE;
+  loadPuzzle: async () => {
+    set({ status: 'loading', error: null });
+    const fetched = await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
+    const puzzle = fetched ?? SAMPLE_VERBINDIGE;
     const allItems = shuffleArray(puzzle.groups.flatMap((g) => g.items));
     set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0 });
   },

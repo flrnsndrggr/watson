@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
+import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
@@ -27,6 +28,8 @@ export function VerbindigePage() {
       confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     }
   }, [status]);
+
+  if (status === 'loading') return <PuzzleLoading />;
 
   const isPlaying = status === 'playing';
 

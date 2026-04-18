@@ -116,6 +116,6 @@ export interface StreakData {
 
 // ===== Game State =====
 
-export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil';
+export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil' | 'buchstaebli';
 
 export type GameStatus = 'loading' | 'playing' | 'won' | 'lost';

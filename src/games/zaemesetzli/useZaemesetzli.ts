@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { ZaemesetzliPuzzle, Rank, CompoundWord } from '@/types';
-import { SAMPLE_ZAEMESETZLI, DEMO_COMPOUND_MAP } from './zaemesetzli.data';
+import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
+import { fetchTodaysPuzzle } from '@/lib/supabase';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -16,7 +17,7 @@ interface ZaemesetzliState {
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
 
-  loadPuzzle: () => void;
+  loadPuzzle: () => Promise<void>;
   selectEmoji: (emoji: string) => void;
   clearEmojiSelection: () => void;
   setInput: (input: string) => void;
@@ -43,9 +44,11 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   hintsUsed: 0,
   lastResult: null,
 
-  loadPuzzle: () => {
+  loadPuzzle: async () => {
+    const fetched = await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
+    const puzzle = fetched ?? SAMPLE_ZAEMESETZLI;
     set({
-      puzzle: SAMPLE_ZAEMESETZLI,
+      puzzle,
       selectedEmojis: [],
       currentInput: '',
       foundWords: [],
@@ -80,8 +83,8 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       return;
     }
 
-    // Check against demo compounds
-    const compound = DEMO_COMPOUND_MAP.get(word);
+    // Check against puzzle compounds
+    const compound = puzzle.valid_compounds.find((c) => c.word.toLowerCase() === word);
 
     if (!compound) {
       set({ lastResult: 'invalid', currentInput: '' });

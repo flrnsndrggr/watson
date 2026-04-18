@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { BuchstaebliPuzzle, Rank } from '@/types';
 import { SAMPLE_BUCHSTAEBLI, DEMO_VALID_WORDS } from './buchstaebli.data';
+import { fetchTodaysPuzzle } from '@/lib/supabase';
 
 interface FoundWord {
   word: string;
@@ -18,7 +19,7 @@ interface BuchstaebliState {
   outerLetters: string[];
   lastResult: 'valid' | 'pangram' | 'mundart' | 'already-found' | 'too-short' | 'not-valid' | 'missing-center' | null;
 
-  loadPuzzle: () => void;
+  loadPuzzle: () => Promise<void>;
   addLetter: (letter: string) => void;
   deleteLetter: () => void;
   clearInput: () => void;
@@ -53,8 +54,9 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
   outerLetters: [],
   lastResult: null,
 
-  loadPuzzle: () => {
-    const puzzle = SAMPLE_BUCHSTAEBLI;
+  loadPuzzle: async () => {
+    const fetched = await fetchTodaysPuzzle<BuchstaebliPuzzle>('buchstaebli');
+    const puzzle = fetched ?? SAMPLE_BUCHSTAEBLI;
     set({
       puzzle,
       outerLetters: [...puzzle.outer_letters],

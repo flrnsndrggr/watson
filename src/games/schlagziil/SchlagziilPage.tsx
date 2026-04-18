@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
+import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { HeadlineCard } from './HeadlineCard';
 import { SchlagziilResult } from './SchlagziilResult';
 import { useSchlagziil } from './useSchlagziil';
@@ -34,7 +35,7 @@ export function SchlagziilPage() {
     }
   }, [lastGuessResult, advanceToNext]);
 
-  if (!puzzle) return null;
+  if (!puzzle) return <PuzzleLoading />;
 
   const headline = puzzle.headlines[currentIndex];
   const isFinished = status === 'finished';

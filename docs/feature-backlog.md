@@ -5,7 +5,7 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 ## Priority: High (Core Game Loop)
 
 - [x] Buchstäbli route: add `/buchstaebli` route to App.tsx (currently only Verbindige, Zämesetzli, Schlagziil are routed) — done 2026-04-16
-- [ ] Supabase puzzle fetch: replace hardcoded `.data.ts` files with live Supabase queries for today's puzzle
+- [x] Supabase puzzle fetch: replace hardcoded `.data.ts` files with live Supabase queries for today's puzzle — done 2026-04-18
 - [ ] Daily puzzle reset: implement midnight CET rollover — show "new puzzle available" if cached puzzle is stale
 - [ ] Game completion state: persist completed state per puzzle per day in localStorage (prevent replaying same puzzle)
 - [ ] Share card generation: implement `generateShareText()` per game with proper emoji grids and watson.ch URL
