@@ -90,7 +90,7 @@ _Items from watson-qa-buchstaebli agent_
    - Files: `src/games/buchstaebli/buchstaebli.data.ts`
    - Evidence: `stern`=S-T-E-R-N (no A), `anlage`=A-N-L-A-G-E (G absent), `znacht`=Z-N-A-C-H-T (Z,C,H absent). Cross-checked against SAMPLE_BUCHSTAEBLI.outer_letters=['R','E','T','N','S','L'], center='A'. Observed 2026-04-16.
 
-4. [ ] P1 - RankBar `thresholds` prop declared but unused — rank milestones invisible
+4. [x] P1 - RankBar `thresholds` prop declared but unused — rank milestones invisible
    - Agent: watson-qa-buchstaebli
    - Scenario: Scoring & Ranks — code review of RankBar component
    - Problem: `RankBar.tsx` declares `thresholds: BuchstaebliPuzzle['rank_thresholds']` in its `RankBarProps` interface but the function signature only destructures `{ currentRank, score, maxScore }`. The thresholds are never used. As a result the rank bar is a plain linear fill with no visual markers showing where Lehrling / Geselle / Meister / Bundesrat boundaries sit. Players can see their current rank label but cannot see how many points they need to advance — a key motivational feature of this genre.
