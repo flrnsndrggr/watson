@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
@@ -17,9 +17,23 @@ export function VerbindigePage() {
     selected,
     submitGuess,
     clearSelection,
+    shuffleRemaining,
     mistakes,
     maxMistakes,
   } = useVerbindige();
+
+  const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
+
+  const handleShuffle = useCallback(() => {
+    if (shufflePhase !== 'idle') return;
+    clearSelection();
+    setShufflePhase('out');
+    setTimeout(() => {
+      shuffleRemaining();
+      setShufflePhase('in');
+      setTimeout(() => setShufflePhase('idle'), 300);
+    }, 300);
+  }, [shufflePhase, clearSelection, shuffleRemaining]);
 
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
@@ -48,12 +62,19 @@ export function VerbindigePage() {
         subtitle="Finde 4 Gruppen à 4"
       />
 
-      <VerbindigeBoard />
+      <VerbindigeBoard shufflePhase={shufflePhase} />
 
       {isPlaying && (
         <div className="mt-4 flex items-center justify-between">
           <ErrorDots total={maxMistakes} used={mistakes} />
           <div className="flex gap-2">
+            <button
+              onClick={handleShuffle}
+              disabled={shufflePhase !== 'idle'}
+              className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-black)] transition-opacity hover:opacity-80 disabled:opacity-40"
+            >
+              Mischen
+            </button>
             <button
               onClick={clearSelection}
               disabled={selected.length === 0}

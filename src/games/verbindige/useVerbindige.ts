@@ -22,6 +22,7 @@ interface VerbindigeState {
 
   loadPuzzle: () => Promise<void>;
   toggleItem: (item: VerbindigeItem) => void;
+  shuffleRemaining: () => void;
   clearSelection: () => void;
   submitGuess: () => void;
   clearLastResult: () => void;
@@ -66,6 +67,11 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     } else if (selected.length < 4) {
       set({ selected: [...selected, item] });
     }
+  },
+
+  shuffleRemaining: () => {
+    const { remainingItems } = get();
+    set({ remainingItems: shuffleArray(remainingItems) });
   },
 
   clearSelection: () => set({ selected: [] }),

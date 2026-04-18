@@ -3,7 +3,11 @@ import { VerbindigeTile } from './VerbindigeTile';
 import { SolvedGroup } from './SolvedGroup';
 import { useEffect, useState } from 'react';
 
-export function VerbindigeBoard() {
+interface VerbindigeBoardProps {
+  shufflePhase?: 'idle' | 'out' | 'in';
+}
+
+export function VerbindigeBoard({ shufflePhase = 'idle' }: VerbindigeBoardProps) {
   const {
     remainingItems,
     selected,
@@ -48,7 +52,7 @@ export function VerbindigeBoard() {
       {/* Remaining items grid */}
       {remainingItems.length > 0 && (
         <div className="grid grid-cols-4 gap-[var(--game-tile-gap)]">
-          {remainingItems.map((item) => (
+          {remainingItems.map((item, index) => (
             <VerbindigeTile
               key={item.text}
               item={item}
@@ -56,6 +60,8 @@ export function VerbindigeBoard() {
               isWrong={wrongItems.has(item.text)}
               onToggle={() => toggleItem(item)}
               disabled={!isPlaying}
+              shufflePhase={shufflePhase}
+              index={index}
             />
           ))}
         </div>
