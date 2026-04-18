@@ -81,6 +81,16 @@
   to { opacity: 0; transform: translateY(-8px); }
 }
 
+@keyframes shuffleOut {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: scale(0) rotate(120deg); opacity: 0; }
+}
+
+@keyframes shuffleIn {
+  0% { transform: scale(0) rotate(-120deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
 /* ===== BASE STYLES ===== */
 
 body {

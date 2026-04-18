@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
@@ -37,6 +37,9 @@ export function BuchstaebliPage() {
     clearLastResult,
   } = useBuchstaebli();
 
+  const [shufflePhase, setShufflePhase] = useState<'out' | 'in' | null>(null);
+  const shuffleTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
@@ -51,6 +54,25 @@ export function BuchstaebliPage() {
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
   }, [lastResult, puzzle, clearLastResult]);
+
+  // Animated shuffle: out → swap letters → in
+  const handleShuffle = useCallback(() => {
+    if (shufflePhase) return; // prevent double-clicks during animation
+    setShufflePhase('out');
+    shuffleTimerRef.current = setTimeout(() => {
+      shuffleLetters();
+      setShufflePhase('in');
+      shuffleTimerRef.current = setTimeout(() => {
+        setShufflePhase(null);
+      }, 380); // 200ms animation + 6×30ms max stagger
+    }, 380);
+  }, [shufflePhase, shuffleLetters]);
+
+  useEffect(() => {
+    return () => {
+      if (shuffleTimerRef.current) clearTimeout(shuffleTimerRef.current);
+    };
+  }, []);
 
   // Keyboard support
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -93,6 +115,7 @@ export function BuchstaebliPage() {
         centerLetter={puzzle.center_letter}
         outerLetters={outerLetters}
         onLetterClick={addLetter}
+        shufflePhase={shufflePhase}
       />
 
       {/* Input display */}
@@ -103,8 +126,9 @@ export function BuchstaebliPage() {
       {/* Action buttons */}
       <div className="mt-3 flex justify-center gap-3">
         <button
-          onClick={shuffleLetters}
-          className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80"
+          onClick={handleShuffle}
+          disabled={shufflePhase !== null}
+          className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
         >
           Mischen
         </button>
