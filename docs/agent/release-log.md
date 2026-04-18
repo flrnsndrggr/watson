@@ -1,5 +1,24 @@
 # Release Log
 
+## Release — 2026-04-18 23:50
+
+- Commits: 70ae58f..621b2d4
+- Netlify deploy: skipped (MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP not available)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
+
+### Notable commits
+- eeef223 triage: verbindige QA findings from share flow scenario
+- d74bb67 triage: schlagziil QA findings from news reader scenario
+- 4d6d3bc triage: zaemesetzli QA findings and harden skill push instructions
+- 621b2d4 polish: fix share text format — add Buchstäbli label/emoji, use puzzle dates
+
+---
+
 ## Release — 2026-04-18 20:15
 
 - Commits: b7fffbe..70ae58f
@@ -56,5 +75,5 @@ routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
 ## Last Verified
-- Commit: 70ae58f
+- Commit: 621b2d4
 - Date: 2026-04-18
