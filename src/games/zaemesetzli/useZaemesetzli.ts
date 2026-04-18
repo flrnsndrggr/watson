@@ -13,7 +13,6 @@ interface ZaemesetzliState {
   foundWords: FoundCompound[];
   score: number;
   currentRank: Rank;
-  lastRankUp: Rank | null;
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
 
@@ -24,7 +23,6 @@ interface ZaemesetzliState {
   submitWord: () => void;
   useHint: () => string | null;
   clearLastResult: () => void;
-  clearRankUp: () => void;
 }
 
 function getRank(score: number, thresholds: ZaemesetzliPuzzle['rank_thresholds']): Rank {
@@ -42,7 +40,6 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   foundWords: [],
   score: 0,
   currentRank: 'stift',
-  lastRankUp: null,
   hintsUsed: 0,
   lastResult: null,
 
@@ -54,7 +51,6 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       foundWords: [],
       score: 0,
       currentRank: 'stift',
-      lastRankUp: null,
       hintsUsed: 0,
     });
   },
@@ -71,7 +67,6 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   setInput: (input) => set({ currentInput: input }),
 
   clearLastResult: () => set({ lastResult: null }),
-  clearRankUp: () => set({ lastRankUp: null }),
 
   submitWord: () => {
     const { currentInput, selectedEmojis, foundWords, score, puzzle } = get();
@@ -105,15 +100,12 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
     const newFound: FoundCompound = { ...compound, foundAt: Date.now() };
     const newScore = score + compound.points;
-    const { currentRank } = get();
     const newRank = getRank(newScore, puzzle.rank_thresholds);
-    const didRankUp = newRank !== currentRank;
 
     set({
       foundWords: [...foundWords, newFound],
       score: newScore,
       currentRank: newRank,
-      lastRankUp: didRankUp ? newRank : null,
       currentInput: '',
       selectedEmojis: [],
       lastResult: compound.is_mundart ? 'mundart' : 'valid',

@@ -15,7 +15,6 @@ interface BuchstaebliState {
   foundWords: FoundWord[];
   score: number;
   currentRank: Rank;
-  lastRankUp: Rank | null;
   outerLetters: string[];
   lastResult: 'valid' | 'pangram' | 'mundart' | 'already-found' | 'too-short' | 'not-valid' | 'missing-center' | null;
 
@@ -26,7 +25,6 @@ interface BuchstaebliState {
   shuffleLetters: () => void;
   submitWord: () => void;
   clearLastResult: () => void;
-  clearRankUp: () => void;
 }
 
 function getRank(score: number, thresholds: BuchstaebliPuzzle['rank_thresholds']): Rank {
@@ -52,7 +50,6 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
   foundWords: [],
   score: 0,
   currentRank: 'stift',
-  lastRankUp: null,
   outerLetters: [],
   lastResult: null,
 
@@ -65,7 +62,6 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
       foundWords: [],
       score: 0,
       currentRank: 'stift',
-      lastRankUp: null,
     });
   },
 
@@ -84,7 +80,6 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
   },
 
   clearLastResult: () => set({ lastResult: null }),
-  clearRankUp: () => set({ lastRankUp: null }),
 
   submitWord: () => {
     const { currentInput, puzzle, foundWords, score } = get();
@@ -116,15 +111,12 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
 
     const newFound: FoundWord = { word, ...result };
     const newScore = score + result.points;
-    const { currentRank } = get();
     const newRank = getRank(newScore, puzzle.rank_thresholds);
-    const didRankUp = newRank !== currentRank;
 
     set({
       foundWords: [...foundWords, newFound],
       score: newScore,
       currentRank: newRank,
-      lastRankUp: didRankUp ? newRank : null,
       currentInput: '',
       lastResult: result.is_pangram ? 'pangram' : result.is_mundart ? 'mundart' : 'valid',
     });

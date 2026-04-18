@@ -9,7 +9,6 @@ import { RankBar } from '@/games/buchstaebli/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
 import { useZaemesetzli } from './useZaemesetzli';
-import confetti from 'canvas-confetti';
 
 const RESULT_MESSAGES: Record<string, string> = {
   'valid': '',
@@ -18,13 +17,6 @@ const RESULT_MESSAGES: Record<string, string> = {
   'invalid': 'Kein gültiges Wort',
   'already-found': 'Schon gefunden!',
   'wrong-emojis': 'Stimmt, aber andere Emojis!',
-};
-
-const RANK_UP_MESSAGES: Record<string, string> = {
-  lehrling: 'Aufstieg: Lehrling!',
-  geselle: 'Aufstieg: Geselle!',
-  meister: 'Aufstieg: Meister!',
-  bundesrat: 'Bundesrat erreicht!',
 };
 
 export function ZaemesetzliPage() {
@@ -36,7 +28,6 @@ export function ZaemesetzliPage() {
     foundWords,
     score,
     currentRank,
-    lastRankUp,
     lastResult,
     selectEmoji,
     clearEmojiSelection,
@@ -44,7 +35,6 @@ export function ZaemesetzliPage() {
     submitWord,
     useHint,
     clearLastResult,
-    clearRankUp,
   } = useZaemesetzli();
 
   useEffect(() => {
@@ -58,21 +48,6 @@ export function ZaemesetzliPage() {
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
   }, [lastResult, clearLastResult]);
-
-  // Rank-up celebration
-  useEffect(() => {
-    if (!lastRankUp) return;
-    const msg = RANK_UP_MESSAGES[lastRankUp];
-    if (msg) {
-      const timer = setTimeout(() => showToast(msg), 400);
-      if (lastRankUp === 'bundesrat') {
-        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
-      }
-      const cleanup = setTimeout(clearRankUp, 2500);
-      return () => { clearTimeout(timer); clearTimeout(cleanup); };
-    }
-    clearRankUp();
-  }, [lastRankUp, clearRankUp]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -102,7 +77,6 @@ export function ZaemesetzliPage() {
         score={score}
         maxScore={puzzle.max_score}
         thresholds={puzzle.rank_thresholds}
-        rankUpRank={lastRankUp}
       />
 
       {/* Emoji pool */}

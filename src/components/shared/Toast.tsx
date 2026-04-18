@@ -14,12 +14,21 @@ export function showToast(text: string) {
   listeners.forEach((fn) => fn(msg));
 }
 
+const MAX_VISIBLE_TOASTS = 3;
+
 export function ToastContainer() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   useEffect(() => {
     const handler = (msg: ToastMessage) => {
-      setToasts((prev) => [...prev, msg]);
+      setToasts((prev) => {
+        const next = [...prev, msg];
+        // Evict oldest non-fading toasts when exceeding max
+        if (next.length > MAX_VISIBLE_TOASTS) {
+          return next.slice(-MAX_VISIBLE_TOASTS);
+        }
+        return next;
+      });
       setTimeout(() => {
         setToasts((prev) => prev.map((t) => t.id === msg.id ? { ...t, fading: true } : t));
       }, 2500);

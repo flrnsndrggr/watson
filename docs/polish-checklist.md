@@ -5,7 +5,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 ## Shared Components
 
 - [x] Toast notifications: add auto-dismiss after 3s with fade-out animation (2026-04-16)
-- [ ] Toast: ensure toast stacks if multiple fire (e.g., "Schon gefunden!" then "Mundart-Bonus!")
+- [x] Toast: ensure toast stacks if multiple fire (e.g., "Schon gefunden!" then "Mundart-Bonus!") (2026-04-18)
 - [ ] ShareButton: verify share text format matches spec for each game (emoji grid, score, URL)
 - [ ] ShareButton: add Web Share API integration for mobile (navigator.share fallback to clipboard)
 - [ ] GameShell: add `prefers-reduced-motion` media query — disable confetti, use opacity instead of transforms
