@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { showToast } from '@/components/shared/Toast';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { HeadlineCard } from './HeadlineCard';
 import { SchlagziilResult } from './SchlagziilResult';
@@ -27,17 +28,53 @@ export function SchlagziilPage() {
   } = useSchlagziil();
 
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
+  const [shaking, setShaking] = useState(false);
+  const prevStatus = useRef(status);
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
 
+  // Handle guess results: toasts, shake, auto-advance
   useEffect(() => {
     if (lastGuessResult === 'correct') {
+      showToast('Richtig! ✓');
       const timer = setTimeout(advanceToNext, 2000);
       return () => clearTimeout(timer);
     }
-  }, [lastGuessResult, advanceToNext]);
+
+    if (lastGuessResult === 'wrong') {
+      // Shake the card
+      setShaking(true);
+      const shakeTimer = setTimeout(() => setShaking(false), 400);
+
+      if (totalErrors >= maxErrors) {
+        showToast('Keine Versuche mehr!');
+      } else {
+        const remaining = maxErrors - totalErrors;
+        showToast(
+          remaining === 1
+            ? 'Falsch! Noch 1 Versuch übrig.'
+            : `Falsch! Noch ${remaining} Versuche.`,
+        );
+      }
+
+      return () => clearTimeout(shakeTimer);
+    }
+  }, [lastGuessResult, advanceToNext, totalErrors, maxErrors]);
+
+  // Confetti on good finish (4+ correct)
+  useEffect(() => {
+    if (status === 'finished' && prevStatus.current !== 'finished') {
+      const correctCount = results.filter((r) => r === 'correct').length;
+      if (correctCount >= 4) {
+        import('canvas-confetti').then(({ default: confetti }) => {
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        });
+      }
+    }
+    prevStatus.current = status;
+  }, [status, results]);
 
   if (!puzzle) return <PuzzleLoading />;
 
@@ -90,6 +127,7 @@ export function SchlagziilPage() {
             disabled={results[currentIndex] !== null}
             hintUsed={hintsUsed[currentIndex]}
             onUseHint={() => useHint(currentIndex)}
+            shaking={shaking}
           />
         </>
       )}
