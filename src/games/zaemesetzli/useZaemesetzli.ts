@@ -2,9 +2,17 @@ import { create } from 'zustand';
 import type { ZaemesetzliPuzzle, Rank, CompoundWord } from '@/types';
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { saveGameState, loadGameState } from '@/lib/gameStorage';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
+}
+
+interface ZaemesetzliSavedState {
+  foundWords: FoundCompound[];
+  score: number;
+  currentRank: Rank;
+  hintsUsed: number;
 }
 
 interface ZaemesetzliState {
@@ -47,6 +55,22 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   loadPuzzle: async () => {
     const fetched = await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
     const puzzle = fetched ?? SAMPLE_ZAEMESETZLI;
+
+    // Restore progress if already played today
+    const saved = loadGameState<ZaemesetzliSavedState>('zaemesetzli', puzzle.date);
+    if (saved && saved.foundWords.length > 0) {
+      set({
+        puzzle,
+        selectedEmojis: [],
+        currentInput: '',
+        foundWords: saved.foundWords,
+        score: saved.score,
+        currentRank: saved.currentRank,
+        hintsUsed: saved.hintsUsed,
+      });
+      return;
+    }
+
     set({
       puzzle,
       selectedEmojis: [],
@@ -102,16 +126,24 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     }
 
     const newFound: FoundCompound = { ...compound, foundAt: Date.now() };
+    const newFoundWords = [...foundWords, newFound];
     const newScore = score + compound.points;
     const newRank = getRank(newScore, puzzle.rank_thresholds);
 
     set({
-      foundWords: [...foundWords, newFound],
+      foundWords: newFoundWords,
       score: newScore,
       currentRank: newRank,
       currentInput: '',
       selectedEmojis: [],
       lastResult: compound.is_mundart ? 'mundart' : 'valid',
+    });
+
+    saveGameState<ZaemesetzliSavedState>('zaemesetzli', puzzle.date, {
+      foundWords: newFoundWords,
+      score: newScore,
+      currentRank: newRank,
+      hintsUsed: get().hintsUsed,
     });
   },
 

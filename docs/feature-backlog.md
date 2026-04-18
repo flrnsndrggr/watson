@@ -6,7 +6,7 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 
 - [x] Supabase puzzle fetch: replace hardcoded `.data.ts` files with live Supabase queries for today's puzzle — done 2026-04-18
 - [x] Daily puzzle reset: implement midnight CET rollover — show "new puzzle available" if cached puzzle is stale — done 2026-04-18
-- [ ] Game completion state: persist completed state per puzzle per day in localStorage (prevent replaying same puzzle)
+- [x] Game completion state: persist completed state per puzzle per day in localStorage (prevent replaying same puzzle) — done 2026-04-19
 - [ ] Share card generation: implement `generateShareText()` per game with proper emoji grids and watson.ch URL
 - [ ] Verbindige share: emoji grid format (colored squares for solve order)
 - [ ] Schlagziil share: accuracy grid (green/red squares) + "Ich lese watson, und du?"

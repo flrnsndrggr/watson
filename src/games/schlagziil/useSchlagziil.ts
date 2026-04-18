@@ -2,9 +2,17 @@ import { create } from 'zustand';
 import type { SchlagziilPuzzle } from '@/types';
 import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS } from './schlagziil.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { saveGameState, loadGameState } from '@/lib/gameStorage';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
+}
+
+interface SchlagziilSavedState {
+  results: ('correct' | 'wrong' | null)[];
+  revealedAnswers: (string | null)[];
+  totalErrors: number;
+  hintsUsed: boolean[];
 }
 
 interface SchlagziilState {
@@ -72,6 +80,23 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     const fetched = await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
     const puzzle: SchlagziilPuzzle = fetched ?? SAMPLE_SCHLAGZIIL;
     const answers = fetched?.answers ?? DEMO_ANSWERS;
+
+    // Restore completed state if already played today
+    const saved = loadGameState<SchlagziilSavedState>('schlagziil', puzzle.date);
+    if (saved && saved.results.every((r) => r !== null)) {
+      set({
+        puzzle,
+        answers,
+        currentIndex: puzzle.headlines.length - 1,
+        totalErrors: saved.totalErrors,
+        results: saved.results,
+        revealedAnswers: saved.revealedAnswers,
+        hintsUsed: saved.hintsUsed,
+        status: 'finished',
+      });
+      return;
+    }
+
     set({
       puzzle,
       answers,
@@ -128,6 +153,15 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           status: 'finished',
           lastGuessResult: 'wrong',
         });
+        const { puzzle } = get();
+        if (puzzle) {
+          saveGameState<SchlagziilSavedState>('schlagziil', puzzle.date, {
+            results: newResults,
+            revealedAnswers: newRevealed,
+            totalErrors: newErrors,
+            hintsUsed: get().hintsUsed,
+          });
+        }
       } else {
         set({ totalErrors: newErrors, lastGuessResult: 'wrong' });
       }
@@ -135,11 +169,17 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   },
 
   advanceToNext: () => {
-    const { currentIndex, puzzle, results } = get();
+    const { currentIndex, puzzle, results, totalErrors, revealedAnswers, hintsUsed } = get();
     if (!puzzle) return;
     const nextIndex = currentIndex + 1;
     if (nextIndex >= puzzle.headlines.length || results.every((r) => r !== null)) {
       set({ status: 'finished' });
+      saveGameState<SchlagziilSavedState>('schlagziil', puzzle.date, {
+        results,
+        revealedAnswers,
+        totalErrors,
+        hintsUsed,
+      });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
     }

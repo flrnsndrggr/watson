@@ -3,9 +3,16 @@ import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle } from '@/types'
 import { SAMPLE_VERBINDIGE } from './verbindige.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
+import { saveGameState, loadGameState } from '@/lib/gameStorage';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
+}
+
+interface VerbindigeSavedState {
+  status: 'won' | 'lost';
+  mistakes: number;
+  solvedGroups: SolvedGroup[];
 }
 
 interface VerbindigeState {
@@ -54,6 +61,21 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     set({ status: 'loading', error: null });
     const fetched = await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
     const puzzle = fetched ?? SAMPLE_VERBINDIGE;
+
+    // Restore completed state if already played today
+    const saved = loadGameState<VerbindigeSavedState>('verbindige', puzzle.date);
+    if (saved && (saved.status === 'won' || saved.status === 'lost')) {
+      set({
+        puzzle,
+        status: saved.status,
+        mistakes: saved.mistakes,
+        solvedGroups: saved.solvedGroups,
+        remainingItems: [],
+        selected: [],
+      });
+      return;
+    }
+
     const allItems = shuffleArray(puzzle.groups.flatMap((g) => g.items));
     set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0 });
   },
@@ -109,6 +131,14 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         lastGuessResult: 'correct',
         status: won ? 'won' : 'playing',
       });
+
+      if (won) {
+        saveGameState<VerbindigeSavedState>('verbindige', puzzle.date, {
+          status: 'won',
+          mistakes,
+          solvedGroups: newSolvedGroups,
+        });
+      }
     } else {
       // Check if "one away" — 3 out of 4 correct in any group
       const isOneAway = unsolvedGroups.some((g) => {
@@ -134,9 +164,15 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
 
       // If lost, reveal all groups
       if (lost) {
+        const revealedGroups = puzzle.groups.map((g, i) => ({ ...g, guessOrder: i }));
         set({
-          solvedGroups: puzzle.groups.map((g, i) => ({ ...g, guessOrder: i })),
+          solvedGroups: revealedGroups,
           remainingItems: [],
+        });
+        saveGameState<VerbindigeSavedState>('verbindige', puzzle.date, {
+          status: 'lost',
+          mistakes: newMistakes,
+          solvedGroups: revealedGroups,
         });
       }
     }
