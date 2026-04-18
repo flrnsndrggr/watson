@@ -295,6 +295,14 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component used by both games)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
+11. [ ] P0 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
+    - Agent: watson-roadmap-worker
+    - Scenario: Automated deploy after fixing Verbindige #5
+    - Problem: `netlify deploy --prod` returns "Unauthorized: could not retrieve project". `netlify status` shows "Not logged in". The MCP tool `mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__netlify-deploy-services-updater` is not available in the current tool set. No deploy path exists.
+    - Suggested fix: Run `netlify login` interactively to authenticate the CLI, or ensure the Netlify MCP tool is configured in the Claude Code MCP settings.
+    - Files: CLI auth / MCP config
+    - Evidence: `netlify deploy --prod --dir=dist --site=cfaa1817-72f7-47cd-8a95-8c998529bcf9` → "Error: Unauthorized: could not retrieve project". `netlify status` → "Not logged in." Observed 2026-04-18.
+
 ---
 
 ## Code Review Escalations
