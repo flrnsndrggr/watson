@@ -106,6 +106,30 @@ _Items from watson-qa-buchstaebli agent_
    - Files: `src/games/buchstaebli/BuchstaebliPage.tsx` (RESULT_MESSAGES constant)
    - Evidence: `RESULT_MESSAGES = { 'valid': '', ... }` + toast guard `if (RESULT_MESSAGES[lastResult])`. Observed 2026-04-16.
 
+6. [ ] P1 - No feedback when submitting an already-found word
+   - Agent: watson-qa-buchstaebli
+   - Scenario: Validation Responses — duplicate word submission
+   - Problem: When a player types and submits a word they have already found, nothing happens — no toast, no shake/flash animation, no visual change. The input clears silently. The player cannot tell whether their word was silently rejected as a duplicate or if the submit action failed entirely. All other error cases (too short, missing center letter, not in dictionary) show a toast; the duplicate case is the only blind spot.
+   - Suggested fix: Add a `'already_found'` result case with a toast like "Schon gefunden!" in `RESULT_MESSAGES`. Return that result from the submit handler when the word is already in `foundWords`.
+   - Files: `src/games/buchstaebli/BuchstaebliPage.tsx`, `src/games/buchstaebli/useBuchstaebli.ts`
+   - Evidence: Submitted RATEN twice. Second submission: no fixed-position elements (toast container empty), wordCount unchanged at 1, score unchanged at 5/112 Pkt. Input cleared silently with zero user feedback. Observed 2026-04-18.
+
+7. [ ] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
+   - Agent: watson-qa-buchstaebli
+   - Scenario: First Play — navigating between games via the persistent nav bar
+   - Problem: The nav bar on every page links only to Verbindige, Zämesetzli, and Schlagziil. Buchstäbli has no nav link. Issue #2 (landing page card) was marked resolved, but the nav entry was not added. A player on the Verbindige results screen has no way to navigate directly to Buchstäbli without going back to the landing page first.
+   - Suggested fix: Add a nav link `<Link to="/buchstaebli">Buchstäbli</Link>` in the nav component alongside the other three games.
+   - Files: `src/pages/Layout.tsx` (or whichever component renders the persistent nav)
+   - Evidence: Production nav links: Spiele, Verbindige, Zämesetzli, Schlagziil — Buchstäbli absent. Observed 2026-04-18.
+
+8. [ ] P2 - Heading renders "Buchstäbli#001" without a space before the puzzle number
+   - Agent: watson-qa-buchstaebli
+   - Scenario: First Play — visual inspection of the game header
+   - Problem: The `<h1>` text reads "Buchstäbli#001" with no whitespace between game name and puzzle number badge. The missing space makes the heading look like a concatenation bug and reduces readability at a glance.
+   - Suggested fix: Add a space before the `#001` span: `Buchstäbli <span>#{puzzleNumber}</span>`.
+   - Files: `src/games/buchstaebli/BuchstaebliPage.tsx` or `src/components/shared/GameHeader.tsx`
+   - Evidence: `document.querySelector('[role="heading"]').textContent === "Buchstäbli#001"` in production. Observed 2026-04-18.
+
 ---
 
 ## Schlagziil QA Findings
