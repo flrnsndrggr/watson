@@ -60,6 +60,22 @@ _Items from watson-qa-verbindige agent_
    - Evidence: No `<dialog>`, modal, or tooltip found in DOM. Only on-screen instruction is the subtitle. Observed 2026-04-16.
    - Related: Zämesetzli #5 — same onboarding gap pattern; consider a shared HowToPlay component
 
+5. [ ] P1 - Share text uses hardcoded puzzle number "#1" — third distinct puzzle identifier
+   - Agent: watson-qa-verbindige
+   - Scenario: Share Flow — completing a game and clicking Teilen
+   - Problem: `VerbindigeResult.tsx:23` calls `generateShareText('verbindige', 1, emojiGrid)` with a hardcoded literal `1`. The resulting share text reads "Verbindige #1 🇨🇭". This is a third distinct identifier for the same puzzle: the game header shows "Verbindige #001", the result footer shows "Verbindige #2026-04-16", and the share text shows "Verbindige #1". A recipient who taps a shared result and sees "#1" cannot match it to the header "#001" they see in the app.
+   - Suggested fix: Pass `puzzle.id` or a date-derived number consistently. Since finding #3 recommends standardising on one identifier across header and result footer, extend that fix to also update `VerbindigeResult.tsx:23` so all three surfaces use the same value.
+   - Files: `src/games/verbindige/VerbindigeResult.tsx` (line 23), `src/lib/share.ts`
+   - Evidence: Captured share text via clipboard interceptor: "Verbindige #1 🇨🇭\n🟨🟨🟨🟨\n🟩🟩🟩🟩\n🟦🟦🟦🟦\n🟪🟪🟪🟪\nwatson.ch/spiele/verbindige". Header on same page rendered "Verbindige #001". Result footer rendered "Verbindige #2026-04-16". Observed 2026-04-18.
+
+6. [ ] P2 - Share error propagates uncaught — silent failure when clipboard is denied
+   - Agent: watson-qa-verbindige
+   - Scenario: Share Flow — Teilen click when clipboard permission denied or document unfocused
+   - Problem: `share.ts:32` calls `navigator.clipboard.writeText(text)` with no try/catch. If it throws (e.g. `NotAllowedError: Document is not focused`, or clipboard permission denied), the rejection propagates to `ShareButton.handleShare()` which also has no catch. `setCopied(true)` (line 14) is never reached — the button label stays "Teilen" forever and no error toast appears. The user has zero indication that the share failed. Note: under normal usage the clipboard succeeds, but on permission-denied or after a cancelled `navigator.share` dialog, this path is reachable.
+   - Suggested fix: Wrap the `clipboard.writeText` call in try/catch in `share.ts`. On catch, either rethrow a typed error or return `false`. In `ShareButton.handleShare`, catch the error and show a fallback toast ("Teilen fehlgeschlagen").
+   - Files: `src/lib/share.ts` (line 32), `src/components/shared/ShareButton.tsx` (line 12-15)
+   - Evidence: Console log showed `NotAllowedError: Failed to execute 'writeText' on 'Clipboard': Document is not focused` thrown from `share.ts`. Post-click page read confirmed button label remained "Teilen" (not "Kopiert!"). Observed 2026-04-18.
+
 ---
 
 ## Buchstäbli QA Findings
