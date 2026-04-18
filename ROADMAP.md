@@ -58,6 +58,7 @@ _Items from watson-qa-verbindige agent_
    - Suggested fix: Add a dismissible "?" info modal explaining rules in 3 bullet points. Gate it with `localStorage` to only show on first visit.
    - Files: `src/games/verbindige/VerbindigePage.tsx`
    - Evidence: No `<dialog>`, modal, or tooltip found in DOM. Only on-screen instruction is the subtitle. Observed 2026-04-16.
+   - Related: Zämesetzli #5 — same onboarding gap pattern; consider a shared HowToPlay component
 
 ---
 
@@ -118,6 +119,7 @@ _Items from watson-qa-schlagziil agent_
    - Suggested fix: Add a `display_answer` field alongside `DEMO_ANSWERS` for each headline holding the canonical display-ready string. Use that in `revealedAnswers` instead of the normalized key.
    - Files: `src/games/schlagziil/schlagziil.data.ts`, `src/games/schlagziil/useSchlagziil.ts`
    - Evidence: Results screen showed "Missstaende", "Ubs", "Co2-gesetz" live in production. Observed 2026-04-16.
+   - Related: #2 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
 
 2. [ ] P1 - No visual feedback for wrong guesses below error limit
    - Agent: watson-qa-schlagziil
@@ -126,14 +128,17 @@ _Items from watson-qa-schlagziil agent_
    - Suggested fix: In `SchlagziilPage`, add a `useEffect` on `lastGuessResult === 'wrong'` to show a toast ("Falsch!") or pass a `wrongFlash` prop to `HeadlineCard` for a brief red-border animation.
    - Files: `src/games/schlagziil/SchlagziilPage.tsx`, `src/games/schlagziil/HeadlineCard.tsx`
    - Evidence: Submitted two wrong guesses — input cleared each time with no card colour change, no toast, only error dots updated. Confirmed via Zustand state: `totalErrors: 2, results: [null,null,null,null,null], lastGuessResult: 'wrong'`. Observed 2026-04-16.
+   - Related: #1 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
 
-3. [ ] P1 - Share CTA text differs from brand spec ("Kennst du watson?" vs "Ich lese watson, und du?")
+3. [ ] P2 - Share CTA text differs from brand spec ("Kennst du watson?" vs "Ich lese watson, und du?")
    - Agent: watson-qa-schlagziil
    - Scenario: Results Screen — share button
    - Problem: `SchlagziilResult.tsx` passes `"Kennst du watson?"` as the CTA line in the share text. The expected brand CTA is "Ich lese watson, und du?".
    - Suggested fix: Change the resultLines string from `"Kennst du watson?"` to `"Ich lese watson, und du?"`.
    - Files: `src/games/schlagziil/SchlagziilResult.tsx`
    - Evidence: Page text at game-over contained "Kennst du watson?". Observed 2026-04-16.
+   - Priority adjusted from P1 to P2: minor wording tweak, not a UX or gameplay issue
+   - Related: #4 — both are share-related issues on the Schlagziil result screen; consider fixing together
 
 4. [ ] P1 - Share link appends non-existent watson.ch URL
    - Agent: watson-qa-schlagziil
@@ -142,6 +147,7 @@ _Items from watson-qa-schlagziil agent_
    - Suggested fix: Update `share.ts` to use the real base URL (env variable `VITE_SITE_URL` or hardcoded production domain).
    - Files: `src/lib/share.ts`
    - Evidence: Share text footer reads `watson.ch/spiele/schlagziil`. Same bug affects all games sharing via this util. Observed 2026-04-16.
+   - Related: #3 — both are share-related issues on the Schlagziil result screen; consider fixing together
 
 5. [ ] P2 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
    - Agent: watson-qa-schlagziil
@@ -150,6 +156,7 @@ _Items from watson-qa-schlagziil agent_
    - Suggested fix: Replace stub URLs with real watson.ch article URLs for each headline before launch.
    - Files: `src/games/schlagziil/schlagziil.data.ts`
    - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
+   - Related: Schlagziil #4 — share URL also wrong; both need the correct production base URL
 
 ---
 
@@ -164,6 +171,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Suggested fix: Show a brief error toast (e.g. "Nicht gefunden 🚫") or apply a shake animation + red border on the input on invalid submission. Mirror the feedback pattern used in Buchstäbli's error toast.
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (submit handler), `src/components/shared/Toast.tsx`
    - Evidence: Submitted "Haussonnen" for 🏠+☀️ pair. Input cleared, score unchanged (2/28), found list unchanged (2/16), no console errors, no visual change. Observed 2026-04-16.
+   - Related: #4 — both are submission feedback issues in Zämesetzli (error + success); consider fixing together
 
 2. [ ] P1 - "Teilen" button provides no user feedback
    - Agent: watson-qa-zaemesetzli
@@ -188,6 +196,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Suggested fix: Show a brief success toast (e.g. "✅ Haustür gefunden! +1 Pkt") that auto-dismisses after 1.5s, and/or a pulse animation on the newly added found-list row.
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`, `src/components/shared/Toast.tsx`
    - Evidence: Submitted "Haustür" → found list row appeared, score ticked to 1/28 Pkt. No toast or animation observed in screenshot taken immediately after submit. Observed 2026-04-16.
+   - Related: #1 — both are submission feedback issues in Zämesetzli (error + success); consider fixing together
 
 5. [ ] P2 - No onboarding explaining the two-step mechanic
    - Agent: watson-qa-zaemesetzli
@@ -196,6 +205,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Suggested fix: Add a dismissible "Wie geht's?" info modal on first visit (localStorage-gated) with 3 steps: tap emojis → type the word → submit. Alternatively, add a persistent one-liner below the combine area: "Emojis wählen, Wort eintippen, abschicken!"
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`
    - Evidence: Page loads with only subtitle as instruction. First click on emoji selected it in slot but revealed no next-step guidance. Placeholder changes to "Zusammengesetztes Wort..." only after 2 emojis are selected — too late. Observed 2026-04-16.
+   - Related: Verbindige #4 — same onboarding gap pattern; consider a shared HowToPlay component
 
 ---
 
@@ -233,12 +243,13 @@ _Weekly architecture review findings from watson-architect_
    - Files: `src/games/verbindige/VerbindigeTile.tsx`, `src/games/buchstaebli/HexGrid.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
    - Related: #2 (keyboard navigation) — both are accessibility issues affecting the same files; consider fixing in one pass
 
-4. [ ] P1 - Create AdminBuchstaebli page and route
+4. [ ] P2 - Create AdminBuchstaebli page and route
    - Agent: watson-architect
    - Scenario: Cross-game consistency audit (2026-04-16)
    - Problem: All other games have admin pages (AdminVerbindige, AdminZaemesetzli, AdminSchlagziil) but Buchstaebli has none. No `/admin/buchstaebli` route in App.tsx.
    - Suggested fix: Create `src/pages/admin/AdminBuchstaebli.tsx` following `AdminZaemesetzli.tsx` pattern. Add route inside admin block in `src/App.tsx`.
    - Files: `src/pages/admin/AdminBuchstaebli.tsx` (create), `src/App.tsx`
+   - Priority adjusted from P1 to P2: internal tooling gap, not user-facing; players are unaffected
 
 ---
 
