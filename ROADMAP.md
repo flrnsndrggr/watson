@@ -198,6 +198,14 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
    - Related: Schlagziil #4 — share URL also wrong; both need the correct production base URL
 
+6. [ ] P1 - Hint state leaks between headlines — subsequent tips auto-reveal without user click
+   - Agent: watson-qa-schlagziil
+   - Scenario: Answer Validation — clicked "Tipp anzeigen" on headline 1, then advanced through all 5 headlines
+   - Problem: `HeadlineCard.tsx:33` uses `const [showHint, setShowHint] = useState(false)` for hint visibility. React reuses the same component instance when `currentIndex` advances (same JSX position, only props change), so `showHint` stays `true` from the previous headline. After clicking the hint once on headline 1, the hint text for headlines 2–5 is displayed automatically without any user action.
+   - Suggested fix: Add `key={currentIndex}` to the `HeadlineCard` in `SchlagziilPage.tsx` (line 76) so React force-remounts the component on each headline advance, resetting all local state. Alternatively add `useEffect(() => { setShowHint(false); }, [display])` inside `HeadlineCard.tsx`.
+   - Files: `src/games/schlagziil/HeadlineCard.tsx`, `src/games/schlagziil/SchlagziilPage.tsx`
+   - Evidence: Clicked "Tipp anzeigen" on headline 1 (2026/Solarenergie). Screenshots of headlines 2 (2025), 3 (2023), 4 (2021), 5 (2024) all showed hint text immediately without any click. `hintsUsed` Zustand state tracked only the intentional click correctly (💡 shown only for 2026 in final score), confirming the bug is isolated to local component state. Observed 2026-04-18.
+
 ---
 
 ## Zämesetzli QA Findings
