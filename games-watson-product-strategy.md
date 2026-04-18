@@ -46,7 +46,7 @@ watson.ch should leapfrog these generic white-label approaches. The opportunity 
 
 ## 2. Product Vision
 
-**games.watson.ch** is watson's daily play destination — three original games rooted in Swiss German culture, language, and watson's own news coverage. Free, ad-supported, mobile-first. One new puzzle per game per day. Streaks, sharing, leaderboards. The goal: make watson the first app opened in the morning, not just the first article scrolled past.
+**games.watson.ch** is watson's daily play destination — original games rooted in Swiss German culture, language, and watson's own news coverage. Free, ad-supported, mobile-first. One new puzzle per game per day. Streaks, sharing, leaderboards. The goal: make watson the first app opened in the morning, not just the first article scrolled past.
 
 **Tagline:** *"Spiel, aber deep."* (mirroring "News, aber deep.")
 
@@ -91,27 +91,7 @@ watson.ch's core: 14–34 year olds, Swiss German-speaking, mobile-first, left-l
 
 ---
 
-### Game 2: "Buchstäbli" — Swiss Word Hex
-
-**Concept:** 7 letters arranged in a hexagonal grid. Make as many German words as possible (minimum 4 letters). The center letter must be in every word. Find the "Pangram" (uses all 7 letters) for bonus points.
-
-**Watson twist:**
-- **Mundart-Bonus:** Swiss German dialect words (e.g., "Chuchichäschtli," "Rüebli," "Znüni") are accepted and earn 2× points. This rewards local knowledge and creates "aha!" moments.
-- **Daily theme hint:** a subtle thematic clue tied to the day's news or a Swiss cultural reference.
-- **Rank system with Swiss names:** instead of NYT's "Genius" you progress through "Stift → Lehrling → Geselle → Meister → Bundesrat."
-
-**Why it works:**
-- Spelling Bee is NYT's stickiest game (highest repeat play rate, longest sessions)
-- German compound words create natural depth — "Handschuh" from the same letters as "Schuh" and "Hand"
-- Swiss dialect layer is a genuine innovation, not a skin
-- Very high time-on-site (avg. 8–12 min for Spelling Bee-type games)
-- Can be localized for watson.ch/fr with French in a later phase
-
-**Dictionary:** Duden German + curated Swiss German word list (start with ~2,000 validated Mundart entries, expand via community submissions).
-
----
-
-### Game 3: "Schlagziil" — The Headline Game
+### Game 2: "Schlagziil" — The Headline Game
 
 **Concept:** 5 real watson.ch headlines from the past 7 days. Each headline has one key word blanked out. Guess all 5. You get 3 wrong guesses total across all 5 headlines.
 
@@ -187,7 +167,7 @@ Every game interaction is a first-party data event. The strategy:
 
 ### Earned Distribution First
 
-- **Social sharing mechanics** built into every game: emoji-grid results (Verbindige), score badges (Buchstäbli), headline accuracy (Schlagziil). Designed for WhatsApp, Instagram Stories, and TikTok screenshots.
+- **Social sharing mechanics** built into every game: emoji-grid results (Verbindige), headline accuracy (Schlagziil). Designed for WhatsApp, Instagram Stories, and TikTok screenshots.
 - **watson editorial integration:** daily "Heute auf games.watson.ch" teaser in the watson.ch feed. Games results mentioned in Picdump/Spass content.
 - **Push notifications:** opt-in daily reminder at configurable time. "Dein tägliches Verbindige wartet."
 
@@ -214,7 +194,7 @@ CH Media Mind sells launch sponsorships. Target: 1 sponsor per game at launch. F
 | M0–M3 | Launch 3 games. Iterate difficulty, fix UX, establish baseline metrics. |
 | M3–M6 | Introduce streaks leaderboard (national + friends). OneID integration live. |
 | M6–M9 | Game 4: "Kantönli" (daily Swiss geography puzzle — canton outlines, landmarks, facts). |
-| M9–M12 | watson.ch/fr games localization (French versions of Buchstäbli + Verbindige). |
+| M9–M12 | watson.ch/fr games localization (French versions of Verbindige + Schlagziil). |
 | M12–M18 | watson Games app (standalone, App Store / Play Store). Push notification layer. |
 | M18–M24 | Premium tier exploration: ad-free games for CHF 2.90/month (test subscription appetite). |
 | Ongoing | Community puzzle submissions. User-generated Verbindige categories. |

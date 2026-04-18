@@ -30,7 +30,6 @@ Compare what exists in code against what the dev brief specifies. Look for:
 
 **Missing game mechanics:**
 - Verbindige: "one away" hint, confetti on completion, difficulty-colored solved groups, 4-error limit with visual dots
-- Buchstäbli: pangram celebration, mundart bonus toast, rank system (Stift→Bundesrat), shuffle animation, keyboard input
 - Schlagziil: article links after solve, typo tolerance (Levenshtein ≤1), category labels, 3-error limit across all headlines
 - Zämesetzli: drag-and-drop or tap-to-combine, compound validation feedback, hint system
 

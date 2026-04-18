@@ -41,7 +41,7 @@ You are the games-watson performance optimizer. You ensure the games meet the st
 
 **Code splitting:**
 - Lazy-load each game route (`React.lazy` + `Suspense`)
-- Ensure Verbindige JS doesn't load when playing Buchstäbli
+- Ensure game bundles are isolated (no cross-game JS loading)
 
 **Bundle optimization:**
 - Tree-shake unused exports

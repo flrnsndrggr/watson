@@ -8,7 +8,7 @@ import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
 import { useDailyReset } from '@/lib/useDailyReset';
-import { RankBar } from '@/games/buchstaebli/RankBar';
+import { RankBar } from '@/components/shared/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
 import { useZaemesetzli } from './useZaemesetzli';

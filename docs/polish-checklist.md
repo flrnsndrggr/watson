@@ -26,19 +26,6 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [ ] Tile grid: ensure 44x44px minimum touch targets on mobile (WCAG AA)
 - [ ] Deselect all: add "Auswahl löschen" button that clears all selected tiles
 
-## Buchstäbli
-
-- [ ] Hex grid: ensure center letter is visually distinct (cyan/pink highlight)
-- [ ] Word input: support physical keyboard on desktop (type letters directly)
-- [ ] "Mischen" button: animate outer letters shuffling to new positions
-- [ ] Rank bar: smooth progress animation when score increases
-- [ ] Pangram found: special celebration animation + "+7 Bonus!" toast
-- [ ] Mundart word found: toast "Mundart-Bonus! 2x Punkte" with Swiss flag emoji
-- [ ] Already-found word: toast "Schon gefunden!" with no score change
-- [ ] Too-short word: toast "Mindestens 4 Buchstaben"
-- [ ] Missing center letter: toast "Der Buchstabe [X] muss dabei sein"
-- [ ] Found words list: collapsible, sorted alphabetically, pangrams highlighted
-
 ## Schlagziil
 
 - [ ] Headline card: category label (Schweiz, Sport, etc.) styled with watson green

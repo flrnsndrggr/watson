@@ -245,98 +245,7 @@ interface VerbindigeItem {
 
 ---
 
-### 3.2 Buchstäbli (Swiss Word Hex)
-
-**Data model:**
-```typescript
-interface BuchstaebliPuzzle {
-  id: string;
-  date: string;
-  center_letter: string;           // must be in every word
-  outer_letters: string[];         // exactly 6
-  pangram: string;                 // word using all 7 letters
-  valid_words: ValidWord[];        // all accepted words
-  max_score: number;               // sum of all word scores
-  rank_thresholds: {               // % of max_score
-    stift: 0;                      // 0%
-    lehrling: number;              // ~20%
-    geselle: number;               // ~40%
-    meister: number;               // ~70%
-    bundesrat: number;             // ~90%
-  };
-}
-
-interface ValidWord {
-  word: string;
-  is_pangram: boolean;
-  is_mundart: boolean;             // Swiss German → 2× points
-  points: number;                  // 4-letter = 1pt, 5+ = length, pangram = +7, mundart = 2×
-}
-```
-
-**UI layout:**
-```
-┌─────────────────────────────────────┐
-│       BUCHSTÄBLI  #042              │
-│     Rang: Geselle (45/112 Pkt)      │
-│     ████████░░░░░░░░                │
-│                                     │
-│           ┌───┐                     │
-│          /  R  \                    │
-│     ┌───┐       ┌───┐              │
-│    /  E  \ ┌───┐/  T  \            │
-│    └───┘ / *A* \ └───┘             │  ← center letter highlighted
-│     ┌───┐ └───┘ ┌───┐              │
-│    /  N  \      /  S  \             │
-│     └───┘ ┌───┐ └───┘              │
-│          /  L  \                    │
-│           └───┘                     │
-│                                     │
-│  ┌─────────────────────────┐        │
-│  │ R A T E N              │← input  │
-│  └─────────────────────────┘        │
-│                                     │
-│  [Mischen]  [Löschen]  [Enter ↵]   │
-│                                     │
-│  Gefundene Wörter (12):             │
-│  RATEN · STERN · TRANS · ...        │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-**Key interactions:**
-- Tap hex letter → appends to input field
-- Tap center letter → always available (highlighted in pink/cyan)
-- "Enter" or submit → validates word
-  - Accepted: word appears in found list, score updates, rank bar progresses
-  - Already found: toast "Schon gefunden!"
-  - Too short: toast "Mindestens 4 Buchstaben"
-  - Not in dictionary: toast "Nicht im Wörterbuch"
-  - Missing center letter: toast "Der Buchstabe [X] muss dabei sein"
-  - Pangram found: celebration animation + "+7 Bonus!" toast
-  - Mundart word: toast "Mundart-Bonus! 2× Punkte 🇨🇭"
-- "Mischen" (shuffle): rotates outer letters randomly (visual refresh, no gameplay effect)
-- Physical keyboard supported on desktop
-
-**Dictionary architecture:**
-```
-/api/buchstaebli/validate
-POST { word: string, puzzle_id: string }
-→ { valid: boolean, is_pangram: boolean, is_mundart: boolean, points: number }
-
-Dictionary stored server-side (NEVER send full word list to client — cheating prevention).
-Client sends word → server validates → returns result.
-
-Word lists:
-- Primary: Duden German dictionary (~150K words, 4+ letters)
-- Mundart: Curated Swiss German list (~2,000 words at launch)
-  - Sources: Schweizerisches Idiotikon, Swiss German Wiktionary, editorial curation
-  - Community submission pipeline: /api/mundart/submit { word, definition, region }
-```
-
----
-
-### 3.3 Schlagziil (The Headline Game)
+### 3.2 Schlagziil (The Headline Game)
 
 **Data model:**
 ```typescript
@@ -429,7 +338,6 @@ interface UserProfile {
   oneid_linked: boolean;           // Phase 2
   streaks: {
     verbindige: StreakData;
-    buchstaebli: StreakData;
     schlagziil: StreakData;
   };
 }
@@ -468,10 +376,6 @@ GET  /verbindige/today          → today's puzzle (no answers)
 POST /verbindige/guess          → { puzzle_id, selected_items[] } → { correct, group?, game_over? }
 GET  /verbindige/archive/:date  → past puzzle
 
-GET  /buchstaebli/today         → today's puzzle (letters + thresholds, no word list)
-POST /buchstaebli/validate      → { puzzle_id, word } → { valid, points, is_pangram, is_mundart }
-GET  /buchstaebli/archive/:date
-
 GET  /schlagziil/today          → today's puzzle (headlines with blanks, no answers)
 POST /schlagziil/guess          → { puzzle_id, headline_index, guess } → { correct, accepted_answer? }
 GET  /schlagziil/archive/:date
@@ -491,7 +395,6 @@ Each game produces a shareable text + optional image card.
 function generateShareText(game: string, number: number, result: string): string {
   const headers = {
     verbindige: `Verbindige #${number} 🇨🇭`,
-    buchstaebli: `Buchstäbli #${number} 🔤`,
     schlagziil: `Schlagziil #${number} 📰`,
   };
   return `${headers[game]}\n${result}\nwatson.ch/spiele/${game}`;
@@ -514,7 +417,7 @@ Generate a 1080×1920 canvas with watson branding (dark bg, cyan/pink accents, r
 | Offline resilience | Puzzle cached after first load | Swiss train tunnels |
 
 ### Optimization notes:
-- Code-split per game (don't load Buchstäbli JS when playing Verbindige)
+- Code-split per game (lazy-load each game's bundle independently)
 - Preload today's puzzle data in HTML (inline JSON, no waterfall)
 - Use CSS animations over JS animations (GPU-accelerated)
 - No heavy libraries — canvas-confetti (~3KB) is the only allowed "fun" dependency
@@ -581,7 +484,6 @@ Pre-game interstitial (mobile only):
 **Critical test scenarios:**
 - Midnight rollover: verify new puzzle loads at 00:00 CET, old puzzle locks
 - Streak edge cases: timezone handling, missed day, playing at 23:59
-- Buchstäbli dictionary: validate no profanity in accepted words
 - Schlagziil: verify answer normalization handles umlauts, typos, hyphenation
 - Offline: verify puzzle remains playable after network drop (after initial load)
 - Ad integration: verify game functions correctly when ad blocker is active (watson.ch already has ad blocker detection — games should work regardless)
@@ -596,22 +498,20 @@ Week 1–2:   Project setup, design system tokens, shared components
 
 Week 3–4:   Verbindige MVP (grid, selection, validation, animations, share)
 
-Week 5–6:   Buchstäbli MVP (hex grid, input, dictionary API, scoring, ranks)
+Week 5–6:   Schlagziil MVP (headline display, input, validation, article links)
 
-Week 7–8:   Schlagziil MVP (headline display, input, validation, article links)
+Week 7:     Streaks, user accounts, leaderboard
 
-Week 9:     Streaks, user accounts, leaderboard
+Week 8:     Ad integration, sponsor bar, analytics events
 
-Week 10:    Ad integration, sponsor bar, analytics events
+Week 9:     QA, accessibility audit, performance optimization, cross-browser
 
-Week 11:    QA, accessibility audit, performance optimization, cross-browser
+Week 10:    Soft launch (internal), bug fixes, difficulty calibration
 
-Week 12:    Soft launch (internal), bug fixes, difficulty calibration
-
-Week 13:    Public launch
+Week 11:    Public launch
 ```
 
-**Total: ~13 weeks / 3 months to public launch.**
+**Total: ~11 weeks to public launch.**
 
 ---
 
@@ -626,10 +526,6 @@ track('streak_milestone', { game, streak_length }) // at 7, 30, 100, 365
 
 // Verbindige-specific
 track('verbindige_guess', { puzzle_id, guess_number, correct, one_away })
-
-// Buchstäbli-specific
-track('buchstaebli_word_found', { puzzle_id, word, is_pangram, is_mundart, points })
-track('buchstaebli_rank_reached', { puzzle_id, rank })
 
 // Schlagziil-specific
 track('schlagziil_headline_solved', { puzzle_id, headline_index, attempts })

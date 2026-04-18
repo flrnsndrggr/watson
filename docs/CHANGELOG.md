@@ -10,10 +10,6 @@
   - `MUNDART-SOURCING.md` — data pipeline docs for Mundart word sourcing
   - `scripts/seed-from-idiotikon.ts` + `mundart-word-bank.json` (79+ verified words)
 
-### Content
-- Triage Buchstäbli QA findings from word nerd scenario (`5e2d686`)
-  - P0: Route `/buchstaebli` missing — blank white screen (tracked in ROADMAP.md)
-
 ### Docs
 - Add agent operating contract, roadmap, and backlogs (`1729e42`)
   - `AGENTS.md` — project conventions, brand tokens, git rules for all agents

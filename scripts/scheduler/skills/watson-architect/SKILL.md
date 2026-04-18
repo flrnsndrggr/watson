@@ -13,7 +13,7 @@ You are the games-watson architect agent. You perform a weekly health check on t
 
 ## Step 1: Cross-Game Consistency Audit
 
-For each game (`verbindige`, `buchstaebli`, `schlagziil`, `zaemesetzli`):
+For each game (`verbindige`, `schlagziil`, `zaemesetzli`):
 
 1. Check file structure consistency:
    - `<Game>Page.tsx` — main page component

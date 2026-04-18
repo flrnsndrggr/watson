@@ -8,7 +8,7 @@
 
 ## One-Liner
 
-A daily games destination on watson.ch — three original, Swiss-culturally specific word and knowledge games, free and ad-supported, designed to create habitual daily visits and generate CHF 1M+ in incremental annual ad revenue.
+A daily games destination on watson.ch — original, Swiss-culturally specific word and knowledge games, free and ad-supported, designed to create habitual daily visits and generate CHF 1M+ in incremental annual ad revenue.
 
 ---
 
@@ -26,19 +26,14 @@ The window: no Swiss German-language publisher has built a native games product 
 
 ---
 
-## Solution: Three Daily Games
+## Solution: Daily Games
 
 ### 1. Verbindige (Swiss Connections)
 16 items in a 4×4 grid → sort into 4 groups of 4. Swiss-themed categories. Occasionally uses images. One category per week ties to watson's biggest news story.
 
 **Core loop:** Open → scan grid → hypothesize groups → tap to select → submit → success/fail → share emoji result.
 
-### 2. Buchstäbli (Swiss Word Hex)
-7 letters in a hex grid → make as many German words as possible (min. 4 letters, center letter required). Find the Pangram. Swiss German dialect words earn 2× points.
-
-**Core loop:** Open → see letters → type words → validate → track score → chase "Bundesrat" rank → share score.
-
-### 3. Schlagziil (The Headline Game)
+### 2. Schlagziil (The Headline Game)
 5 real watson.ch headlines from the past week, each with a key word blanked out. Guess all 5. 3 wrong guesses allowed across all 5.
 
 **Core loop:** Open → read headline → type guess → correct/wrong → next headline → see results → tap headline to read full article → share.
@@ -62,13 +57,13 @@ The window: no Swiss German-language publisher has built a native games product 
 Day 1:  User sees friend's Verbindige emoji grid on WhatsApp
         → taps link → lands on games.watson.ch/verbindige
         → plays (no account needed) → gets result → shares own result
-        → notices Buchstäbli and Schlagziil → plays one more
+        → notices Schlagziil → plays one more
 
 Day 3:  User returns directly (bookmark/app)
         → prompt: "Willst du deinen Streak behalten? Konto erstellen."
         → creates account (email + username) → streak counter starts
 
-Day 14: User has 14-day streak across Verbindige + Buchstäbli
+Day 14: User has 14-day streak across Verbindige + Schlagziil
         → leaderboard unlocked → sees friends' scores
         → push notification opt-in → daily 8am reminder
 
@@ -87,9 +82,8 @@ watson.ch
 ├── Navigation: Schweiz | International | ... | Spiele ← (replaces "Quiz")
 │
 ├── games.watson.ch (or watson.ch/spiele/)
-│   ├── Landing page — today's 3 games, streaks overview, leaderboard teaser
+│   ├── Landing page — today's games, streaks overview, leaderboard teaser
 │   ├── /verbindige — daily puzzle + archive
-│   ├── /buchstaebli — daily puzzle
 │   ├── /schlagziil — daily puzzle
 │   ├── /profil — streaks, stats, leaderboard position
 │   └── /archiv — past puzzles (play missed days, no streak credit)
@@ -111,7 +105,7 @@ watson.ch
 | Daily puzzles | ✅ | ❌ (casual, no daily) | ✅ |
 | Swiss cultural content | ❌ | ❌ | ✅ |
 | News-integrated games | ❌ | ❌ | ✅ (Schlagziil) |
-| Swiss German language | ❌ | ❌ | ✅ (Buchstäbli Mundart) |
+| Swiss German language | ❌ | ❌ | ✅ |
 | Streaks & leaderboards | ✅ | ❌ | ✅ |
 | Social sharing | ✅ | ❌ | ✅ |
 | Free (no paywall) | ❌ (subscription) | ✅ | ✅ |
@@ -133,10 +127,9 @@ watson.ch
 ## Dependencies & Assumptions
 
 1. **Puzzle Editor hire** is critical. Games live or die on daily puzzle quality. This is not automatable (yet).
-2. **Swiss German word list** needs curation. Start with Duden + ~2,000 validated Mundart entries. Community submissions pipeline needed.
-3. **watson editorial buy-in** required for Schlagziil (editors flag 5 headlines/day for game use) and Verbindige (occasional current-events categories).
-4. **OneID integration** is a medium-term dependency (M3–M6), not a launch blocker. Launch with simple email accounts, migrate to OneID.
-5. **No app at launch.** Mobile web only. App is M12–M18 roadmap item.
+2. **watson editorial buy-in** required for Schlagziil (editors flag 5 headlines/day for game use) and Verbindige (occasional current-events categories).
+3. **OneID integration** is a medium-term dependency (M3–M6), not a launch blocker. Launch with simple email accounts, migrate to OneID.
+4. **No app at launch.** Mobile web only. App is M12–M18 roadmap item.
 
 ---
 

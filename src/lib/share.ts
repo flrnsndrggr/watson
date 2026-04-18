@@ -1,13 +1,11 @@
 const GAME_LABELS: Record<string, string> = {
   verbindige: 'Verbindige',
-  buchstaebli: 'Buchstäbli',
   zaemesetzli: 'Zämesetzli',
   schlagziil: 'Schlagziil',
 };
 
 const GAME_EMOJIS: Record<string, string> = {
   verbindige: '🇨🇭',
-  buchstaebli: '🔤',
   zaemesetzli: '🧩',
   schlagziil: '📰',
 };

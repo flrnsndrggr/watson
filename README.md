@@ -7,7 +7,6 @@ Daily word games in Swiss German for watson.ch readers.
 | Game | Route | Description |
 |---|---|---|
 | Verbindige | `/verbindige` | Group 16 Swiss German words into 4 thematic categories |
-| Buchstäbli | `/buchstaebli` | Spelling Bee in Mundart — find words using 7 letters |
 | Schlagziil | `/schlagziil` | Guess the watson.ch headline from a partial reveal |
 | Zämesetzli | `/zaemesetzli` | Combine emoji pairs to form Swiss German compound words |
 

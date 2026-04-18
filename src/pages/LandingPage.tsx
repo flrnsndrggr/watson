@@ -11,13 +11,6 @@ const GAMES = [
     color: 'var(--color-cyan)',
   },
   {
-    path: '/buchstaebli',
-    name: 'Buchstäbli',
-    emoji: '🐝',
-    description: 'Bilde Wörter aus 7 Buchstaben. Mundart-Bonus!',
-    color: 'var(--color-pink)',
-  },
-  {
     path: '/zaemesetzli',
     name: 'Zämesetzli',
     emoji: '🧩',

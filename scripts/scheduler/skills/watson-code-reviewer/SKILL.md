@@ -39,7 +39,6 @@ Review against:
 
 ### Game Correctness
 - Verbindige: group validation logic correct? Exactly 4 groups of 4?
-- Buchstäbli: scoring formula right (4-letter=1, 5+=length, pangram+7, mundart 2x)?
 - Schlagziil: answer normalization handles umlauts and typos?
 - Zämesetzli: compound validation working?
 
@@ -53,7 +52,7 @@ Review against:
 ### Performance
 - No heavy dependencies added (canvas-confetti ~3KB is the max for "fun" deps)?
 - Images WebP, lazy-loaded?
-- No full word lists sent to client (cheating prevention)?
+- No full word lists sent to client (cheating prevention)
 
 ### Security
 - No secrets/keys in code

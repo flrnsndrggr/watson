@@ -8,14 +8,14 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not available)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
 
 ### Notable commits
 - eeef223 triage: verbindige QA findings from share flow scenario
 - d74bb67 triage: schlagziil QA findings from news reader scenario
 - 4d6d3bc triage: zaemesetzli QA findings and harden skill push instructions
-- 621b2d4 polish: fix share text format — add Buchstäbli label/emoji, use puzzle dates
+- 621b2d4 polish: fix share text format — use puzzle dates
 
 ---
 
@@ -27,12 +27,11 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not available)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
 
 ### Notable commits
 - b20c579 fix: render rank threshold tick marks on RankBar progress bar
-- b1dbfd3 triage: buchstäbli QA findings from word nerd scenario
 - 70ae58f scripts: add launchd agent to regenerate dashboard HTML every 30s
 
 ---
@@ -45,7 +44,7 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP permission not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
 
 ### Notable commits
@@ -64,13 +63,13 @@
 - HTTP status: all routes 200
 - Console errors: not checked (no browser MCP available)
 - Supabase: not checked (MCP permission not granted)
-- Routes checked (HTTP 200): landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓, buchstaebli ✓
+- Routes checked (HTTP 200): landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓
 
 ### Notes
 
 This is the first release verification. Smoke testing was limited to HTTP status
 codes because WebFetch cannot execute JavaScript (SPA renders client-side) and
-Chrome MCP / Netlify MCP / Supabase MCP permissions were not available. All five
+Chrome MCP / Netlify MCP / Supabase MCP permissions were not available. All four
 routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 

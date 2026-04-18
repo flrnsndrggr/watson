@@ -17,15 +17,12 @@ const GAME_TABLE: Record<GameType, string> = {
   verbindige: 'verbindige_puzzles',
   zaemesetzli: 'zaemesetzli_puzzles',
   schlagziil: 'schlagziil_puzzles',
-  buchstaebli: 'buchstaebli_puzzles',
 };
 
-// Buchstäbli: never fetch valid_words (cheating prevention)
 const GAME_SELECT: Record<GameType, string> = {
   verbindige: '*',
   zaemesetzli: '*',
   schlagziil: '*',
-  buchstaebli: 'puzzle_id, center_letter, outer_letters, max_score, rank_thresholds',
 };
 
 interface PuzzleRow {

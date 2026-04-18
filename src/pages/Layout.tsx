@@ -7,7 +7,6 @@ const NAV_ITEMS = [
   { path: '/', label: 'Spiele' },
   { path: '/verbindige', label: 'Verbindige' },
   { path: '/zaemesetzli', label: 'Zämesetzli' },
-  { path: '/buchstaebli', label: 'Buchstäbli' },
   { path: '/schlagziil', label: 'Schlagziil' },
 ];
 
