@@ -79,6 +79,7 @@ export function SchlagziilPage() {
           </div>
 
           <HeadlineCard
+            key={currentIndex}
             display={headline.display}
             category={headline.category}
             articleYear={headline.article_year}

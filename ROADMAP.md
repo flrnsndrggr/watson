@@ -198,7 +198,7 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
    - Related: Schlagziil #4 — share URL also wrong; both need the correct production base URL
 
-6. [ ] P1 - Hint state leaks between headlines — subsequent tips auto-reveal without user click
+6. [x] P1 - Hint state leaks between headlines — subsequent tips auto-reveal without user click
    - Agent: watson-qa-schlagziil
    - Scenario: Answer Validation — clicked "Tipp anzeigen" on headline 1, then advanced through all 5 headlines
    - Problem: `HeadlineCard.tsx:33` uses `const [showHint, setShowHint] = useState(false)` for hint visibility. React reuses the same component instance when `currentIndex` advances (same JSX position, only props change), so `showHint` stays `true` from the previous headline. After clicking the hint once on headline 1, the hint text for headlines 2–5 is displayed automatically without any user action.
