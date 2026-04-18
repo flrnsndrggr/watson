@@ -7,12 +7,15 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ text, label = 'Teilen' }: ShareButtonProps) {
-  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   async function handleShare() {
-    await share(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const result = await share(text);
+    if (result === 'copied') {
+      setFeedback('Kopiert!');
+      setTimeout(() => setFeedback(null), 2000);
+    }
+    // When Web Share API was used, the OS handles feedback — no button text change needed
   }
 
   return (
@@ -20,7 +23,7 @@ export function ShareButton({ text, label = 'Teilen' }: ShareButtonProps) {
       onClick={handleShare}
       className="rounded bg-[var(--color-cyan)] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-85 active:scale-[0.97]"
     >
-      {copied ? 'Kopiert!' : label}
+      {feedback ?? label}
     </button>
   );
 }

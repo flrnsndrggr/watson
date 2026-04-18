@@ -20,14 +20,16 @@ export function generateShareText(
   return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\nwatson.ch/spiele/${game}`;
 }
 
-export async function share(text: string): Promise<void> {
+/** Returns 'shared' if Web Share API was used, 'copied' if clipboard fallback. */
+export async function share(text: string): Promise<'shared' | 'copied'> {
   if (navigator.share) {
     try {
       await navigator.share({ text });
-      return;
+      return 'shared';
     } catch {
       // User cancelled or not supported — fall through to clipboard
     }
   }
   await navigator.clipboard.writeText(text);
+  return 'copied';
 }
