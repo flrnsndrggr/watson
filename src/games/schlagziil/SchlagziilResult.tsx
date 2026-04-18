@@ -20,7 +20,7 @@ export function SchlagziilResult() {
 
   const shareText = generateShareText(
     'schlagziil',
-    1,
+    puzzle.date,
     `${correctCount}/5\n${yearLine}\nKennst du watson?`,
   );
 

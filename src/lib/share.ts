@@ -14,7 +14,7 @@ const GAME_EMOJIS: Record<string, string> = {
 
 export function generateShareText(
   game: string,
-  puzzleNumber: number,
+  puzzleNumber: number | string,
   resultLines: string,
 ): string {
   const label = GAME_LABELS[game] ?? game;

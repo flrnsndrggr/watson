@@ -69,7 +69,7 @@ export function ZaemesetzliPage() {
 
   const shareText = generateShareText(
     'zaemesetzli',
-    1,
+    puzzle.date,
     `${foundWords.length}/${puzzle.valid_compounds.length} gefunden · ${score} Pkt · ${currentRank.charAt(0).toUpperCase() + currentRank.slice(1)}`,
   );
 

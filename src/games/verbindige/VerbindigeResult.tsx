@@ -20,7 +20,7 @@ export function VerbindigeResult() {
     .map((g) => DIFFICULTY_EMOJIS[g.difficulty].repeat(4))
     .join('\n');
 
-  const shareText = generateShareText('verbindige', 1, emojiGrid);
+  const shareText = generateShareText('verbindige', puzzle?.date ?? 1, emojiGrid);
 
   return (
     <div className="mt-6 text-center">

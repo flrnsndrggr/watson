@@ -100,7 +100,7 @@ export function BuchstaebliPage() {
 
   const shareText = generateShareText(
     'buchstaebli',
-    1,
+    puzzle.date,
     `${score} Punkte · ${foundWords.length} Wörter · ${currentRank.charAt(0).toUpperCase() + currentRank.slice(1)}`,
   );
 
