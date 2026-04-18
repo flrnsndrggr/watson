@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fs.claude-scheduler.watson-performance</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/fs/Code/game-watson/scripts/scheduler/run-task.sh</string>
+        <string>watson-performance</string>
+        <string>/Users/fs/.claude/scheduled-tasks/watson-performance/SKILL.md</string>
+        <string>/Users/fs/Code/game-watson-wt/main-shared</string>
+        <string>main-locked</string>
+    </array>
+    <!-- cron "47 */6 * * *" · worktree: main-shared · branch: main · coord: main-locked -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Minute</key><integer>47</integer><key>Hour</key><integer>0</integer></dict>
+        <dict><key>Minute</key><integer>47</integer><key>Hour</key><integer>6</integer></dict>
+        <dict><key>Minute</key><integer>47</integer><key>Hour</key><integer>12</integer></dict>
+        <dict><key>Minute</key><integer>47</integer><key>Hour</key><integer>18</integer></dict>
+    </array>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-performance/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-performance/launchd.err.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/fs/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/fs</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/fs/Code/game-watson-wt/main-shared</string>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fs.claude-scheduler.watson-triage</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/fs/Code/game-watson/scripts/scheduler/run-task.sh</string>
+        <string>watson-triage</string>
+        <string>/Users/fs/.claude/scheduled-tasks/watson-triage/SKILL.md</string>
+        <string>/Users/fs/Code/game-watson-wt/main-shared</string>
+        <string>main-locked</string>
+    </array>
+    <!-- cron "27 3,8,13,18 * * *" · worktree: main-shared · branch: main · coord: main-locked -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Minute</key><integer>27</integer><key>Hour</key><integer>3</integer></dict>
+        <dict><key>Minute</key><integer>27</integer><key>Hour</key><integer>8</integer></dict>
+        <dict><key>Minute</key><integer>27</integer><key>Hour</key><integer>13</integer></dict>
+        <dict><key>Minute</key><integer>27</integer><key>Hour</key><integer>18</integer></dict>
+    </array>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-triage/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-triage/launchd.err.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/fs/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/fs</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/fs/Code/game-watson-wt/main-shared</string>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

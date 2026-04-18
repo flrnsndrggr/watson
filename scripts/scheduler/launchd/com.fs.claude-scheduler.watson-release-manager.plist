@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fs.claude-scheduler.watson-release-manager</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/fs/Code/game-watson/scripts/scheduler/run-task.sh</string>
+        <string>watson-release-manager</string>
+        <string>/Users/fs/.claude/scheduled-tasks/watson-release-manager/SKILL.md</string>
+        <string>/Users/fs/Code/game-watson-wt/main-shared</string>
+        <string>main-locked</string>
+    </array>
+    <!-- cron "37 */2 * * *" · worktree: main-shared · branch: main · coord: main-locked -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>0</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>2</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>4</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>6</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>8</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>10</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>12</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>14</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>16</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>18</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>20</integer></dict>
+        <dict><key>Minute</key><integer>37</integer><key>Hour</key><integer>22</integer></dict>
+    </array>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-release-manager/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/fs/.claude/external-scheduler/logs/watson-release-manager/launchd.err.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/fs/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/fs</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/fs/Code/game-watson-wt/main-shared</string>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
