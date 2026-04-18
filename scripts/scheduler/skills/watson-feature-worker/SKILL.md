@@ -59,7 +59,7 @@ If ANY fails: debug and fix. If unfixable within reason, revert, mark item `[!] 
 
    Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
    ```
-4. Push: `git push origin main 2>/dev/null || true`
+4. Push: `git push origin main`. If the push fails (non-fast-forward, auth, network), STOP and report the failure — do not claim success. Never use `2>/dev/null`, `|| true`, or any pattern that swallows the exit code.
 
 ## Rules
 - ONE feature per run (unless trivially small and related)

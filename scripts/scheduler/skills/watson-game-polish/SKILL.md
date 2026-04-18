@@ -49,7 +49,7 @@ If ANY fails: revert all changes (`git checkout -- .`), mark the checklist item 
 
    Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
    ```
-4. Push: `git push origin main 2>/dev/null || true`
+4. Push: `git push origin main`. If the push fails (non-fast-forward, auth, network), STOP and report the failure — do not claim success. Never use `2>/dev/null`, `|| true`, or any pattern that swallows the exit code.
 
 ## Rules
 - ONE item per run. Stop after committing.

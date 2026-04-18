@@ -79,7 +79,7 @@ Implements: {which dev brief spec this fulfills}
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 ```
-Push: `git push origin main 2>/dev/null || true`
+Push: `git push origin main`. If the push fails (non-fast-forward, auth, network), STOP and report the failure — do not claim success. Never use `2>/dev/null`, `|| true`, or any pattern that swallows the exit code.
 
 ## Rules
 - ONE improvement per run. Deep and polished beats broad and shallow.

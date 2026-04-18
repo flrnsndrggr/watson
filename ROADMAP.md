@@ -255,6 +255,46 @@ _Items from watson-qa-zaemesetzli agent_
    - Evidence: Page loads with only subtitle as instruction. First click on emoji selected it in slot but revealed no next-step guidance. Placeholder changes to "Zusammengesetztes Wort..." only after 2 emojis are selected — too late. Observed 2026-04-16.
    - Related: Verbindige #4 — same onboarding gap pattern; consider a shared HowToPlay component
 
+6. [ ] P2 - No rank-up notification when crossing a rank threshold
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Scoring & Ranks — played through Stift→Lehrling (6pt) and Lehrling→Geselle (13pt) rank transitions
+   - Problem: When score crosses a rank threshold the rank label and progress hint silently update, but there is no toast, no confetti, no flash animation. Two transitions confirmed (Stift→Lehrling at 6pt, Lehrling→Geselle at 12pt+) — both entirely silent. Code confirms: the only `useEffect` in `ZaemesetzliPage.tsx` watches `lastResult`; there is no effect watching `currentRank` changes.
+   - Suggested fix: Add a `useEffect` on `currentRank` (comparing prev value to current) to fire a celebratory toast, e.g. "🎉 Geselle erreicht!" when the rank advances. A brief rank-name pulse animation on the label would also reinforce the milestone.
+   - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (add rank-change effect), `src/components/shared/Toast.tsx`
+   - Evidence: Screenshot taken immediately after reaching 6pt shows "Lehrling" label and updated hint, no toast in DOM. Same for Geselle transition at 13pt. `ZaemesetzliPage.tsx:45-51` only tracks `lastResult`. Observed 2026-04-18.
+
+7. [ ] P1 - d=2/d=3 compounds use emojis as phonetic stand-ins not listed in alt_nouns
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Scoring & Ranks — attempted all 16 compounds; 5 require non-obvious emoji readings
+   - Problem: Five compounds require interpreting emojis in ways that appear nowhere in `alt_nouns` or any UI element: `🔑` (Schlüssel) as "-schein" in Sonnenschein; `🔑` as "-schloss" in Türschloss; `🔔` (Glocke) as "-uhr" in Sonnenuhr; `🔔` as "-bund" in Schlüsselbund; `☀️` (Sonne) as "Sonntag-" in Bergsonntag. A player who logically tries "Sonnenschlüssel" (sun + key → literal) gets rejected with no guidance. The hint button reveals the emoji pair (e.g. "☀️+🔑=?") but still leaves the player stuck on what word to type. The only discovery path is random guessing.
+   - Suggested fix: Extend `alt_nouns` for each affected emoji to include the hidden readings: `🔑`: add `"Schein"`, `"Schloss"`; `🔔`: add `"Uhr"`, `"Bund"`; `☀️`: add `"Sonntag"`. Then surface these in a tooltip or the hint message when the relevant emoji pair is selected (e.g. hint changes to "Tipp: 🔑 kann auch 'Schein' bedeuten").
+   - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (alt_nouns), `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint display)
+   - Evidence: `zaemesetzli.data.ts` line 8: `🔑 alt_nouns: ['Key']`; line 13: `🔔 alt_nouns: []`; line 15: `☀️ alt_nouns: ['Licht']`. All five abstract compounds accepted in-game (confirmed). Observed 2026-04-18.
+
+8. [ ] P1 - "Bergsonntag" requires two-hop etymology (☀️→Sonne→Sonntag) and is incorrectly marked non-Mundart
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Scoring & Ranks — reviewing d=3 compound data
+   - Problem: `Bergsonntag` [⛰️+☀️] is the hardest compound (difficulty: 3, points: 3). ☀️'s canonical noun is "Sonne" but the compound needs "Sonntag" (Sunday). The leap from ☀️→Sonntag requires knowing German etymology (Sonntag = "Sonne" + "-tag" = "day of the sun") — two conceptual hops away from the emoji. The word "Bergsonntag" itself denotes a traditional Swiss Alpine Sunday celebration, making it regionally specific but it is marked `is_mundart: false`, so it receives no Mundart-Bonus toast and no 🇨🇭 marker in the found list. Players who find it get no signal it's culturally Swiss.
+   - Suggested fix: Either mark `is_mundart: true` (triggering the "Mundart-Bonus! 🇨🇭" toast) or add a cultural-note tooltip. Also add `"Sonntag"` to ☀️'s `alt_nouns` (see finding #7).
+   - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (line 33: `is_mundart: false`)
+   - Evidence: `{ word: 'Bergsonntag', components: ['⛰️','☀️'], difficulty: 3, points: 3, is_mundart: false }` in data file. ☀️ alt_nouns only contains `'Licht'`, not `'Sonntag'`. Observed 2026-04-18.
+
+9. [ ] P1 - max_score: 28 is incorrect — actual compound point sum is 29
+   - Agent: watson-qa-zaemesetzli
+   - Scenario: Scoring & Ranks — summing all compound points
+   - Problem: `zaemesetzli.data.ts` sets `max_score: 28`, but summing all 16 compound `points` values gives 29 (7×1pt + 5×2pt + 4×3pt = 7+10+12 = 29). `RankBar.tsx:21` uses `maxScore` to compute the bar fill percentage and at Bundesrat (nextRank=null) renders `${score}/${maxScore} Pkt`. A player who finds all 16 compounds scores 29pt and sees "29/28 Pkt" — an impossible-looking score. The progress bar caps correctly at 100% due to `Math.min(100, …)`, but the label is misleading.
+   - Suggested fix: Fix `max_score` to `29` in `zaemesetzli.data.ts`. Alternatively derive it dynamically: `valid_compounds.reduce((sum, c) => sum + c.points, 0)`.
+   - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (line 36: `max_score: 28`)
+   - Evidence: Compound points: 1+1+1+1+2+1+2+1+2+2+3+2+1+3+3+3 = 29. Data shows `max_score: 28`. `RankBar.tsx:40-41` renders `${score}/${maxScore} Pkt` when Bundesrat is reached. Observed 2026-04-18.
+
+10. [ ] P2 - Current numeric score hidden during play; only relative "noch X Pkt" shown
+    - Agent: watson-qa-zaemesetzli
+    - Scenario: Scoring & Ranks — tracking progress during active play
+    - Problem: While playing, the RankBar right-side text always reads "noch X Pkt bis Y" (e.g. "noch 7 Pkt bis Meister"), never showing the actual score (e.g. "13 Pkt"). The raw score only becomes visible once Bundesrat is reached (when `nextRank` is null). Players cannot easily tell where they are on the full scale without mentally summing individual compound scores from the found list. By contrast, Buchstäbli prominently shows the running score (e.g. "5/112 Pkt") at all times.
+    - Suggested fix: In `RankBar.tsx:38-40`, change the right-side label to show both: `${score} Pkt (noch ${pointsToNext} bis ${RANK_LABELS[nextRank]})` or add a small score label above/below the bar.
+    - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component used by both games)
+    - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
+
 ---
 
 ## Code Review Escalations
