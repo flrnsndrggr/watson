@@ -1,5 +1,29 @@
 # Release Log
 
+## Release — 2026-04-19 14:30
+
+- Commits: 621b2d4..dfe2fa9
+- Netlify deploy: skipped (MCP permission not granted)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP permission not granted)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
+
+### Notable commits
+- dfe2fa9 feat: user accounts with Supabase Auth magic link sign-in
+- 0cd5e55 feat: premium Verbindige results screen with performance tiers and animations
+- ed06b94 feat: add game feel to Zämesetzli — shake, confetti, rank celebrations
+- 6f5e768 feat: finalize share card formats — Schlagziil accuracy grid + CTA
+- 17bc2ed feat: add game feel to Schlagziil — shake, toasts, confetti
+- 8bd0acd ci: auto-deploy to Netlify on push to main
+- b51764b feat: add Verbindige shuffle button with staggered tile animation
+- 1c851cb feat: add daily puzzle reset with midnight CET rollover detection
+- 7ac73b9 feat: add Buchstäbli shuffle animation and fix share support
+
+---
+
 ## Release — 2026-04-18 23:50
 
 - Commits: 70ae58f..621b2d4
@@ -74,5 +98,5 @@ routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
 ## Last Verified
-- Commit: 621b2d4
-- Date: 2026-04-18
+- Commit: dfe2fa9
+- Date: 2026-04-19

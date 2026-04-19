@@ -1,10 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { PostgrestClient } from '@supabase/postgrest-js';
 import type { GameType } from '@/types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const postgrest = new PostgrestClient(`${supabaseUrl}/rest/v1`, {
+  headers: {
+    apikey: supabaseAnonKey,
+    Authorization: `Bearer ${supabaseAnonKey}`,
+  },
+});
 
 /** Returns today's date in YYYY-MM-DD format (Europe/Zurich timezone). */
 export function getTodayDateCET(): string {
@@ -42,7 +47,7 @@ export async function fetchTodaysPuzzle<T>(gameType: GameType): Promise<T | null
     const select = GAME_SELECT[gameType];
 
     // First, find today's puzzle ID from the parent table
-    const { data: puzzleRow, error: puzzleError } = await supabase
+    const { data: puzzleRow, error: puzzleError } = await postgrest
       .from('puzzles')
       .select('id, game_type, publish_date')
       .eq('game_type', gameType)
@@ -54,7 +59,7 @@ export async function fetchTodaysPuzzle<T>(gameType: GameType): Promise<T | null
     const row = puzzleRow as PuzzleRow;
 
     // Then fetch the game-specific data
-    const { data: gameData, error: gameError } = await supabase
+    const { data: gameData, error: gameError } = await postgrest
       .from(table)
       .select(select)
       .eq('puzzle_id', row.id)
