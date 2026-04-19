@@ -10,6 +10,11 @@ interface SolvedGroup extends VerbindigeGroup {
   revealedOnLoss?: boolean;
 }
 
+interface PendingCorrectGroup {
+  group: SolvedGroup;
+  itemTexts: Set<string>;
+}
+
 interface VerbindigeState {
   puzzle: VerbindigePuzzle | null;
   selected: VerbindigeItem[];
@@ -21,6 +26,7 @@ interface VerbindigeState {
   remainingItems: VerbindigeItem[];
   lastGuessResult: 'correct' | 'wrong' | 'one-away' | null;
   lastWrongItems: VerbindigeItem[];
+  pendingCorrect: PendingCorrectGroup | null;
   streak: StreakData;
 
   loadPuzzle: () => Promise<void>;
@@ -28,6 +34,7 @@ interface VerbindigeState {
   shuffleRemaining: () => void;
   clearSelection: () => void;
   submitGuess: () => void;
+  confirmCorrectGroup: () => void;
   clearLastResult: () => void;
   clearWrongItems: () => void;
 }
@@ -52,6 +59,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   remainingItems: [],
   lastGuessResult: null,
   lastWrongItems: [],
+  pendingCorrect: null,
   streak: getStreak('verbindige'),
 
   loadPuzzle: async () => {
@@ -83,8 +91,29 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   clearLastResult: () => set({ lastGuessResult: null }),
   clearWrongItems: () => set({ lastWrongItems: [] }),
 
+  confirmCorrectGroup: () => {
+    const { pendingCorrect, solvedGroups, remainingItems } = get();
+    if (!pendingCorrect) return;
+
+    const newSolvedGroups = [...solvedGroups, pendingCorrect.group];
+    const newRemaining = remainingItems.filter(
+      (item) => !pendingCorrect.itemTexts.has(item.text),
+    );
+    const won = newSolvedGroups.length === 4;
+    const updates: Partial<VerbindigeState> = {
+      solvedGroups: newSolvedGroups,
+      remainingItems: newRemaining,
+      pendingCorrect: null,
+      status: won ? 'won' : 'playing',
+    };
+    if (won) {
+      updates.streak = recordGamePlayed('verbindige');
+    }
+    set(updates);
+  },
+
   submitGuess: () => {
-    const { selected, puzzle, solvedGroups, mistakes, maxMistakes, remainingItems } = get();
+    const { selected, puzzle, solvedGroups, mistakes, maxMistakes } = get();
     if (!puzzle || selected.length !== 4) return;
 
     const selectedTexts = new Set(selected.map((s) => s.text));
@@ -99,23 +128,16 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     );
 
     if (matchedGroup) {
-      const newSolvedGroups = [
-        ...solvedGroups,
-        { ...matchedGroup, guessOrder: solvedGroups.length },
-      ];
-      const newRemaining = remainingItems.filter((item) => !selectedTexts.has(item.text));
-      const won = newSolvedGroups.length === 4;
-      const updates: Partial<VerbindigeState> = {
-        solvedGroups: newSolvedGroups,
-        selected: [],
-        remainingItems: newRemaining,
-        lastGuessResult: 'correct',
-        status: won ? 'won' : 'playing',
+      // Phase 1: Flash tiles with difficulty color — don't remove yet
+      const pending: PendingCorrectGroup = {
+        group: { ...matchedGroup, guessOrder: solvedGroups.length },
+        itemTexts: selectedTexts,
       };
-      if (won) {
-        updates.streak = recordGamePlayed('verbindige');
-      }
-      set(updates);
+      set({
+        pendingCorrect: pending,
+        selected: [],
+        lastGuessResult: 'correct',
+      });
     } else {
       // Check if "one away" — 3 out of 4 correct in any group
       const isOneAway = unsolvedGroups.some((g) => {

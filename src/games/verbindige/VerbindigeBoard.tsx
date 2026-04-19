@@ -59,11 +59,14 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
     toggleItem,
     lastGuessResult,
     lastWrongItems,
+    pendingCorrect,
+    confirmCorrectGroup,
     clearLastResult,
     clearWrongItems,
   } = useVerbindige();
 
   const [wrongItems, setWrongItems] = useState<Set<string>>(new Set());
+  const [collapsingItems, setCollapsingItems] = useState<Set<string>>(new Set());
   const revealedCount = useSyncExternalStore(revealSubscribe, revealGetSnapshot);
 
   // Separate player-solved groups from loss-revealed groups
@@ -88,7 +91,7 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
     }
   }, [status]);
 
-  // Handle wrong/correct guess feedback
+  // Handle wrong guess feedback
   useEffect(() => {
     if (lastGuessResult === 'wrong' || lastGuessResult === 'one-away') {
       const items = new Set(lastWrongItems.map((s) => s.text));
@@ -100,11 +103,31 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
       }, 500);
       return () => clearTimeout(timer);
     }
-    if (lastGuessResult === 'correct') {
-      const timer = setTimeout(() => clearLastResult(), 300);
-      return () => clearTimeout(timer);
-    }
   }, [lastGuessResult, lastWrongItems, clearLastResult, clearWrongItems]);
+
+  // Correct guess: two-phase animation
+  // Phase 1 (0–400ms): tiles flash difficulty color with bounce
+  // Phase 2 (400–700ms): tiles collapse, then confirmCorrectGroup resolves the state
+  useEffect(() => {
+    if (!pendingCorrect) return;
+
+    // Phase 2: collapse tiles after bounce completes
+    const collapseTimer = setTimeout(() => {
+      setCollapsingItems(new Set(pendingCorrect.itemTexts));
+    }, 400);
+
+    // Phase 3: confirm group after collapse animation finishes
+    const confirmTimer = setTimeout(() => {
+      confirmCorrectGroup();
+      clearLastResult();
+    }, 700);
+
+    return () => {
+      clearTimeout(collapseTimer);
+      clearTimeout(confirmTimer);
+      setCollapsingItems(new Set());
+    };
+  }, [pendingCorrect, confirmCorrectGroup, clearLastResult]);
 
   const isPlaying = status === 'playing';
   const visibleLossGroups = lossRevealed.slice(0, revealedCount);
@@ -132,9 +155,15 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
               isSelected={selected.some((s) => s.text === item.text)}
               isWrong={wrongItems.has(item.text)}
               onToggle={() => toggleItem(item)}
-              disabled={!isPlaying}
+              disabled={!isPlaying || pendingCorrect != null}
               shufflePhase={shufflePhase}
               index={index}
+              correctDifficulty={
+                pendingCorrect?.itemTexts.has(item.text)
+                  ? pendingCorrect.group.difficulty
+                  : undefined
+              }
+              isCollapsing={collapsingItems.has(item.text)}
             />
           ))}
         </div>
