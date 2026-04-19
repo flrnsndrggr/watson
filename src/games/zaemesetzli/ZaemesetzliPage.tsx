@@ -227,6 +227,7 @@ export function ZaemesetzliPage() {
             <button
               type="submit"
               disabled={selectedEmojis.length < 2 || !currentInput.trim()}
+              aria-label="Wort absenden"
               className="rounded bg-[var(--color-cyan)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
             >
               &rarr;

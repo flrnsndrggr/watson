@@ -32,6 +32,7 @@ export function CombineSlots({ selectedEmojis, onClear }: CombineSlotsProps) {
       {selectedEmojis.length > 0 && (
         <button
           onClick={onClear}
+          aria-label="Emoji-Auswahl zurücksetzen"
           className="ml-2 text-xs text-[var(--color-gray-text)] underline hover:text-[var(--color-black)]"
         >
           Zurücksetzen

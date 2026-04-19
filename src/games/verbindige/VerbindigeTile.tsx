@@ -63,6 +63,8 @@ export function VerbindigeTile({
     <button
       onClick={onToggle}
       disabled={disabled || shufflePhase !== 'idle' || isCorrectFlash}
+      aria-label={`${isSelected ? 'Deselect' : 'Select'} ${item.text}`}
+      aria-pressed={isSelected}
       style={shufflePhase !== 'idle' ? { animationDelay: staggerDelay } : undefined}
       className={`
         flex h-[60px] items-center justify-center rounded-[var(--game-tile-radius)]

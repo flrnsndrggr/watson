@@ -28,6 +28,7 @@ function HexButton({
     <button
       onClick={onClick}
       style={shuffleStyle}
+      aria-label={isCenter ? `Mittelbuchstabe ${letter}` : `Buchstabe ${letter}`}
       className={`
         flex h-[52px] w-[52px] items-center justify-center
         rounded-full text-lg font-bold

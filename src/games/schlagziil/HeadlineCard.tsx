@@ -140,6 +140,7 @@ export function HeadlineCard({
           <button
             type="submit"
             disabled={!input.trim() || disabled}
+            aria-label="Antwort absenden"
             className="rounded bg-[var(--color-cyan)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
           >
             &rarr;

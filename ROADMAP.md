@@ -346,7 +346,7 @@ _Weekly architecture review findings from watson-architect_
    - Files: `src/games/verbindige/VerbindigePage.tsx`, `src/games/zaemesetzli/ZaemesetzliPage.tsx`
    - Related: #3 (ARIA labels) — both are accessibility issues affecting the same files; consider fixing in one pass
 
-3. [ ] P1 - Add ARIA labels to interactive game elements
+3. [x] P1 - Add ARIA labels to interactive game elements
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-16)
    - Problem: Only 1 `aria-label` found across all 4 game directories (`EmojiPool.tsx:30`). Tile buttons, hex letter buttons, combine slots, and action buttons across all games lack ARIA labels — screen reader inaccessible.
