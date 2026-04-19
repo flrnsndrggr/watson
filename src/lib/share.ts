@@ -19,7 +19,7 @@ export function generateShareText(
 ): string {
   const label = GAME_LABELS[game] ?? game;
   const emoji = GAME_EMOJIS[game] ?? '';
-  return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\nwatson.ch/spiele/${game}`;
+  return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\ngames-watson.netlify.app/${game}`;
 }
 
 export async function share(text: string): Promise<void> {

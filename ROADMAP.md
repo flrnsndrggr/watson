@@ -51,7 +51,7 @@ _Items from watson-qa-verbindige agent_
    - Files: `src/games/verbindige/VerbindigePage.tsx`, `src/games/verbindige/VerbindigeResult.tsx`, `src/components/shared/GameHeader.tsx`
    - Evidence: Header rendered "Verbindige #001"; result panel rendered "Verbindige #2026-04-16". Observed 2026-04-16.
 
-4. [ ] P2 - No first-time onboarding or how-to-play
+4. [x] P2 - No first-time onboarding or how-to-play
    - Agent: watson-qa-verbindige
    - Scenario: Full Game Flow — first load with no prior knowledge
    - Problem: The only instruction visible is subtitle "Finde 4 Gruppen à 4". No how-to-play modal, tooltip, or example. A new player cannot tell that 4 tiles must be selected before submitting, that wrong guesses have a limit of 4, or that tiles deselect on second tap.
@@ -167,7 +167,7 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Results screen showed "Missstaende", "Ubs", "Co2-gesetz" live in production. Observed 2026-04-16.
    - Related: #2 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
 
-2. [ ] P1 - No visual feedback for wrong guesses below error limit
+2. [x] P1 - No visual feedback for wrong guesses below error limit
    - Agent: watson-qa-schlagziil
    - Scenario: Answer Validation — submitting wrong answers with totalErrors < 3
    - Problem: After a wrong guess, `results[currentIndex]` stays `null` so the HeadlineCard border stays neutral. `lastGuessResult: 'wrong'` is set in the store but `SchlagziilPage` only reads `lastGuessResult` for the correct-answer auto-advance timer — it never triggers a red flash, shake, or toast. The user sees the input clear with no feedback beyond the error dot filling.
@@ -186,7 +186,7 @@ _Items from watson-qa-schlagziil agent_
    - Priority adjusted from P1 to P2: minor wording tweak, not a UX or gameplay issue
    - Related: #4 — both are share-related issues on the Schlagziil result screen; consider fixing together
 
-4. [ ] P1 - Share link appends non-existent watson.ch URL
+4. [x] P1 - Share link appends non-existent watson.ch URL
    - Agent: watson-qa-schlagziil
    - Scenario: Results Screen — share button
    - Problem: `generateShareText` appends `watson.ch/spiele/schlagziil` to every share text. That URL does not exist — the game lives at `games-watson.netlify.app/schlagziil`. Anyone who taps the link in a shared message hits a 404.
@@ -219,7 +219,7 @@ _Items from watson-qa-schlagziil agent_
 
 _Items from watson-qa-zaemesetzli agent_
 
-1. [ ] P1 - Silent failure on invalid combination — no error feedback
+1. [x] P1 - Silent failure on invalid combination — no error feedback
    - Agent: watson-qa-zaemesetzli
    - Scenario: Invalid Combinations — submitting a nonsense word for selected emojis
    - Problem: When a user submits a word that does not match any valid compound for the selected emoji pair, the input field clears silently. No toast, no shake/error animation, no error text — the user has zero signal that their guess was rejected.
@@ -228,7 +228,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Evidence: Submitted "Haussonnen" for 🏠+☀️ pair. Input cleared, score unchanged (2/28), found list unchanged (2/16), no console errors, no visual change. Observed 2026-04-16.
    - Related: #4 — both are submission feedback issues in Zämesetzli (error + success); consider fixing together
 
-2. [ ] P1 - "Teilen" button provides no user feedback
+2. [x] P1 - "Teilen" button provides no user feedback
    - Agent: watson-qa-zaemesetzli
    - Scenario: Combination Flow — clicking share mid-game
    - Problem: Clicking "Teilen" while the game is in progress produces no visible result — no toast saying "Kopiert!", no share sheet, no animation. It is unclear if anything was copied to clipboard or if the action failed silently.
@@ -246,7 +246,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint handler logic)
    - Evidence: Had 🏠+☀️ in slots. Clicked Tipp. Tooltip showed "🏠 + 🔑 = ?", score dropped 2→1, but slots still showed 🏠+☀️. Observed 2026-04-16.
 
-4. [ ] P2 - No success animation or celebration on correct compound
+4. [x] P2 - No success animation or celebration on correct compound
    - Agent: watson-qa-zaemesetzli
    - Scenario: Combination Flow — submitting a valid compound word
    - Problem: After a correct answer (e.g. "Haustür"), the input clears and the word appears in the "Gefunden" list, but there is no immediate visual celebration: no toast, no color flash, no emoji animation. The feedback is purely textual and easy to miss.
@@ -255,7 +255,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Evidence: Submitted "Haustür" → found list row appeared, score ticked to 1/28 Pkt. No toast or animation observed in screenshot taken immediately after submit. Observed 2026-04-16.
    - Related: #1 — both are submission feedback issues in Zämesetzli (error + success); consider fixing together
 
-5. [ ] P2 - No onboarding explaining the two-step mechanic
+5. [x] P2 - No onboarding explaining the two-step mechanic
    - Agent: watson-qa-zaemesetzli
    - Scenario: First Play — arriving at the game with no prior knowledge
    - Problem: The only instruction is subtitle "Kombiniere Emojis zu deutschen Wörtern". The game has a two-step mechanic: (1) tap emojis to fill combine slots, then (2) type the German compound word. Step 2 is non-obvious — new players may expect clicking emojis to auto-reveal the answer. The placeholder "Wähle 2-3 Emojis..." does not hint that typing is required.
@@ -264,7 +264,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Evidence: Page loads with only subtitle as instruction. First click on emoji selected it in slot but revealed no next-step guidance. Placeholder changes to "Zusammengesetztes Wort..." only after 2 emojis are selected — too late. Observed 2026-04-16.
    - Related: Verbindige #4 — same onboarding gap pattern; consider a shared HowToPlay component
 
-6. [ ] P2 - No rank-up notification when crossing a rank threshold
+6. [x] P2 - No rank-up notification when crossing a rank threshold
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — played through Stift→Lehrling (6pt) and Lehrling→Geselle (13pt) rank transitions
    - Problem: When score crosses a rank threshold the rank label and progress hint silently update, but there is no toast, no confetti, no flash animation. Two transitions confirmed (Stift→Lehrling at 6pt, Lehrling→Geselle at 12pt+) — both entirely silent. Code confirms: the only `useEffect` in `ZaemesetzliPage.tsx` watches `lastResult`; there is no effect watching `currentRank` changes.
