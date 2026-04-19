@@ -338,7 +338,7 @@ _Weekly architecture review findings from watson-architect_
    - Files: `src/lib/utils.ts` (create), `src/types/index.ts`, `src/games/verbindige/useVerbindige.ts`, `src/games/buchstaebli/useBuchstaebli.ts`, `src/games/zaemesetzli/useZaemesetzli.ts`
    - Priority adjusted from P1 to P2: pure code deduplication with no user-facing impact; fits P2 polish/tech-debt category
 
-2. [ ] P1 - Add keyboard navigation to Verbindige and Zaemesetzli
+2. [x] P1 - Add keyboard navigation to Verbindige and Zaemesetzli
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-16)
    - Problem: Only Buchstaebli has keyboard support (`BuchstaebliPage.tsx:68-69`). Verbindige and Zaemesetzli have no keyboard interaction — keyboard-only users cannot play.

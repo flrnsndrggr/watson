@@ -67,6 +67,21 @@ export function VerbindigePage() {
     }
   }, [status]);
 
+  // Keyboard support
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (status !== 'playing' || pendingCorrect != null) return;
+    if (e.key === 'Enter' && selected.length === 4) {
+      submitGuess();
+    } else if (e.key === 'Backspace') {
+      clearSelection();
+    }
+  }, [status, pendingCorrect, selected.length, submitGuess, clearSelection]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   useEffect(() => {
     if (status === 'won') {
       import('canvas-confetti').then(({ default: confetti }) => {

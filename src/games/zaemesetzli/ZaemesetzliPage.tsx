@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
@@ -122,6 +122,19 @@ export function ZaemesetzliPage() {
       }
     }
   }, [currentRank]);
+
+  // Keyboard support: Backspace clears emoji selection when input is empty
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (status !== 'playing') return;
+    if (e.key === 'Backspace' && !currentInput && selectedEmojis.length > 0) {
+      clearEmojiSelection();
+    }
+  }, [status, currentInput, selectedEmojis.length, clearEmojiSelection]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   // Confetti on game completion (all compounds found)
   useEffect(() => {
