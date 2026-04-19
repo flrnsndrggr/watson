@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from '@/components/shared/Toast';
 import { useAuth } from '@/lib/auth';
+import { useUserAuth } from '@/lib/userAuth';
+import { AuthModal } from '@/components/shared/AuthModal';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Spiele' },
@@ -72,7 +74,12 @@ function LoginModal({ onClose }: { onClose: () => void }) {
 export function Layout() {
   const location = useLocation();
   const { isLoggedIn } = useAuth();
+  const { user, loading: userLoading, signOut } = useUserAuth();
   const [showLogin, setShowLogin] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const userInitial = user?.email?.charAt(0).toUpperCase() ?? '?';
 
   return (
     <div className="min-h-screen bg-white">
@@ -100,21 +107,60 @@ export function Layout() {
               </Link>
             ))}
           </nav>
-          <div className="ml-auto">
-            {isLoggedIn ? (
+          <div className="ml-auto flex items-center gap-2">
+            {/* User account */}
+            {!userLoading && (
+              user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu((v) => !v)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-cyan)] text-xs font-bold text-white hover:opacity-85 transition-opacity cursor-pointer"
+                    aria-label="Konto-Menü"
+                  >
+                    {userInitial}
+                  </button>
+                  {showUserMenu && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowUserMenu(false)}
+                      />
+                      <div className="absolute right-0 top-10 z-50 w-56 rounded-lg bg-white py-2 shadow-lg ring-1 ring-black/5">
+                        <div className="px-4 py-2 text-xs text-[var(--color-gray-text)] truncate">
+                          {user.email}
+                        </div>
+                        <div className="mx-2 my-1 h-px bg-gray-100" />
+                        <button
+                          onClick={async () => {
+                            await signOut();
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                        >
+                          Abmelden
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="rounded bg-[var(--color-cyan)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 transition-opacity cursor-pointer"
+                  aria-label="Anmelden"
+                >
+                  Anmelden
+                </button>
+              )
+            )}
+            {/* Admin login */}
+            {isLoggedIn && (
               <Link
                 to="/admin"
                 className="rounded bg-[var(--color-blue)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"
               >
                 Admin
               </Link>
-            ) : (
-              <button
-                onClick={() => setShowLogin(true)}
-                className="rounded bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/60 hover:text-white hover:bg-white/20 transition-colors cursor-pointer"
-              >
-                Login
-              </button>
             )}
           </div>
         </div>
@@ -128,12 +174,26 @@ export function Layout() {
       {/* Toast overlay */}
       <ToastContainer />
 
-      {/* Login modal */}
+      {/* Admin login modal */}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+
+      {/* User auth modal */}
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
       {/* Footer */}
       <footer className="border-t border-[var(--color-gray-bg)] py-6 text-center text-xs text-[var(--color-gray-text)]">
         watson Spiele &middot; Spiel, aber deep. &middot; watson.ch
+        {!isLoggedIn && (
+          <>
+            {' '}&middot;{' '}
+            <button
+              onClick={() => setShowLogin(true)}
+              className="text-[var(--color-gray-text)] hover:text-[var(--color-cyan)] transition-colors cursor-pointer"
+            >
+              Admin
+            </button>
+          </>
+        )}
       </footer>
     </div>
   );

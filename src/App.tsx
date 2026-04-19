@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/lib/auth';
+import { UserAuthProvider } from '@/lib/userAuth';
 import { Layout } from '@/pages/Layout';
 
 const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ default: m.LandingPage })));
@@ -17,6 +18,7 @@ const AdminSchlagziil = lazy(() => import('@/pages/admin/AdminSchlagziil').then(
 export default function App() {
   return (
     <AuthProvider>
+      <UserAuthProvider>
       <BrowserRouter>
         <Suspense fallback={null}>
           <Routes>
@@ -36,6 +38,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </UserAuthProvider>
     </AuthProvider>
   );
 }
