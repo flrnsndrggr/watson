@@ -126,7 +126,7 @@ _Items from watson-qa-buchstaebli agent_
    - Evidence: `RESULT_MESSAGES = { 'valid': '', ... }` + toast guard `if (RESULT_MESSAGES[lastResult])`. Observed 2026-04-16.
    - Related: Buchstäbli #6 — both are submission feedback gaps; consider fixing together
 
-6. [ ] P1 - No feedback when submitting an already-found word
+6. [x] P1 - No feedback when submitting an already-found word
    - Agent: watson-qa-buchstaebli
    - Scenario: Validation Responses — duplicate word submission
    - Problem: When a player types and submits a word they have already found, nothing happens — no toast, no shake/flash animation, no visual change. The input clears silently. The player cannot tell whether their word was silently rejected as a duplicate or if the submit action failed entirely. All other error cases (too short, missing center letter, not in dictionary) show a toast; the duplicate case is the only blind spot.
@@ -135,7 +135,7 @@ _Items from watson-qa-buchstaebli agent_
    - Evidence: Submitted RATEN twice. Second submission: no fixed-position elements (toast container empty), wordCount unchanged at 1, score unchanged at 5/112 Pkt. Input cleared silently with zero user feedback. Observed 2026-04-18.
    - Related: Buchstäbli #5 — both are submission feedback gaps; consider fixing together
 
-7. [ ] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
+7. [x] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — navigating between games via the persistent nav bar
    - Problem: The nav bar on every page links only to Verbindige, Zämesetzli, and Schlagziil. Buchstäbli has no nav link. Issue #2 (landing page card) was marked resolved, but the nav entry was not added. A player on the Verbindige results screen has no way to navigate directly to Buchstäbli without going back to the landing page first.
