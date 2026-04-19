@@ -1,5 +1,30 @@
 # Release Log
 
+## Release — 2026-04-19 19:45
+
+- Commits: dfe2fa9..56df671 (13 commits)
+- Netlify deploy: skipped (MCP permission not granted)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP permission not granted)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, but game removed in 6fa24b7 — SPA shell returns 200 regardless)
+- Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
+
+### Notable commits
+- 6fa24b7 feat: remove Buchstäbli game entirely
+- 2b906a3 perf: replace full Supabase SDK with postgrest-js — 51.85KB → 7.77KB gzipped
+- 789b993 feat: persist game completion state in localStorage
+- 9ff71ec polish: respect prefers-reduced-motion — disable confetti, kill transforms
+- a487c03 polish: add streak counter display to GameHeader
+- 1a2835f fix: display proper German strings for revealed Schlagziil answers
+- 5bb45e4 polish: improve ShareButton Web Share API integration
+
+### Notes
+Buchstäbli was removed in this release (6fa24b7). The `/buchstaebli` route still returns HTTP 200 because Netlify serves the SPA shell for all routes. Without JS execution (Chrome MCP), we cannot verify whether the app correctly handles this removed route.
+
+---
+
 ## Release — 2026-04-19 14:30
 
 - Commits: 621b2d4..dfe2fa9
@@ -98,5 +123,5 @@ routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
 ## Last Verified
-- Commit: dfe2fa9
+- Commit: 56df671
 - Date: 2026-04-19
