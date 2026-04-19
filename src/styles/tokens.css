@@ -102,6 +102,18 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+@keyframes groupUnveil {
+  0% { transform: scaleY(0.3) scaleX(0.95); opacity: 0; }
+  40% { transform: scaleY(1.02) scaleX(1.01); opacity: 0.8; }
+  70% { transform: scaleY(0.98) scaleX(1); opacity: 1; }
+  100% { transform: scaleY(1) scaleX(1); opacity: 1; }
+}
+
+@keyframes tileFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+
 @keyframes countdownPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }

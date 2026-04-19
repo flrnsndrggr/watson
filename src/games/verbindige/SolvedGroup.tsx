@@ -9,12 +9,17 @@ const DIFFICULTY_COLORS: Record<number, string> = {
 
 interface SolvedGroupProps {
   group: VerbindigeGroup;
+  isReveal?: boolean;
 }
 
-export function SolvedGroup({ group }: SolvedGroupProps) {
+export function SolvedGroup({ group, isReveal = false }: SolvedGroupProps) {
+  const animation = isReveal
+    ? 'animate-[groupUnveil_500ms_ease-out_both]'
+    : 'animate-[popIn_var(--transition-normal)]';
+
   return (
     <div
-      className={`animate-[popIn_var(--transition-normal)] rounded-[var(--game-tile-radius)] px-4 py-3 text-center text-white ${DIFFICULTY_COLORS[group.difficulty]}`}
+      className={`origin-top rounded-[var(--game-tile-radius)] px-4 py-3 text-center text-white ${animation} ${DIFFICULTY_COLORS[group.difficulty]}`}
     >
       <div className="text-sm font-bold uppercase tracking-wide">
         {group.category_label ?? group.category}

@@ -23,6 +23,7 @@ export function VerbindigePage() {
   } = useVerbindige();
 
   const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
+  const [revealComplete, setRevealComplete] = useState(false);
 
   const handleShuffle = useCallback(() => {
     if (shufflePhase !== 'idle') return;
@@ -35,11 +36,22 @@ export function VerbindigePage() {
     }, 300);
   }, [shufflePhase, clearSelection, shuffleRemaining]);
 
+  const handleRevealComplete = useCallback(() => {
+    setRevealComplete(true);
+  }, []);
+
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
+
+  // Reset reveal state when a new puzzle loads
+  useEffect(() => {
+    if (status === 'playing') {
+      setRevealComplete(false);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (status === 'won') {
@@ -52,6 +64,8 @@ export function VerbindigePage() {
   if (status === 'loading') return <PuzzleLoading />;
 
   const isPlaying = status === 'playing';
+  // Show results immediately on win, but wait for staggered reveal on loss
+  const showResult = status === 'won' || (status === 'lost' && revealComplete);
 
   return (
     <GameShell>
@@ -62,7 +76,10 @@ export function VerbindigePage() {
         subtitle="Finde 4 Gruppen à 4"
       />
 
-      <VerbindigeBoard shufflePhase={shufflePhase} />
+      <VerbindigeBoard
+        shufflePhase={shufflePhase}
+        onRevealComplete={handleRevealComplete}
+      />
 
       {isPlaying && (
         <div className="mt-4 flex items-center justify-between">
@@ -93,7 +110,7 @@ export function VerbindigePage() {
         </div>
       )}
 
-      <VerbindigeResult />
+      {showResult && <VerbindigeResult />}
     </GameShell>
   );
 }

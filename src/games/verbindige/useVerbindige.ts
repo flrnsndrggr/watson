@@ -7,6 +7,7 @@ import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
+  revealedOnLoss?: boolean;
 }
 
 interface VerbindigeState {
@@ -142,10 +143,20 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       }
       set(lostUpdates);
 
-      // If lost, reveal all groups
+      // If lost, reveal unsolved groups with revealedOnLoss flag
       if (lost) {
+        const alreadySolved = get().solvedGroups;
+        const solvedCategories = new Set(alreadySolved.map((sg) => sg.category));
+        const unsolvedGroups = puzzle.groups
+          .filter((g) => !solvedCategories.has(g.category))
+          .sort((a, b) => a.difficulty - b.difficulty)
+          .map((g, i) => ({
+            ...g,
+            guessOrder: alreadySolved.length + i,
+            revealedOnLoss: true,
+          }));
         set({
-          solvedGroups: puzzle.groups.map((g, i) => ({ ...g, guessOrder: i })),
+          solvedGroups: [...alreadySolved, ...unsolvedGroups],
           remainingItems: [],
         });
       }
