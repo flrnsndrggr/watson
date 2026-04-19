@@ -12,7 +12,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [ ] GameHeader: add streak counter display next to game title (when user has active streak)
 - [x] ErrorDots: add subtle pulse animation on the dot that just filled (2026-04-19)
 - [ ] AdSlot: placeholder styling with watson gray background and "Anzeige" label
-- [ ] Loading state: add skeleton loader for puzzle data fetch (game-shaped placeholder)
+- [x] Loading state: add skeleton loader for puzzle data fetch (game-shaped placeholder) (2026-04-19)
 - [ ] 404 page: create a custom not-found page at unknown routes with link back to landing
 
 ## Verbindige

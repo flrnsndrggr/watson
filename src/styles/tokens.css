@@ -137,6 +137,11 @@
   100% { transform: scale(0.4) translateY(-20px); opacity: 0; }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* ===== BASE STYLES ===== */
 
 body {
