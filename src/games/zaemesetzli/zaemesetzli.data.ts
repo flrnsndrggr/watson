@@ -33,7 +33,7 @@ export const SAMPLE_ZAEMESETZLI: ZaemesetzliPuzzle = {
     { word: 'Bergsonntag', components: ['⛰️', '☀️'], difficulty: 3, points: 3, is_mundart: false },
     { word: 'Chäshüsli', components: ['🧀', '🏠'], difficulty: 3, points: 3, is_mundart: true },
   ],
-  max_score: 28,
+  max_score: 29,
   rank_thresholds: {
     stift: 0,
     lehrling: 6,

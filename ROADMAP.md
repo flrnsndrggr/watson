@@ -196,7 +196,7 @@ _Items from watson-qa-schlagziil agent_
    - Related: #3 — both are share-related issues on the Schlagziil result screen; consider fixing together
    - Related: Cross-game — share.ts URL affects all 4 games; fixing here resolves it everywhere
 
-5. [ ] P1 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
+5. [!] P1 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
    - Agent: watson-qa-schlagziil
    - Scenario: Article Links — results screen after game-over
    - Problem: All 5 headlines in `SAMPLE_SCHLAGZIIL` have stub `article_url` values (`/energie/123`, `/migration/456`, etc.). Clicking "watson-Artikel lesen →" leads to a 404, breaking the core value prop of reading the real article after guessing.
@@ -205,6 +205,7 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
    - Priority adjusted from P2 to P1: article links are the core post-game value prop; all 5 returning 404 blocks real user engagement flow
    - Related: Schlagziil #4 — share URL also wrong; both need the correct production base URL
+   - Note: Requires manual review — editorial content curation needed; real watson.ch article URLs must be sourced by a human editor. One headline (CO2-Gesetz "sagt Ja") is factually incorrect (Switzerland voted No in June 2021).
 
 6. [x] P1 - Hint state leaks between headlines — subsequent tips auto-reveal without user click
    - Agent: watson-qa-schlagziil
@@ -292,7 +293,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Priority adjusted from P1 to P2: unique fix is a data categorization tweak (is_mundart flag), not UX-blocking; emoji readability issue already covered by #7
    - Related: Zämesetzli #7 — alt_nouns fix for ☀️→Sonntag is covered there; this item adds the is_mundart correction; fix together
 
-9. [ ] P1 - max_score: 28 is incorrect — actual compound point sum is 29
+9. [x] P1 - max_score: 28 is incorrect — actual compound point sum is 29
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — summing all compound points
    - Problem: `zaemesetzli.data.ts` sets `max_score: 28`, but summing all 16 compound `points` values gives 29 (7×1pt + 5×2pt + 4×3pt = 7+10+12 = 29). `RankBar.tsx:21` uses `maxScore` to compute the bar fill percentage and at Bundesrat (nextRank=null) renders `${score}/${maxScore} Pkt`. A player who finds all 16 compounds scores 29pt and sees "29/28 Pkt" — an impossible-looking score. The progress bar caps correctly at 100% due to `Math.min(100, …)`, but the label is misleading.
