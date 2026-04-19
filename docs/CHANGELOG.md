@@ -3,6 +3,7 @@
 ## 2026-04-19
 
 ### Features
+- Wrong-answer shake feedback for Schlagziil headline cards (`87dbe18`)
 - Persist game completion state in localStorage — prevent replaying same puzzle (`789b993`)
 - User accounts with Supabase Auth magic link sign-in (`dfe2fa9`)
 - Premium Verbindige results screen with performance tiers and animations (`0cd5e55`)
@@ -11,9 +12,12 @@
 - Add game feel to Schlagziil — shake, toasts, confetti (`17bc2ed`)
 
 ### Fixes
+- Standardize puzzle identifier across header, result, and share text (`31bc00d`)
 - Display proper German strings for revealed Schlagziil answers (`1a2835f`)
 
 ### Polish
+- Add subtle pulse animation to ErrorDots on latest filled dot (`a7859cd`)
+- AdSlot placeholder with dashed border and "Anzeige" label (`41077ee`)
 - Improve ShareButton Web Share API integration (`5bb45e4`)
 - Add streak counter display to GameHeader (`a487c03`)
 - Respect `prefers-reduced-motion` — disable confetti, kill transforms (`9ff71ec`)
