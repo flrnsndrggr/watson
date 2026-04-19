@@ -82,7 +82,7 @@ _Items from watson-qa-verbindige agent_
 
 _Items from watson-qa-schlagziil agent_
 
-1. [ ] P1 - Revealed answers show normalized non-German strings
+1. [x] P1 - Revealed answers show normalized non-German strings
    - Agent: watson-qa-schlagziil
    - Scenario: Error Counting — game-over after 3 total errors on headline 1
    - Problem: When an answer is revealed (game-over), `revealedAnswers[i]` is set to `DEMO_ANSWERS[i][0]` which is the lowercase normalized form. `HeadlineCard` only uppercases the first character. Result: "Missstaende" instead of "Missstände", "Ubs" instead of "UBS", "Co2-gesetz" instead of "CO2-Gesetz".
@@ -241,13 +241,14 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/components/shared/RankBar.tsx` (lines 38-41)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
-11. [ ] P0 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
+11. [x] P0 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
     - Agent: watson-roadmap-worker
     - Scenario: Automated deploy after fixing Verbindige #5
     - Problem: `netlify deploy --prod` returns "Unauthorized: could not retrieve project". `netlify status` shows "Not logged in". The MCP tool `mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__netlify-deploy-services-updater` is not available in the current tool set. No deploy path exists.
     - Suggested fix: Run `netlify login` interactively to authenticate the CLI, or ensure the Netlify MCP tool is configured in the Claude Code MCP settings.
     - Files: CLI auth / MCP config
     - Evidence: `netlify deploy --prod --dir=dist --site=cfaa1817-72f7-47cd-8a95-8c998529bcf9` → "Error: Unauthorized: could not retrieve project". `netlify status` → "Not logged in." Observed 2026-04-18.
+    - Resolution: Netlify MCP tools (`mcp__claude_ai_Netlify__netlify-deploy-services-updater/reader`) now available in Claude Code MCP config. Resolved 2026-04-19.
 
 ---
 

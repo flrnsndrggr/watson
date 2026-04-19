@@ -60,3 +60,12 @@ export const DEMO_ANSWERS: string[][] = [
   ['co2-gesetz', 'co2 gesetz', 'co2gesetz'],
   ['nemo'],
 ];
+
+// Display-ready answer strings (proper casing, umlauts, abbreviations)
+export const DEMO_DISPLAY_ANSWERS: string[] = [
+  'Solarenergie',
+  'Missstände',
+  'UBS',
+  'CO2-Gesetz',
+  'Nemo',
+];
