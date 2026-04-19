@@ -9,19 +9,19 @@ export function SchlagziilResult() {
 
   const correctCount = results.filter((r) => r === 'correct').length;
 
-  // v2 share format: "2023 ✓ | 2019 ✓ | 2026 ✗ | 2017 ✓ | 2024 ✓💡"
-  const yearLine = puzzle.headlines
-    .map((h, i) => {
-      const mark = results[i] === 'correct' ? '✓' : '✗';
+  // Share format: green/red squares grid + CTA
+  const accuracyGrid = results
+    .map((r, i) => {
+      const square = r === 'correct' ? '🟩' : '🟥';
       const hint = hintsUsed[i] ? '💡' : '';
-      return `${h.article_year} ${mark}${hint}`;
+      return `${square}${hint}`;
     })
-    .join(' | ');
+    .join('');
 
   const shareText = generateShareText(
     'schlagziil',
     puzzle.date,
-    `${correctCount}/5\n${yearLine}\nKennst du watson?`,
+    `${correctCount}/5\n${accuracyGrid}\nIch lese watson, und du?`,
   );
 
   return (
@@ -32,8 +32,8 @@ export function SchlagziilResult() {
       <p className="mt-1 text-[var(--color-gray-text)]">
         {correctCount}/5 Schlagzeilen erraten
       </p>
-      <p className="mt-2 text-sm font-mono">
-        {yearLine}
+      <p className="mt-2 text-2xl">
+        {accuracyGrid}
       </p>
       <div className="mt-4">
         <ShareButton text={shareText} />
