@@ -2,9 +2,10 @@ interface GameHeaderProps {
   title: string;
   puzzleNumber: number;
   subtitle?: string;
+  streak?: number;
 }
 
-export function GameHeader({ title, puzzleNumber, subtitle }: GameHeaderProps) {
+export function GameHeader({ title, puzzleNumber, subtitle, streak }: GameHeaderProps) {
   return (
     <div className="mb-4 text-center">
       <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold tracking-tight">
@@ -12,6 +13,14 @@ export function GameHeader({ title, puzzleNumber, subtitle }: GameHeaderProps) {
         <span className="ml-2 text-[var(--color-gray-text)] text-base font-normal">
           #{puzzleNumber.toString().padStart(3, '0')}
         </span>
+        {streak != null && streak >= 2 && (
+          <span
+            className="ml-2 inline-flex items-center gap-0.5 rounded-full bg-[var(--color-pink)]/10 px-2 py-0.5 text-sm font-semibold text-[var(--color-pink)]"
+            title={`${streak} Tage in Folge`}
+          >
+            🔥 {streak}
+          </span>
+        )}
       </h1>
       {subtitle && (
         <p className="mt-1 text-sm text-[var(--color-gray-text)]">{subtitle}</p>

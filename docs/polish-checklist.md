@@ -9,7 +9,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [x] ShareButton: verify share text format matches spec for each game (emoji grid, score, URL) (2026-04-18)
 - [x] ShareButton: add Web Share API integration for mobile (navigator.share fallback to clipboard) (2026-04-19)
 - [x] GameShell: add `prefers-reduced-motion` media query — disable confetti, use opacity instead of transforms (2026-04-19)
-- [ ] GameHeader: add streak counter display next to game title (when user has active streak)
+- [x] GameHeader: add streak counter display next to game title (when user has active streak) (2026-04-19)
 - [ ] ErrorDots: add subtle pulse animation on the dot that just filled
 - [ ] AdSlot: placeholder styling with watson gray background and "Anzeige" label
 - [ ] Loading state: add skeleton loader for puzzle data fetch (game-shaped placeholder)

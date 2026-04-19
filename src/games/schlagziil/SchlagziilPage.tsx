@@ -5,6 +5,7 @@ import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { useDailyReset } from '@/lib/useDailyReset';
+import { useStreak } from '@/lib/useStreak';
 import { HeadlineCard } from './HeadlineCard';
 import { SchlagziilResult } from './SchlagziilResult';
 import { useSchlagziil } from './useSchlagziil';
@@ -26,11 +27,18 @@ export function SchlagziilPage() {
     useHint,
   } = useSchlagziil();
 
+  const { current: streak, recordPlay } = useStreak('schlagziil');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
+
+  useEffect(() => {
+    if (status === 'finished' && puzzle?.date) {
+      recordPlay(puzzle.date);
+    }
+  }, [status, puzzle?.date, recordPlay]);
 
   useEffect(() => {
     if (lastGuessResult === 'correct') {
@@ -51,6 +59,7 @@ export function SchlagziilPage() {
         title="Schlagziil"
         puzzleNumber={1}
         subtitle="Errate das fehlende Wort"
+        streak={streak}
       />
 
       {!isFinished && headline && (

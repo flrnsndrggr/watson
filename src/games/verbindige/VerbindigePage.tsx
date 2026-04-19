@@ -6,6 +6,7 @@ import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { useStreak } from '@/lib/useStreak';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
@@ -24,6 +25,7 @@ export function VerbindigePage() {
   } = useVerbindige();
 
   const reducedMotion = usePrefersReducedMotion();
+  const { current: streak, recordPlay } = useStreak('verbindige');
   const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
 
   const handleShuffle = useCallback(() => {
@@ -44,6 +46,12 @@ export function VerbindigePage() {
   }, [loadPuzzle]);
 
   useEffect(() => {
+    if ((status === 'won' || status === 'lost') && puzzle?.date) {
+      recordPlay(puzzle.date);
+    }
+  }, [status, puzzle?.date, recordPlay]);
+
+  useEffect(() => {
     if (status === 'won' && !reducedMotion) {
       import('canvas-confetti').then(({ default: confetti }) => {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
@@ -62,6 +70,7 @@ export function VerbindigePage() {
         title="Verbindige"
         puzzleNumber={1}
         subtitle="Finde 4 Gruppen à 4"
+        streak={streak}
       />
 
       <VerbindigeBoard shufflePhase={shufflePhase} />

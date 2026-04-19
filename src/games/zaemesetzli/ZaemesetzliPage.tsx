@@ -8,6 +8,7 @@ import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
 import { useDailyReset } from '@/lib/useDailyReset';
+import { useStreak } from '@/lib/useStreak';
 import { RankBar } from '@/components/shared/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
@@ -40,11 +41,18 @@ export function ZaemesetzliPage() {
     clearLastResult,
   } = useZaemesetzli();
 
+  const { current: streak, recordPlay } = useStreak('zaemesetzli');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
+
+  useEffect(() => {
+    if (foundWords.length > 0 && puzzle?.date) {
+      recordPlay(puzzle.date);
+    }
+  }, [foundWords.length, puzzle?.date, recordPlay]);
 
   useEffect(() => {
     if (!lastResult) return;
@@ -76,7 +84,7 @@ export function ZaemesetzliPage() {
   return (
     <GameShell>
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" />
+      <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" streak={streak} />
 
       <RankBar
         currentRank={currentRank}
