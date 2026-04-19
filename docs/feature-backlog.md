@@ -20,8 +20,8 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Streak tracking: calculate and display current streak per game (consecutive days played) — done 2026-04-19
 - [x] Streak prompt: show "Willst du deinen Streak behalten? Konto erstellen." after Day 3 — done 2026-04-19
 - [x] Profile page: `/profil` route showing streaks, stats, games played per game — done 2026-04-19
-- [ ] Archive mode: `/archiv` route with calendar view of past puzzles (no streak credit)
-- [ ] Leaderboard: basic daily leaderboard per game (score-based for Buchstäbli/Zämesetzli, speed for Verbindige/Schlagziil)
+- [x] Archive mode: `/archiv` route with calendar view of past puzzles (no streak credit) — done 2026-04-19
+- [x] Leaderboard: basic daily leaderboard per game (score-based for Buchstäbli/Zämesetzli, speed for Verbindige/Schlagziil) — done 2026-04-19
 
 ## Priority: Lower (Monetization & Integration)
 

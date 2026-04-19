@@ -3,6 +3,7 @@ import type { SchlagziilPuzzle, StreakData } from '@/types';
 import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagziil.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
+import { submitLeaderboardEntry } from '@/lib/leaderboard';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
@@ -23,6 +24,8 @@ interface SchlagziilState {
   lastGuessResult: 'correct' | 'wrong' | null;
   streak: StreakData;
   isArchive: boolean;
+  startedAt: number | null;
+  elapsedSeconds: number | null;
 
   loadPuzzle: (archiveDate?: string) => Promise<void>;
   submitGuess: (guess: string) => void;
@@ -74,6 +77,8 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   lastGuessResult: null,
   streak: getStreak('schlagziil'),
   isArchive: false,
+  startedAt: null,
+  elapsedSeconds: null,
 
   loadPuzzle: async (archiveDate?: string) => {
     set({ status: 'loading', isArchive: !!archiveDate });
@@ -93,6 +98,8 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       revealedAnswers: Array(puzzle.headlines.length).fill(null),
       hintsUsed: Array(puzzle.headlines.length).fill(false),
       status: 'playing',
+      startedAt: Date.now(),
+      elapsedSeconds: null,
     });
   },
 
@@ -133,12 +140,18 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
             newRevealed[i] = displayAnswers[i] ?? allAnswers[i]?.[0] ?? '';
           }
         }
+        const correctCount = newResults.filter((r) => r === 'correct').length;
+        const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
+        if (!get().isArchive) {
+          void submitLeaderboardEntry('schlagziil', correctCount, elapsed);
+        }
         set({
           totalErrors: newErrors,
           results: newResults,
           revealedAnswers: newRevealed,
           status: 'finished',
           lastGuessResult: 'wrong',
+          elapsedSeconds: elapsed,
           ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }),
         });
       } else {
@@ -152,7 +165,12 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     if (!puzzle) return;
     const nextIndex = currentIndex + 1;
     if (nextIndex >= puzzle.headlines.length || results.every((r) => r !== null)) {
-      set({ status: 'finished', ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }) });
+      const correctCount = results.filter((r) => r === 'correct').length;
+      const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
+      if (!get().isArchive) {
+        void submitLeaderboardEntry('schlagziil', correctCount, elapsed);
+      }
+      set({ status: 'finished', elapsedSeconds: elapsed, ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }) });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
     }

@@ -3,6 +3,7 @@ import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
+import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
 import { generateShareText } from '@/lib/share';
 import { useBuchstaebli } from './useBuchstaebli';
 import type { Rank } from '@/types';
@@ -192,6 +193,9 @@ export function BuchstaebliResult() {
 
       {/* Streak account prompt */}
       <StreakPrompt streak={streak} />
+
+      {/* Leaderboard */}
+      <LeaderboardPanel gameType="buchstaebli" puzzleDate={puzzle.date} />
 
       {/* Share button */}
       <div className="mt-5 flex justify-center animate-[resultSlideUp_400ms_ease-out_800ms_both]">

@@ -4,6 +4,7 @@ import { SAMPLE_VERBINDIGE } from './verbindige.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
+import { submitLeaderboardEntry } from '@/lib/leaderboard';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -29,6 +30,8 @@ interface VerbindigeState {
   pendingCorrect: PendingCorrectGroup | null;
   streak: StreakData;
   isArchive: boolean;
+  startedAt: number | null;
+  elapsedSeconds: number | null;
 
   loadPuzzle: (archiveDate?: string) => Promise<void>;
   toggleItem: (item: VerbindigeItem) => void;
@@ -63,6 +66,8 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   pendingCorrect: null,
   streak: getStreak('verbindige'),
   isArchive: false,
+  startedAt: null,
+  elapsedSeconds: null,
 
   loadPuzzle: async (archiveDate?: string) => {
     set({ status: 'loading', error: null, isArchive: !!archiveDate });
@@ -71,7 +76,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       : await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
     const puzzle = fetched ?? SAMPLE_VERBINDIGE;
     const allItems = shuffleArray(puzzle.groups.flatMap((g) => g.items));
-    set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0 });
+    set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0, startedAt: Date.now(), elapsedSeconds: null });
   },
 
   toggleItem: (item) => {
@@ -112,6 +117,10 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     };
     if (won && !get().isArchive) {
       updates.streak = recordGamePlayed('verbindige');
+      const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
+      updates.elapsedSeconds = elapsed;
+      const score = 4 - get().mistakes;
+      void submitLeaderboardEntry('verbindige', score, elapsed);
     }
     set(updates);
   },
@@ -166,6 +175,9 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       };
       if (lost && !get().isArchive) {
         lostUpdates.streak = recordGamePlayed('verbindige');
+        const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
+        lostUpdates.elapsedSeconds = elapsed;
+        void submitLeaderboardEntry('verbindige', 0, elapsed);
       }
       set(lostUpdates);
 

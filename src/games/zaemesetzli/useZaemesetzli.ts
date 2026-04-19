@@ -3,6 +3,7 @@ import type { ZaemesetzliPuzzle, Rank, CompoundWord, StreakData } from '@/types'
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
+import { submitLeaderboardEntry } from '@/lib/leaderboard';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -122,6 +123,11 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const streakUpdate = foundWords.length === 0 && !get().isArchive
       ? { streak: recordGamePlayed('zaemesetzli') }
       : {};
+
+    // Submit to leaderboard on each word found (upsert keeps latest score)
+    if (!get().isArchive) {
+      void submitLeaderboardEntry('zaemesetzli', newScore, null);
+    }
 
     set({
       foundWords: newFoundWords,

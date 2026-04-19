@@ -3,6 +3,7 @@ import type { BuchstaebliPuzzle, Rank, StreakData } from '@/types';
 import { SAMPLE_BUCHSTAEBLI, DEMO_VALID_WORDS } from './buchstaebli.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
+import { submitLeaderboardEntry } from '@/lib/leaderboard';
 
 export interface FoundWord {
   word: string;
@@ -137,6 +138,11 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
     const allFound = Object.keys(DEMO_VALID_WORDS).every(
       (w) => newFoundWords.some((fw) => fw.word === w),
     );
+
+    // Submit to leaderboard on each word found (upsert keeps latest score)
+    if (!get().isArchive) {
+      void submitLeaderboardEntry('buchstaebli', newScore, null);
+    }
 
     set({
       foundWords: newFoundWords,

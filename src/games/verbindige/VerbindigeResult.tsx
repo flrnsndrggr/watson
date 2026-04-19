@@ -3,6 +3,7 @@ import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
+import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
 import { generateShareText } from '@/lib/share';
 import { useVerbindige } from './useVerbindige';
 
@@ -158,6 +159,9 @@ export function VerbindigeResult() {
 
       {/* Streak account prompt */}
       <StreakPrompt streak={streak} />
+
+      {/* Leaderboard */}
+      <LeaderboardPanel gameType="verbindige" puzzleDate={puzzle?.date} showTime />
 
       {/* Emoji grid — staggered row reveal */}
       <div
