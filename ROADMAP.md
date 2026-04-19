@@ -75,6 +75,7 @@ _Items from watson-qa-verbindige agent_
    - Suggested fix: Wrap the `clipboard.writeText` call in try/catch in `share.ts`. On catch, either rethrow a typed error or return `false`. In `ShareButton.handleShare`, catch the error and show a fallback toast ("Teilen fehlgeschlagen").
    - Files: `src/lib/share.ts` (line 32), `src/components/shared/ShareButton.tsx` (line 12-15)
    - Evidence: Console log showed `NotAllowedError: Failed to execute 'writeText' on 'Clipboard': Document is not focused` thrown from `share.ts`. Post-click page read confirmed button label remained "Teilen" (not "Kopiert!"). Observed 2026-04-18.
+   - Related: Zämesetzli #2 — same share error handling gap; share.ts fix would benefit both games
 
 ---
 
@@ -121,6 +122,7 @@ _Items from watson-qa-buchstaebli agent_
    - Suggested fix: Show a brief positive toast for valid words, e.g. `+${points} Pkt` or a short exclamation ("Gut!"). Alternatively, animate the input field green on success.
    - Files: `src/games/buchstaebli/BuchstaebliPage.tsx` (RESULT_MESSAGES constant)
    - Evidence: `RESULT_MESSAGES = { 'valid': '', ... }` + toast guard `if (RESULT_MESSAGES[lastResult])`. Observed 2026-04-16.
+   - Related: Buchstäbli #6 — both are submission feedback gaps; consider fixing together
 
 6. [ ] P1 - No feedback when submitting an already-found word
    - Agent: watson-qa-buchstaebli
@@ -129,6 +131,7 @@ _Items from watson-qa-buchstaebli agent_
    - Suggested fix: Add a `'already_found'` result case with a toast like "Schon gefunden!" in `RESULT_MESSAGES`. Return that result from the submit handler when the word is already in `foundWords`.
    - Files: `src/games/buchstaebli/BuchstaebliPage.tsx`, `src/games/buchstaebli/useBuchstaebli.ts`
    - Evidence: Submitted RATEN twice. Second submission: no fixed-position elements (toast container empty), wordCount unchanged at 1, score unchanged at 5/112 Pkt. Input cleared silently with zero user feedback. Observed 2026-04-18.
+   - Related: Buchstäbli #5 — both are submission feedback gaps; consider fixing together
 
 7. [ ] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
    - Agent: watson-qa-buchstaebli
@@ -188,6 +191,7 @@ _Items from watson-qa-schlagziil agent_
    - Files: `src/lib/share.ts`
    - Evidence: Share text footer reads `watson.ch/spiele/schlagziil`. Same bug affects all games sharing via this util. Observed 2026-04-16.
    - Related: #3 — both are share-related issues on the Schlagziil result screen; consider fixing together
+   - Related: Cross-game — share.ts URL affects all 4 games; fixing here resolves it everywhere
 
 5. [ ] P2 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
    - Agent: watson-qa-schlagziil
@@ -228,6 +232,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Suggested fix: Show a "Kopiert! 📋" toast on clipboard copy success, and a fallback error toast if navigator.share / clipboard API fails. The Verbindige ShareButton already does this pattern — reuse it.
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`, `src/components/shared/ShareButton.tsx`
    - Evidence: Clicked "Teilen" at 2/16 found, 1/28 Pkt. Page state unchanged, no console output, no toast or modal. Observed 2026-04-16.
+   - Related: Verbindige #6 — same share error handling gap in share.ts; fixing share.ts centrally would benefit both games
 
 3. [ ] P1 - Hint deducts a point but does not auto-select the hinted emojis
    - Agent: watson-qa-zaemesetzli
@@ -270,6 +275,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Suggested fix: Extend `alt_nouns` for each affected emoji to include the hidden readings: `🔑`: add `"Schein"`, `"Schloss"`; `🔔`: add `"Uhr"`, `"Bund"`; `☀️`: add `"Sonntag"`. Then surface these in a tooltip or the hint message when the relevant emoji pair is selected (e.g. hint changes to "Tipp: 🔑 kann auch 'Schein' bedeuten").
    - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (alt_nouns), `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint display)
    - Evidence: `zaemesetzli.data.ts` line 8: `🔑 alt_nouns: ['Key']`; line 13: `🔔 alt_nouns: []`; line 15: `☀️ alt_nouns: ['Licht']`. All five abstract compounds accepted in-game (confirmed). Observed 2026-04-18.
+   - Related: Zämesetzli #8 — Bergsonntag is one of the 5 compounds here; #8 adds is_mundart fix; consider fixing together
 
 8. [ ] P1 - "Bergsonntag" requires two-hop etymology (☀️→Sonne→Sonntag) and is incorrectly marked non-Mundart
    - Agent: watson-qa-zaemesetzli
@@ -278,6 +284,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Suggested fix: Either mark `is_mundart: true` (triggering the "Mundart-Bonus! 🇨🇭" toast) or add a cultural-note tooltip. Also add `"Sonntag"` to ☀️'s `alt_nouns` (see finding #7).
    - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (line 33: `is_mundart: false`)
    - Evidence: `{ word: 'Bergsonntag', components: ['⛰️','☀️'], difficulty: 3, points: 3, is_mundart: false }` in data file. ☀️ alt_nouns only contains `'Licht'`, not `'Sonntag'`. Observed 2026-04-18.
+   - Related: Zämesetzli #7 — alt_nouns fix for ☀️→Sonntag is covered there; this item adds the is_mundart correction; fix together
 
 9. [ ] P1 - max_score: 28 is incorrect — actual compound point sum is 29
    - Agent: watson-qa-zaemesetzli
@@ -295,13 +302,14 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component used by both games)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
-11. [ ] P0 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
+11. [ ] P1 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
     - Agent: watson-roadmap-worker
     - Scenario: Automated deploy after fixing Verbindige #5
     - Problem: `netlify deploy --prod` returns "Unauthorized: could not retrieve project". `netlify status` shows "Not logged in". The MCP tool `mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__netlify-deploy-services-updater` is not available in the current tool set. No deploy path exists.
     - Suggested fix: Run `netlify login` interactively to authenticate the CLI, or ensure the Netlify MCP tool is configured in the Claude Code MCP settings.
     - Files: CLI auth / MCP config
     - Evidence: `netlify deploy --prod --dir=dist --site=cfaa1817-72f7-47cd-8a95-8c998529bcf9` → "Error: Unauthorized: could not retrieve project". `netlify status` → "Not logged in." Observed 2026-04-18.
+    - Priority adjusted from P0 to P1: CI auto-deploys on push to main (commit 8bd0acd); manual CLI auth is not a deploy failure — deploys succeed via CI pipeline
 
 ---
 
