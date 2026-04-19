@@ -17,7 +17,7 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 ## Priority: Medium (User Engagement)
 
 - [ ] User accounts: Supabase Auth with email magic link — basic sign-up/sign-in flow
-- [ ] Streak tracking: calculate and display current streak per game (consecutive days played)
+- [x] Streak tracking: calculate and display current streak per game (consecutive days played) — done 2026-04-19
 - [ ] Streak prompt: show "Willst du deinen Streak behalten? Konto erstellen." after Day 3
 - [ ] Profile page: `/profil` route showing streaks, stats, games played per game
 - [ ] Archive mode: `/archiv` route with calendar view of past puzzles (no streak credit)

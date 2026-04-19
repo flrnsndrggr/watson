@@ -7,6 +7,7 @@ import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
+import { StreakBadge } from '@/components/shared/StreakBadge';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { RankBar } from '@/games/buchstaebli/RankBar';
 import { EmojiPool } from './EmojiPool';
@@ -32,6 +33,7 @@ export function ZaemesetzliPage() {
     score,
     currentRank,
     lastResult,
+    streak,
     selectEmoji,
     clearEmojiSelection,
     setInput,
@@ -221,8 +223,9 @@ export function ZaemesetzliPage() {
         </div>
       )}
 
-      {/* Share */}
-      <div className="mt-6 text-center">
+      {/* Streak + Share */}
+      <div className="mt-6 flex flex-col items-center gap-3">
+        {streak.current >= 1 && <StreakBadge streak={streak} />}
         <ShareButton text={shareText} />
       </div>
 

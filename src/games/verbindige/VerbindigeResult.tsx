@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
+import { StreakBadge } from '@/components/shared/StreakBadge';
 import { generateShareText } from '@/lib/share';
 import { useVerbindige } from './useVerbindige';
 
@@ -88,7 +89,7 @@ function useNextPuzzleCountdown(): string {
 }
 
 export function VerbindigeResult() {
-  const { solvedGroups, status, puzzle, mistakes, maxMistakes } =
+  const { solvedGroups, status, puzzle, mistakes, maxMistakes, streak } =
     useVerbindige();
   const countdown = useNextPuzzleCountdown();
 
@@ -146,6 +147,13 @@ export function VerbindigeResult() {
           />
         ))}
       </div>
+
+      {/* Streak badge */}
+      {streak.current >= 1 && (
+        <div className="mt-4 flex justify-center animate-[resultSlideUp_400ms_ease-out_250ms_both]">
+          <StreakBadge streak={streak} />
+        </div>
+      )}
 
       {/* Emoji grid — staggered row reveal */}
       <div

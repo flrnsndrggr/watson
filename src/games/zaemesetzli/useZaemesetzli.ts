@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import type { ZaemesetzliPuzzle, Rank, CompoundWord } from '@/types';
+import type { ZaemesetzliPuzzle, Rank, CompoundWord, StreakData } from '@/types';
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -16,6 +17,7 @@ interface ZaemesetzliState {
   currentRank: Rank;
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
+  streak: StreakData;
 
   loadPuzzle: () => Promise<void>;
   selectEmoji: (emoji: string) => void;
@@ -43,6 +45,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   currentRank: 'stift',
   hintsUsed: 0,
   lastResult: null,
+  streak: getStreak('zaemesetzli'),
 
   loadPuzzle: async () => {
     const fetched = await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
@@ -104,14 +107,21 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const newFound: FoundCompound = { ...compound, foundAt: Date.now() };
     const newScore = score + compound.points;
     const newRank = getRank(newScore, puzzle.rank_thresholds);
+    const newFoundWords = [...foundWords, newFound];
+
+    // Record streak on first word found
+    const streakUpdate = foundWords.length === 0
+      ? { streak: recordGamePlayed('zaemesetzli') }
+      : {};
 
     set({
-      foundWords: [...foundWords, newFound],
+      foundWords: newFoundWords,
       score: newScore,
       currentRank: newRank,
       currentInput: '',
       selectedEmojis: [],
       lastResult: compound.is_mundart ? 'mundart' : 'valid',
+      ...streakUpdate,
     });
   },
 

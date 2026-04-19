@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle } from '@/types';
+import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle, StreakData } from '@/types';
 import { SAMPLE_VERBINDIGE } from './verbindige.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
+import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -19,6 +20,7 @@ interface VerbindigeState {
   remainingItems: VerbindigeItem[];
   lastGuessResult: 'correct' | 'wrong' | 'one-away' | null;
   lastWrongItems: VerbindigeItem[];
+  streak: StreakData;
 
   loadPuzzle: () => Promise<void>;
   toggleItem: (item: VerbindigeItem) => void;
@@ -49,6 +51,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   remainingItems: [],
   lastGuessResult: null,
   lastWrongItems: [],
+  streak: getStreak('verbindige'),
 
   loadPuzzle: async () => {
     set({ status: 'loading', error: null });
@@ -101,14 +104,17 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       ];
       const newRemaining = remainingItems.filter((item) => !selectedTexts.has(item.text));
       const won = newSolvedGroups.length === 4;
-
-      set({
+      const updates: Partial<VerbindigeState> = {
         solvedGroups: newSolvedGroups,
         selected: [],
         remainingItems: newRemaining,
         lastGuessResult: 'correct',
         status: won ? 'won' : 'playing',
-      });
+      };
+      if (won) {
+        updates.streak = recordGamePlayed('verbindige');
+      }
+      set(updates);
     } else {
       // Check if "one away" — 3 out of 4 correct in any group
       const isOneAway = unsolvedGroups.some((g) => {
@@ -124,13 +130,17 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         showToast('Fast! Nur 1 falsch.');
       }
 
-      set({
+      const lostUpdates: Partial<VerbindigeState> = {
         mistakes: newMistakes,
         selected: [],
         lastWrongItems: selected,
         lastGuessResult: result,
         status: lost ? 'lost' : 'playing',
-      });
+      };
+      if (lost) {
+        lostUpdates.streak = recordGamePlayed('verbindige');
+      }
+      set(lostUpdates);
 
       // If lost, reveal all groups
       if (lost) {

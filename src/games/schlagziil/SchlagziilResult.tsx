@@ -1,10 +1,11 @@
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
+import { StreakBadge } from '@/components/shared/StreakBadge';
 import { generateShareText } from '@/lib/share';
 import { useSchlagziil } from './useSchlagziil';
 
 export function SchlagziilResult() {
-  const { results, hintsUsed, puzzle, status } = useSchlagziil();
+  const { results, hintsUsed, puzzle, status, streak } = useSchlagziil();
   if (status !== 'finished' || !puzzle) return null;
 
   const correctCount = results.filter((r) => r === 'correct').length;
@@ -35,6 +36,11 @@ export function SchlagziilResult() {
       <p className="mt-2 text-2xl">
         {accuracyGrid}
       </p>
+      {streak.current >= 1 && (
+        <div className="mt-3">
+          <StreakBadge streak={streak} />
+        </div>
+      )}
       <div className="mt-4">
         <ShareButton text={shareText} />
       </div>

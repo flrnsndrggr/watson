@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import type { SchlagziilPuzzle } from '@/types';
+import type { SchlagziilPuzzle, StreakData } from '@/types';
 import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS } from './schlagziil.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
@@ -18,6 +19,7 @@ interface SchlagziilState {
   hintsUsed: boolean[];
   status: 'loading' | 'playing' | 'finished';
   lastGuessResult: 'correct' | 'wrong' | null;
+  streak: StreakData;
 
   loadPuzzle: () => Promise<void>;
   submitGuess: (guess: string) => void;
@@ -66,6 +68,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   hintsUsed: [],
   status: 'loading',
   lastGuessResult: null,
+  streak: getStreak('schlagziil'),
 
   loadPuzzle: async () => {
     set({ status: 'loading' });
@@ -127,6 +130,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           revealedAnswers: newRevealed,
           status: 'finished',
           lastGuessResult: 'wrong',
+          streak: recordGamePlayed('schlagziil'),
         });
       } else {
         set({ totalErrors: newErrors, lastGuessResult: 'wrong' });
@@ -139,7 +143,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     if (!puzzle) return;
     const nextIndex = currentIndex + 1;
     if (nextIndex >= puzzle.headlines.length || results.every((r) => r !== null)) {
-      set({ status: 'finished' });
+      set({ status: 'finished', streak: recordGamePlayed('schlagziil') });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
     }
