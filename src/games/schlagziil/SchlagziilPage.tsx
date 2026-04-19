@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { showToast } from '@/components/shared/Toast';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { useStreak } from '@/lib/useStreak';
 import { HeadlineCard } from './HeadlineCard';
@@ -25,6 +26,7 @@ export function SchlagziilPage() {
     submitGuess,
     advanceToNext,
     useHint,
+    clearLastResult,
   } = useSchlagziil();
 
   const { current: streak, recordPlay } = useStreak('schlagziil');
@@ -40,12 +42,23 @@ export function SchlagziilPage() {
     }
   }, [status, puzzle?.date, recordPlay]);
 
+  const [wrongFlash, setWrongFlash] = useState(false);
+
   useEffect(() => {
     if (lastGuessResult === 'correct') {
       const timer = setTimeout(advanceToNext, 2000);
       return () => clearTimeout(timer);
     }
-  }, [lastGuessResult, advanceToNext]);
+    if (lastGuessResult === 'wrong' && status !== 'finished') {
+      showToast('Falsch!');
+      setWrongFlash(true);
+      const timer = setTimeout(() => {
+        setWrongFlash(false);
+        clearLastResult();
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [lastGuessResult, advanceToNext, status, clearLastResult]);
 
   if (!puzzle) return <PuzzleLoading />;
 
@@ -100,6 +113,7 @@ export function SchlagziilPage() {
             disabled={results[currentIndex] !== null}
             hintUsed={hintsUsed[currentIndex]}
             onUseHint={() => useHint(currentIndex)}
+            wrongFlash={wrongFlash}
           />
         </>
       )}

@@ -13,6 +13,7 @@ interface HeadlineCardProps {
   disabled: boolean;
   hintUsed: boolean;
   onUseHint: () => void;
+  wrongFlash?: boolean;
 }
 
 export function HeadlineCard({
@@ -28,6 +29,7 @@ export function HeadlineCard({
   disabled,
   hintUsed,
   onUseHint,
+  wrongFlash,
 }: HeadlineCardProps) {
   const [input, setInput] = useState('');
   const [showHint, setShowHint] = useState(false);
@@ -52,7 +54,9 @@ export function HeadlineCard({
           ? 'border-[var(--color-green)] bg-green-50'
           : isCorrect === false
             ? 'border-[var(--color-pink)] bg-pink-50'
-            : 'border-[var(--color-gray-bg)] bg-white'
+            : wrongFlash
+              ? 'animate-[shake_0.4s_ease-in-out] border-[var(--color-pink)] bg-pink-50'
+              : 'border-[var(--color-gray-bg)] bg-white'
       }`}
     >
       {/* Year + Category badge */}
