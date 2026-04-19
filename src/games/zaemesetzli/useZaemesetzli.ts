@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { ZaemesetzliPuzzle, Rank, CompoundWord, StreakData } from '@/types';
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
-import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface FoundCompound extends CompoundWord {
@@ -19,8 +19,9 @@ interface ZaemesetzliState {
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
   status: 'playing' | 'complete';
   streak: StreakData;
+  isArchive: boolean;
 
-  loadPuzzle: () => Promise<void>;
+  loadPuzzle: (archiveDate?: string) => Promise<void>;
   selectEmoji: (emoji: string) => void;
   clearEmojiSelection: () => void;
   setInput: (input: string) => void;
@@ -48,9 +49,13 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   lastResult: null,
   status: 'playing',
   streak: getStreak('zaemesetzli'),
+  isArchive: false,
 
-  loadPuzzle: async () => {
-    const fetched = await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
+  loadPuzzle: async (archiveDate?: string) => {
+    set({ isArchive: !!archiveDate });
+    const fetched = archiveDate
+      ? await fetchPuzzleByDate<ZaemesetzliPuzzle>('zaemesetzli', archiveDate)
+      : await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
     const puzzle = fetched ?? SAMPLE_ZAEMESETZLI;
     set({
       puzzle,
@@ -113,8 +118,8 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const newFoundWords = [...foundWords, newFound];
     const allFound = newFoundWords.length === puzzle.valid_compounds.length;
 
-    // Record streak on first word found
-    const streakUpdate = foundWords.length === 0
+    // Record streak on first word found (skip for archive)
+    const streakUpdate = foundWords.length === 0 && !get().isArchive
       ? { streak: recordGamePlayed('zaemesetzli') }
       : {};
 

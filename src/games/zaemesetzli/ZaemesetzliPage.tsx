@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { ArchiveBanner } from '@/components/shared/ArchiveBanner';
 import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { ZAEMESETZLI_STEPS } from '@/lib/howToPlayContent';
@@ -29,6 +31,9 @@ const RANK_LABELS: Record<Rank, string> = {
 };
 
 export function ZaemesetzliPage() {
+  const [searchParams] = useSearchParams();
+  const archiveDate = searchParams.get('date');
+
   const {
     loadPuzzle,
     puzzle,
@@ -40,6 +45,7 @@ export function ZaemesetzliPage() {
     lastResult,
     status,
     streak,
+    isArchive,
     selectEmoji,
     clearEmojiSelection,
     setInput,
@@ -55,11 +61,11 @@ export function ZaemesetzliPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    loadPuzzle();
+    loadPuzzle(archiveDate ?? undefined);
     if (!hasSeenHowToPlay('zaemesetzli')) {
       setShowHowToPlay(true);
     }
-  }, [loadPuzzle]);
+  }, [loadPuzzle, archiveDate]);
 
   // Handle guess results: shake on wrong, celebrate on correct
   useEffect(() => {
@@ -150,7 +156,8 @@ export function ZaemesetzliPage() {
 
   return (
     <GameShell>
-      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
+      {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
+      {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" onInfoClick={() => setShowHowToPlay(true)} />
 
       {showHowToPlay && (

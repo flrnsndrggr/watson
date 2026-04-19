@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle, StreakData } from '@/types';
 import { SAMPLE_VERBINDIGE } from './verbindige.data';
-import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
@@ -28,8 +28,9 @@ interface VerbindigeState {
   lastWrongItems: VerbindigeItem[];
   pendingCorrect: PendingCorrectGroup | null;
   streak: StreakData;
+  isArchive: boolean;
 
-  loadPuzzle: () => Promise<void>;
+  loadPuzzle: (archiveDate?: string) => Promise<void>;
   toggleItem: (item: VerbindigeItem) => void;
   shuffleRemaining: () => void;
   clearSelection: () => void;
@@ -61,10 +62,13 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   lastWrongItems: [],
   pendingCorrect: null,
   streak: getStreak('verbindige'),
+  isArchive: false,
 
-  loadPuzzle: async () => {
-    set({ status: 'loading', error: null });
-    const fetched = await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
+  loadPuzzle: async (archiveDate?: string) => {
+    set({ status: 'loading', error: null, isArchive: !!archiveDate });
+    const fetched = archiveDate
+      ? await fetchPuzzleByDate<VerbindigePuzzle>('verbindige', archiveDate)
+      : await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
     const puzzle = fetched ?? SAMPLE_VERBINDIGE;
     const allItems = shuffleArray(puzzle.groups.flatMap((g) => g.items));
     set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0 });
@@ -106,7 +110,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       pendingCorrect: null,
       status: won ? 'won' : 'playing',
     };
-    if (won) {
+    if (won && !get().isArchive) {
       updates.streak = recordGamePlayed('verbindige');
     }
     set(updates);
@@ -160,7 +164,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         lastGuessResult: result,
         status: lost ? 'lost' : 'playing',
       };
-      if (lost) {
+      if (lost && !get().isArchive) {
         lostUpdates.streak = recordGamePlayed('verbindige');
       }
       set(lostUpdates);

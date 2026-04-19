@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { ArchiveBanner } from '@/components/shared/ArchiveBanner';
 import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { VERBINDIGE_STEPS } from '@/lib/howToPlayContent';
@@ -13,6 +15,9 @@ import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
 
 export function VerbindigePage() {
+  const [searchParams] = useSearchParams();
+  const archiveDate = searchParams.get('date');
+
   const {
     loadPuzzle,
     puzzle,
@@ -24,6 +29,7 @@ export function VerbindigePage() {
     mistakes,
     maxMistakes,
     pendingCorrect,
+    isArchive,
   } = useVerbindige();
 
   const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
@@ -48,11 +54,11 @@ export function VerbindigePage() {
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
 
   useEffect(() => {
-    loadPuzzle();
+    loadPuzzle(archiveDate ?? undefined);
     if (!hasSeenHowToPlay('verbindige')) {
       setShowHowToPlay(true);
     }
-  }, [loadPuzzle]);
+  }, [loadPuzzle, archiveDate]);
 
   // Reset reveal state when a new puzzle loads
   useEffect(() => {
@@ -77,7 +83,8 @@ export function VerbindigePage() {
 
   return (
     <GameShell>
-      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
+      {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
+      {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Verbindige"
         puzzleNumber={1}

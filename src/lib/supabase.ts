@@ -35,6 +35,61 @@ interface PuzzleRow {
 }
 
 /**
+ * Fetch all published puzzle dates (past only, excluding today).
+ * Returns an array of { publish_date, game_type } rows.
+ */
+export async function fetchPuzzleDates(): Promise<{ publish_date: string; game_type: GameType }[]> {
+  try {
+    const today = getTodayDateCET();
+    const { data, error } = await supabase
+      .from('puzzles')
+      .select('publish_date, game_type')
+      .lt('publish_date', today)
+      .order('publish_date', { ascending: false });
+
+    if (error || !data) return [];
+    return data as { publish_date: string; game_type: GameType }[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Fetch a specific puzzle by game type and date.
+ * Returns null if not found.
+ */
+export async function fetchPuzzleByDate<T>(gameType: GameType, date: string): Promise<T | null> {
+  try {
+    const table = GAME_TABLE[gameType];
+    const select = GAME_SELECT[gameType];
+
+    const { data: puzzleRow, error: puzzleError } = await supabase
+      .from('puzzles')
+      .select('id, game_type, publish_date')
+      .eq('game_type', gameType)
+      .eq('publish_date', date)
+      .maybeSingle();
+
+    if (puzzleError || !puzzleRow) return null;
+
+    const row = puzzleRow as PuzzleRow;
+
+    const { data: gameData, error: gameError } = await supabase
+      .from(table)
+      .select(select)
+      .eq('puzzle_id', row.id)
+      .maybeSingle();
+
+    if (gameError || !gameData) return null;
+
+    const gameObj = gameData as unknown as Record<string, unknown>;
+    return { ...gameObj, id: row.id, date: row.publish_date } as T;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Fetch today's puzzle for a given game type from Supabase.
  * Returns null if no puzzle is published or Supabase is unreachable.
  */

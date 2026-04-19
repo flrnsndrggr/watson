@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { ArchiveBanner } from '@/components/shared/ArchiveBanner';
 import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { SCHLAGZIIL_STEPS } from '@/lib/howToPlayContent';
@@ -14,6 +16,9 @@ import { SchlagziilResult } from './SchlagziilResult';
 import { useSchlagziil } from './useSchlagziil';
 
 export function SchlagziilPage() {
+  const [searchParams] = useSearchParams();
+  const archiveDate = searchParams.get('date');
+
   const {
     loadPuzzle,
     puzzle,
@@ -25,6 +30,7 @@ export function SchlagziilPage() {
     hintsUsed,
     status,
     lastGuessResult,
+    isArchive,
     submitGuess,
     advanceToNext,
     useHint,
@@ -37,11 +43,11 @@ export function SchlagziilPage() {
   const prevStatus = useRef(status);
 
   useEffect(() => {
-    loadPuzzle();
+    loadPuzzle(archiveDate ?? undefined);
     if (!hasSeenHowToPlay('schlagziil')) {
       setShowHowToPlay(true);
     }
-  }, [loadPuzzle]);
+  }, [loadPuzzle, archiveDate]);
 
   // Handle guess results: toasts, shake, auto-advance
   useEffect(() => {
@@ -91,7 +97,8 @@ export function SchlagziilPage() {
 
   return (
     <GameShell>
-      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
+      {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
+      {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Schlagziil"
         puzzleNumber={1}

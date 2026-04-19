@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { SchlagziilPuzzle, StreakData } from '@/types';
 import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagziil.data';
-import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
@@ -22,8 +22,9 @@ interface SchlagziilState {
   status: 'loading' | 'playing' | 'finished';
   lastGuessResult: 'correct' | 'wrong' | null;
   streak: StreakData;
+  isArchive: boolean;
 
-  loadPuzzle: () => Promise<void>;
+  loadPuzzle: (archiveDate?: string) => Promise<void>;
   submitGuess: (guess: string) => void;
   advanceToNext: () => void;
   useHint: (index: number) => void;
@@ -72,10 +73,13 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   status: 'loading',
   lastGuessResult: null,
   streak: getStreak('schlagziil'),
+  isArchive: false,
 
-  loadPuzzle: async () => {
-    set({ status: 'loading' });
-    const fetched = await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
+  loadPuzzle: async (archiveDate?: string) => {
+    set({ status: 'loading', isArchive: !!archiveDate });
+    const fetched = archiveDate
+      ? await fetchPuzzleByDate<SchlagziilPuzzleWithAnswers>('schlagziil', archiveDate)
+      : await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
     const puzzle: SchlagziilPuzzle = fetched ?? SAMPLE_SCHLAGZIIL;
     const answers = fetched?.answers ?? DEMO_ANSWERS;
     const displayAnswers = fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS;
@@ -135,7 +139,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           revealedAnswers: newRevealed,
           status: 'finished',
           lastGuessResult: 'wrong',
-          streak: recordGamePlayed('schlagziil'),
+          ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }),
         });
       } else {
         set({ totalErrors: newErrors, lastGuessResult: 'wrong' });
@@ -148,7 +152,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     if (!puzzle) return;
     const nextIndex = currentIndex + 1;
     if (nextIndex >= puzzle.headlines.length || results.every((r) => r !== null)) {
-      set({ status: 'finished', streak: recordGamePlayed('schlagziil') });
+      set({ status: 'finished', ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }) });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
     }
