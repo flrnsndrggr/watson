@@ -68,7 +68,7 @@ export function VerbindigePage() {
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Verbindige"
-        puzzleNumber={1}
+        puzzleId={puzzle?.date ?? ''}
         subtitle="Finde 4 Gruppen à 4"
         streak={streak}
       />

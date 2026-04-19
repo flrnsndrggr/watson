@@ -84,7 +84,7 @@ export function ZaemesetzliPage() {
   return (
     <GameShell>
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" streak={streak} />
+      <GameHeader title="Zämesetzli" puzzleId={puzzle?.date ?? '1'} subtitle="Kombiniere Emojis zu deutschen Wörtern" streak={streak} />
 
       <RankBar
         currentRank={currentRank}

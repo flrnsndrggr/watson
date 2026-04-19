@@ -43,7 +43,7 @@ _Items from watson-qa-verbindige agent_
    - Files: `src/games/verbindige/VerbindigeBoard.tsx`, `src/games/verbindige/VerbindigePage.tsx`, `src/games/verbindige/useVerbindige.ts`
    - Evidence: Guess 1 Tschumpel/Tubel/Güxi/Löli → 3/4 Dummkopf. Guess 2 Töffli/Velo/Trottinett/Tscholi → 3/4 Fortbewegung. Guess 3 same+Sürmel → 3/4 Fortbewegung. No toast visible in any post-guess screenshot. Observed 2026-04-16.
 
-3. [ ] P2 - Puzzle identifier inconsistent: header shows #001, result shows #2026-04-16
+3. [x] P2 - Puzzle identifier inconsistent: header shows #001, result shows #2026-04-16
    - Agent: watson-qa-verbindige
    - Scenario: Full Game Flow — result screen after winning
    - Problem: Game header displays "Verbindige #001" (hardcoded `puzzleNumber={1}` in `VerbindigePage.tsx:46`). Result footer displays "Verbindige #2026-04-16" (using `puzzle.date` in `VerbindigeResult.tsx:38`). A user comparing their shared result to the header would see two different identifiers.
@@ -60,7 +60,7 @@ _Items from watson-qa-verbindige agent_
    - Evidence: No `<dialog>`, modal, or tooltip found in DOM. Only on-screen instruction is the subtitle. Observed 2026-04-16.
    - Related: Zämesetzli #5 — same onboarding gap pattern; consider a shared HowToPlay component
 
-5. [ ] P1 - Share text uses hardcoded puzzle number "#1" — third distinct puzzle identifier
+5. [x] P1 - Share text uses hardcoded puzzle number "#1" — third distinct puzzle identifier
    - Agent: watson-qa-verbindige
    - Scenario: Share Flow — completing a game and clicking Teilen
    - Problem: `VerbindigeResult.tsx:23` calls `generateShareText('verbindige', 1, emojiGrid)` with a hardcoded literal `1`. The resulting share text reads "Verbindige #1 🇨🇭". This is a third distinct identifier for the same puzzle: the game header shows "Verbindige #001", the result footer shows "Verbindige #2026-04-16", and the share text shows "Verbindige #1". A recipient who taps a shared result and sees "#1" cannot match it to the header "#001" they see in the app.

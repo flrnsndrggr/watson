@@ -1,17 +1,17 @@
 interface GameHeaderProps {
   title: string;
-  puzzleNumber: number;
+  puzzleId: string;
   subtitle?: string;
   streak?: number;
 }
 
-export function GameHeader({ title, puzzleNumber, subtitle, streak }: GameHeaderProps) {
+export function GameHeader({ title, puzzleId, subtitle, streak }: GameHeaderProps) {
   return (
     <div className="mb-4 text-center">
       <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold tracking-tight">
         {title}
         <span className="ml-2 text-[var(--color-gray-text)] text-base font-normal">
-          #{puzzleNumber.toString().padStart(3, '0')}
+          #{puzzleId}
         </span>
         {streak != null && streak >= 2 && (
           <span

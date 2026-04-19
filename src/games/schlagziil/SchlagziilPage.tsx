@@ -57,7 +57,7 @@ export function SchlagziilPage() {
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Schlagziil"
-        puzzleNumber={1}
+        puzzleId={puzzle?.date ?? '1'}
         subtitle="Errate das fehlende Wort"
         streak={streak}
       />
