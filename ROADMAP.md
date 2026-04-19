@@ -196,13 +196,14 @@ _Items from watson-qa-schlagziil agent_
    - Related: #3 — both are share-related issues on the Schlagziil result screen; consider fixing together
    - Related: Cross-game — share.ts URL affects all 4 games; fixing here resolves it everywhere
 
-5. [ ] P2 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
+5. [ ] P1 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
    - Agent: watson-qa-schlagziil
    - Scenario: Article Links — results screen after game-over
    - Problem: All 5 headlines in `SAMPLE_SCHLAGZIIL` have stub `article_url` values (`/energie/123`, `/migration/456`, etc.). Clicking "watson-Artikel lesen →" leads to a 404, breaking the core value prop of reading the real article after guessing.
    - Suggested fix: Replace stub URLs with real watson.ch article URLs for each headline before launch.
-   - Files: `src/games/schlagziil/schlagziil.data.ts`
+   - Files: `src/games/schlagziil/schlagziil.data.ts`, `src/games/schlagziil/HeadlineCard.tsx`
    - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
+   - Priority adjusted from P2 to P1: article links are the core post-game value prop; all 5 returning 404 blocks real user engagement flow
    - Related: Schlagziil #4 — share URL also wrong; both need the correct production base URL
 
 6. [x] P1 - Hint state leaks between headlines — subsequent tips auto-reveal without user click
