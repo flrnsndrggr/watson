@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
+import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { generateShareText } from '@/lib/share';
 import { useSchlagziil } from './useSchlagziil';
 
@@ -149,6 +150,9 @@ export function SchlagziilResult() {
           <StreakBadge streak={streak} />
         </div>
       )}
+
+      {/* Streak account prompt */}
+      <StreakPrompt streak={streak} />
 
       {/* Share button */}
       <div className="mt-5 flex justify-center animate-[resultSlideUp_400ms_ease-out_800ms_both]">

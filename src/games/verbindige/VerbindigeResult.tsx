@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
+import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { generateShareText } from '@/lib/share';
 import { useVerbindige } from './useVerbindige';
 
@@ -154,6 +155,9 @@ export function VerbindigeResult() {
           <StreakBadge streak={streak} />
         </div>
       )}
+
+      {/* Streak account prompt */}
+      <StreakPrompt streak={streak} />
 
       {/* Emoji grid — staggered row reveal */}
       <div
