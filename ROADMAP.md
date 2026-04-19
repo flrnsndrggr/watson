@@ -274,7 +274,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (add rank-change effect), `src/components/shared/Toast.tsx`
    - Evidence: Screenshot taken immediately after reaching 6pt shows "Lehrling" label and updated hint, no toast in DOM. Same for Geselle transition at 13pt. `ZaemesetzliPage.tsx:45-51` only tracks `lastResult`. Observed 2026-04-18.
 
-7. [ ] P1 - d=2/d=3 compounds use emojis as phonetic stand-ins not listed in alt_nouns
+7. [x] P1 - d=2/d=3 compounds use emojis as phonetic stand-ins not listed in alt_nouns
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — attempted all 16 compounds; 5 require non-obvious emoji readings
    - Problem: Five compounds require interpreting emojis in ways that appear nowhere in `alt_nouns` or any UI element: `🔑` (Schlüssel) as "-schein" in Sonnenschein; `🔑` as "-schloss" in Türschloss; `🔔` (Glocke) as "-uhr" in Sonnenuhr; `🔔` as "-bund" in Schlüsselbund; `☀️` (Sonne) as "Sonntag-" in Bergsonntag. A player who logically tries "Sonnenschlüssel" (sun + key → literal) gets rejected with no guidance. The hint button reveals the emoji pair (e.g. "☀️+🔑=?") but still leaves the player stuck on what word to type. The only discovery path is random guessing.
@@ -283,7 +283,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Evidence: `zaemesetzli.data.ts` line 8: `🔑 alt_nouns: ['Key']`; line 13: `🔔 alt_nouns: []`; line 15: `☀️ alt_nouns: ['Licht']`. All five abstract compounds accepted in-game (confirmed). Observed 2026-04-18.
    - Related: Zämesetzli #8 — Bergsonntag is one of the 5 compounds here; #8 adds is_mundart fix; consider fixing together
 
-8. [ ] P2 - "Bergsonntag" requires two-hop etymology (☀️→Sonne→Sonntag) and is incorrectly marked non-Mundart
+8. [x] P2 - "Bergsonntag" requires two-hop etymology (☀️→Sonne→Sonntag) and is incorrectly marked non-Mundart
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — reviewing d=3 compound data
    - Problem: `Bergsonntag` [⛰️+☀️] is the hardest compound (difficulty: 3, points: 3). ☀️'s canonical noun is "Sonne" but the compound needs "Sonntag" (Sunday). The leap from ☀️→Sonntag requires knowing German etymology (Sonntag = "Sonne" + "-tag" = "day of the sun") — two conceptual hops away from the emoji. The word "Bergsonntag" itself denotes a traditional Swiss Alpine Sunday celebration, making it regionally specific but it is marked `is_mundart: false`, so it receives no Mundart-Bonus toast and no 🇨🇭 marker in the found list. Players who find it get no signal it's culturally Swiss.

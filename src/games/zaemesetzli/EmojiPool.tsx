@@ -32,7 +32,7 @@ function EmojiButton({ item, isSelected, onSelect }: { item: EmojiItem; isSelect
       {item.emoji}
       {showNoun && (
         <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[var(--color-nav-bg)] px-2 py-0.5 text-[10px] font-semibold text-white">
-          {item.canonical_noun}
+          {item.canonical_noun}{item.alt_nouns.length > 0 && ` · ${item.alt_nouns.join(', ')}`}
         </span>
       )}
     </button>
