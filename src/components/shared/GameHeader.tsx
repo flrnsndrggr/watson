@@ -1,18 +1,20 @@
 interface GameHeaderProps {
   title: string;
-  puzzleNumber: number;
+  puzzleId: string;
   subtitle?: string;
   onInfoClick?: () => void;
 }
 
-export function GameHeader({ title, puzzleNumber, subtitle, onInfoClick }: GameHeaderProps) {
+export function GameHeader({ title, puzzleId, subtitle, onInfoClick }: GameHeaderProps) {
   return (
     <div className="mb-4 text-center relative">
       <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold tracking-tight">
         {title}
-        <span className="ml-2 text-[var(--color-gray-text)] text-base font-normal">
-          #{puzzleNumber.toString().padStart(3, '0')}
-        </span>
+        {puzzleId && (
+          <span className="ml-2 text-[var(--color-gray-text)] text-base font-normal">
+            #{puzzleId}
+          </span>
+        )}
       </h1>
       {subtitle && (
         <p className="mt-1 text-sm text-[var(--color-gray-text)]">{subtitle}</p>

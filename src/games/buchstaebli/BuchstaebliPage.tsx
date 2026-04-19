@@ -187,7 +187,7 @@ export function BuchstaebliPage() {
   return (
     <GameShell>
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Buchstäbli" puzzleNumber={1} onInfoClick={() => setShowHowToPlay(true)} />
+      <GameHeader title="Buchstäbli" puzzleId={puzzle?.date ?? ''} onInfoClick={() => setShowHowToPlay(true)} />
 
       {showHowToPlay && (
         <HowToPlayModal

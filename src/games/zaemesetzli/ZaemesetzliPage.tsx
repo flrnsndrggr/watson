@@ -158,7 +158,7 @@ export function ZaemesetzliPage() {
     <GameShell>
       {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
       {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" onInfoClick={() => setShowHowToPlay(true)} />
+      <GameHeader title="Zämesetzli" puzzleId={puzzle?.date ?? ''} subtitle="Kombiniere Emojis zu deutschen Wörtern" onInfoClick={() => setShowHowToPlay(true)} />
 
       {showHowToPlay && (
         <HowToPlayModal

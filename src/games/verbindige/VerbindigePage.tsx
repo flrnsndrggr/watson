@@ -87,7 +87,7 @@ export function VerbindigePage() {
       {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
         title="Verbindige"
-        puzzleNumber={1}
+        puzzleId={puzzle?.date ?? ''}
         subtitle="Finde 4 Gruppen à 4"
         onInfoClick={() => setShowHowToPlay(true)}
       />

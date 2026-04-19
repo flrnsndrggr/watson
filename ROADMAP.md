@@ -60,7 +60,7 @@ _Items from watson-qa-verbindige agent_
    - Evidence: No `<dialog>`, modal, or tooltip found in DOM. Only on-screen instruction is the subtitle. Observed 2026-04-16.
    - Related: Zämesetzli #5 — same onboarding gap pattern; consider a shared HowToPlay component
 
-5. [ ] P1 - Share text uses hardcoded puzzle number "#1" — third distinct puzzle identifier
+5. [x] P1 - Share text uses hardcoded puzzle number "#1" — third distinct puzzle identifier
    - Agent: watson-qa-verbindige
    - Scenario: Share Flow — completing a game and clicking Teilen
    - Problem: `VerbindigeResult.tsx:23` calls `generateShareText('verbindige', 1, emojiGrid)` with a hardcoded literal `1`. The resulting share text reads "Verbindige #1 🇨🇭". This is a third distinct identifier for the same puzzle: the game header shows "Verbindige #001", the result footer shows "Verbindige #2026-04-16", and the share text shows "Verbindige #1". A recipient who taps a shared result and sees "#1" cannot match it to the header "#001" they see in the app.
