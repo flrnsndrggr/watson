@@ -240,7 +240,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Related: Verbindige #6 — same share error handling gap in share.ts; fixing share.ts centrally would benefit both games
    - Related: Schlagziil #4 — share.ts is the common fix surface for share URL, error handling, and feedback across all games
 
-3. [ ] P1 - Hint deducts a point but does not auto-select the hinted emojis
+3. [x] P1 - Hint deducts a point but does not auto-select the hinted emojis
    - Agent: watson-qa-zaemesetzli
    - Scenario: Combination Flow — using the Tipp button with a different emoji pair active
    - Problem: Clicking "💡 Tipp (-1 Pkt)" shows a tooltip like "Tipp: 🏠 + 🔑 = ?" and deducts 1 point, but the currently selected emoji pair in the combine slots is unchanged (was 🏠+☀️, stayed 🏠+☀️). The user paid a point for a hint but must manually deselect and reselect to use it.

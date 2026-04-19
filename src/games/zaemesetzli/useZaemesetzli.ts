@@ -153,6 +153,8 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     set({
       hintsUsed: hintsUsed + 1,
       score: Math.max(0, score - 1),
+      selectedEmojis: hint.components,
+      currentInput: '',
     });
     return `${hint.components.join(' + ')} = ?`;
   },
