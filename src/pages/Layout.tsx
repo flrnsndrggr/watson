@@ -130,6 +130,13 @@ export function Layout() {
                           {user.email}
                         </div>
                         <div className="mx-2 my-1 h-px bg-gray-100" />
+                        <Link
+                          to="/profil"
+                          onClick={() => setShowUserMenu(false)}
+                          className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                          Mein Profil
+                        </Link>
                         <button
                           onClick={async () => {
                             await signOut();

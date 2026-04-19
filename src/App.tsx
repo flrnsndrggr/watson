@@ -23,6 +23,7 @@ const VerbindigePage = lazy(() => import('@/games/verbindige/VerbindigePage').th
 const ZaemesetzliPage = lazy(() => import('@/games/zaemesetzli/ZaemesetzliPage').then(m => ({ default: m.ZaemesetzliPage })));
 const SchlagziilPage = lazy(() => import('@/games/schlagziil/SchlagziilPage').then(m => ({ default: m.SchlagziilPage })));
 const BuchstaebliPage = lazy(() => import('@/games/buchstaebli/BuchstaebliPage').then(m => ({ default: m.BuchstaebliPage })));
+const ProfilPage = lazy(() => import('@/pages/ProfilPage').then(m => ({ default: m.ProfilPage })));
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 const AdminVerbindige = lazy(() => import('@/pages/admin/AdminVerbindige').then(m => ({ default: m.AdminVerbindige })));
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="zaemesetzli" element={<ZaemesetzliPage />} />
               <Route path="schlagziil" element={<SchlagziilPage />} />
               <Route path="buchstaebli" element={<BuchstaebliPage />} />
+              <Route path="profil" element={<ProfilPage />} />
             </Route>
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
