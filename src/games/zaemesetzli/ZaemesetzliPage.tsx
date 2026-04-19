@@ -5,6 +5,9 @@ import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
+import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
+import { ZAEMESETZLI_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
 import { generateShareText } from '@/lib/share';
 import { StreakBadge } from '@/components/shared/StreakBadge';
@@ -45,11 +48,15 @@ export function ZaemesetzliPage() {
 
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevRank = useRef<Rank>(currentRank);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadPuzzle();
+    if (!hasSeenHowToPlay('zaemesetzli')) {
+      setShowHowToPlay(true);
+    }
   }, [loadPuzzle]);
 
   // Handle guess results: shake on wrong, celebrate on correct
@@ -130,7 +137,16 @@ export function ZaemesetzliPage() {
   return (
     <GameShell>
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" />
+      <GameHeader title="Zämesetzli" puzzleNumber={1} subtitle="Kombiniere Emojis zu deutschen Wörtern" onInfoClick={() => setShowHowToPlay(true)} />
+
+      {showHowToPlay && (
+        <HowToPlayModal
+          gameId="zaemesetzli"
+          title="Zämesetzli"
+          steps={ZAEMESETZLI_STEPS}
+          onClose={() => setShowHowToPlay(false)}
+        />
+      )}
 
       <RankBar
         currentRank={currentRank}

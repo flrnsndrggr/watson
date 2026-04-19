@@ -4,6 +4,9 @@ import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
+import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
+import { SCHLAGZIIL_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { HeadlineCard } from './HeadlineCard';
@@ -30,10 +33,14 @@ export function SchlagziilPage() {
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
   const [reviewExpanded, setReviewExpanded] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevStatus = useRef(status);
 
   useEffect(() => {
     loadPuzzle();
+    if (!hasSeenHowToPlay('schlagziil')) {
+      setShowHowToPlay(true);
+    }
   }, [loadPuzzle]);
 
   // Handle guess results: toasts, shake, auto-advance
@@ -89,7 +96,17 @@ export function SchlagziilPage() {
         title="Schlagziil"
         puzzleNumber={1}
         subtitle="Errate das fehlende Wort"
+        onInfoClick={() => setShowHowToPlay(true)}
       />
+
+      {showHowToPlay && (
+        <HowToPlayModal
+          gameId="schlagziil"
+          title="Schlagziil"
+          steps={SCHLAGZIIL_STEPS}
+          onClose={() => setShowHowToPlay(false)}
+        />
+      )}
 
       {!isFinished && headline && (
         <>

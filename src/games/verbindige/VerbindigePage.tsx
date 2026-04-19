@@ -4,6 +4,9 @@ import { GameHeader } from '@/components/shared/GameHeader';
 import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
+import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
+import { VERBINDIGE_STEPS } from '@/lib/howToPlayContent';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
@@ -24,6 +27,7 @@ export function VerbindigePage() {
 
   const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
   const [revealComplete, setRevealComplete] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   const handleShuffle = useCallback(() => {
     if (shufflePhase !== 'idle') return;
@@ -44,6 +48,9 @@ export function VerbindigePage() {
 
   useEffect(() => {
     loadPuzzle();
+    if (!hasSeenHowToPlay('verbindige')) {
+      setShowHowToPlay(true);
+    }
   }, [loadPuzzle]);
 
   // Reset reveal state when a new puzzle loads
@@ -74,7 +81,17 @@ export function VerbindigePage() {
         title="Verbindige"
         puzzleNumber={1}
         subtitle="Finde 4 Gruppen à 4"
+        onInfoClick={() => setShowHowToPlay(true)}
       />
+
+      {showHowToPlay && (
+        <HowToPlayModal
+          gameId="verbindige"
+          title="Verbindige"
+          steps={VERBINDIGE_STEPS}
+          onClose={() => setShowHowToPlay(false)}
+        />
+      )}
 
       <VerbindigeBoard
         shufflePhase={shufflePhase}

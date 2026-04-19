@@ -1,0 +1,29 @@
+import type { HowToPlayStep } from '@/components/shared/HowToPlayModal';
+
+export const VERBINDIGE_STEPS: HowToPlayStep[] = [
+  { icon: '🔲', text: 'Finde 4 Gruppen à 4 Wörter, die zusammengehören.' },
+  { icon: '👆', text: 'Tippe 4 Wörter an und drücke «Prüfen».' },
+  { icon: '🎨', text: 'Jede Gruppe hat eine Farbe — von Gelb (einfach) bis Violett (knifflig).' },
+  { icon: '❌', text: 'Du hast 4 Versuche. Danach ist das Spiel vorbei.' },
+];
+
+export const SCHLAGZIIL_STEPS: HowToPlayStep[] = [
+  { icon: '📰', text: 'Errate das fehlende Wort in 5 echten watson-Schlagzeilen.' },
+  { icon: '⌨️', text: 'Tippe deine Antwort ein und drücke Enter.' },
+  { icon: '❌', text: '3 Fehler insgesamt — dann ist Schluss.' },
+  { icon: '🔗', text: 'Nach jeder Schlagzeile kannst du den ganzen Artikel lesen.' },
+];
+
+export const BUCHSTAEBLI_STEPS: HowToPlayStep[] = [
+  { icon: '🐝', text: 'Bilde Wörter mit den 7 Buchstaben. Der mittlere muss immer dabei sein.' },
+  { icon: '📏', text: 'Jedes Wort braucht mindestens 4 Buchstaben.' },
+  { icon: '⭐', text: 'Pangram = alle 7 Buchstaben in einem Wort. Gibt Bonus!' },
+  { icon: '🏔️', text: 'Steige auf: Stift → Lehrling → Geselle → Meister → Bundesrat.' },
+];
+
+export const ZAEMESETZLI_STEPS: HowToPlayStep[] = [
+  { icon: '🧩', text: 'Kombiniere 2–3 Emojis zu zusammengesetzten Wörtern.' },
+  { icon: '👆', text: 'Wähle Emojis aus, tippe das Wort ein und drücke Enter.' },
+  { icon: '🇨🇭', text: 'Mundart-Wörter geben extra Punkte!' },
+  { icon: '🏔️', text: 'Steige auf: Stift → Lehrling → Geselle → Meister → Bundesrat.' },
+];

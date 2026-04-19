@@ -3,6 +3,9 @@ import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
+import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
+import { BUCHSTAEBLI_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { generateShareText } from '@/lib/share';
@@ -55,6 +58,7 @@ export function BuchstaebliPage() {
 
   const [shufflePhase, setShufflePhase] = useState<'out' | 'in' | null>(null);
   const shuffleTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [inputFlash, setInputFlash] = useState<'success' | 'error' | null>(null);
   const prevRank = useRef<Rank>(currentRank);
@@ -62,6 +66,9 @@ export function BuchstaebliPage() {
 
   useEffect(() => {
     loadPuzzle();
+    if (!hasSeenHowToPlay('buchstaebli')) {
+      setShowHowToPlay(true);
+    }
   }, [loadPuzzle]);
 
   // Toast + input feedback on guess result
@@ -180,7 +187,16 @@ export function BuchstaebliPage() {
   return (
     <GameShell>
       {isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Buchstäbli" puzzleNumber={1} />
+      <GameHeader title="Buchstäbli" puzzleNumber={1} onInfoClick={() => setShowHowToPlay(true)} />
+
+      {showHowToPlay && (
+        <HowToPlayModal
+          gameId="buchstaebli"
+          title="Buchstäbli"
+          steps={BUCHSTAEBLI_STEPS}
+          onClose={() => setShowHowToPlay(false)}
+        />
+      )}
 
       <RankBar
         currentRank={currentRank}
