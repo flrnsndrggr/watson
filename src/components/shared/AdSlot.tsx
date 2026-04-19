@@ -12,9 +12,11 @@ export function AdSlot({ type, className = '' }: AdSlotProps) {
 
   return (
     <div
-      className={`mx-auto flex items-center justify-center bg-[var(--color-gray-bg)] text-xs text-[var(--color-gray-text)] ${sizes[type]} ${className}`}
+      className={`mx-auto flex flex-col items-center justify-center rounded-[var(--game-tile-radius)] border border-dashed border-[var(--color-gray-text)]/30 bg-[var(--color-gray-bg)] ${sizes[type]} ${className}`}
     >
-      Werbung
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-gray-text)]">
+        Anzeige
+      </span>
     </div>
   );
 }
