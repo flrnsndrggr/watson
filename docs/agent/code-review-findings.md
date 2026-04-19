@@ -46,5 +46,34 @@
 
 4. RankBar moved from `src/games/buchstaebli/` to `src/components/shared/` — good refactor since it's now used by Zämesetzli only. The `thresholds` prop remains unused (existing P1 from Buchstäbli QA still applies).
 
+---
+
+## Review — 2026-04-19 (incremental)
+
+### Branch: temp-holder (commits 31bc00d..90cc78d)
+
+3 commits: ErrorDots pulse animation, code review findings commit, release verification.
+
+**CRITICAL** (must fix before merge):
+
+_None._
+
+**WARNING** (should fix):
+
+1. `error-dot-pulse` keyframe uses `transform: scale()` — interacts with existing CRITICAL (transform: none !important).
+   - File: `src/styles/tokens.css:104-108`
+   - Problem: The new `@keyframes error-dot-pulse` uses `transform: scale(1.5)` at 50%. This animation is correctly neutered under `prefers-reduced-motion` by the existing `animation-duration: 0.01ms !important` rule, so accessibility is fine. However, if the CRITICAL `transform: none !important` issue from the previous review remains unfixed, it would also affect this animation's scale transform during playback — though that's moot since the animation-duration rule fires first. No new breakage, but this is another reason to fix the CRITICAL from the prior review.
+   - Suggested fix: Fix the original CRITICAL (remove `transform: none !important`); no changes needed to the pulse animation itself.
+
+**NOTE** (consider):
+
+1. React key-based remount trick for re-triggering animation is correct but slightly unusual.
+   - File: `src/components/shared/ErrorDots.tsx:13`
+   - Problem: `key={isLatest ? \`dot-${i}-${used}\` : i}` forces React to destroy and recreate the DOM node when a dot becomes "latest", re-triggering the CSS animation. This is a valid pattern, but when `used` increments, the previously-latest dot also remounts (its key changes from the dynamic form back to just `i`). For simple `<span>` elements with no state this is harmless, but worth a comment explaining the intent for future maintainers.
+
+2. ErrorDots pulse animation not tested with screen readers.
+   - File: `src/components/shared/ErrorDots.tsx`
+   - Problem: The error dots have no ARIA attributes. Screen readers won't announce when a new error occurs. Consider `aria-live="polite"` on the container and an `aria-label` like `"Fehler: {used} von {total}"` so error progression is accessible to non-visual users. (This predates this commit but is worth noting alongside the visual enhancement.)
+
 ## Last Reviewed
-- temp-holder: 31bc00d
+- temp-holder: 90cc78d
