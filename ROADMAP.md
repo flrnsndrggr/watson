@@ -67,6 +67,8 @@ _Items from watson-qa-verbindige agent_
    - Suggested fix: Pass `puzzle.id` or a date-derived number consistently. Since finding #3 recommends standardising on one identifier across header and result footer, extend that fix to also update `VerbindigeResult.tsx:23` so all three surfaces use the same value.
    - Files: `src/games/verbindige/VerbindigeResult.tsx` (line 23), `src/lib/share.ts`
    - Evidence: Captured share text via clipboard interceptor: "Verbindige #1 🇨🇭\n🟨🟨🟨🟨\n🟩🟩🟩🟩\n🟦🟦🟦🟦\n🟪🟪🟪🟪\nwatson.ch/spiele/verbindige". Header on same page rendered "Verbindige #001". Result footer rendered "Verbindige #2026-04-16". Observed 2026-04-18.
+   - Related: #3 — same puzzle identifier inconsistency; this item extends the fix to the share text surface
+   - Related: Schlagziil #4 — share text also appends wrong base URL (watson.ch instead of production domain)
 
 6. [ ] P2 - Share error propagates uncaught — silent failure when clipboard is denied
    - Agent: watson-qa-verbindige
@@ -148,6 +150,7 @@ _Items from watson-qa-buchstaebli agent_
    - Suggested fix: Add a space before the `#001` span: `Buchstäbli <span>#{puzzleNumber}</span>`.
    - Files: `src/games/buchstaebli/BuchstaebliPage.tsx` or `src/components/shared/GameHeader.tsx`
    - Evidence: `document.querySelector('[role="heading"]').textContent === "Buchstäbli#001"` in production. Observed 2026-04-18.
+   - Related: Verbindige #3 — both involve GameHeader puzzle number display; may share root cause in `GameHeader.tsx`
 
 ---
 
@@ -233,6 +236,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`, `src/components/shared/ShareButton.tsx`
    - Evidence: Clicked "Teilen" at 2/16 found, 1/28 Pkt. Page state unchanged, no console output, no toast or modal. Observed 2026-04-16.
    - Related: Verbindige #6 — same share error handling gap in share.ts; fixing share.ts centrally would benefit both games
+   - Related: Schlagziil #4 — share.ts is the common fix surface for share URL, error handling, and feedback across all games
 
 3. [ ] P1 - Hint deducts a point but does not auto-select the hinted emojis
    - Agent: watson-qa-zaemesetzli
@@ -303,14 +307,14 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component used by both games)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
-11. [ ] P1 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
+11. [ ] P2 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
     - Agent: watson-roadmap-worker
     - Scenario: Automated deploy after fixing Verbindige #5
     - Problem: `netlify deploy --prod` returns "Unauthorized: could not retrieve project". `netlify status` shows "Not logged in". The MCP tool `mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__netlify-deploy-services-updater` is not available in the current tool set. No deploy path exists.
     - Suggested fix: Run `netlify login` interactively to authenticate the CLI, or ensure the Netlify MCP tool is configured in the Claude Code MCP settings.
     - Files: CLI auth / MCP config
     - Evidence: `netlify deploy --prod --dir=dist --site=cfaa1817-72f7-47cd-8a95-8c998529bcf9` → "Error: Unauthorized: could not retrieve project". `netlify status` → "Not logged in." Observed 2026-04-18.
-    - Priority adjusted from P0 to P1: CI auto-deploys on push to main (commit 8bd0acd); manual CLI auth is not a deploy failure — deploys succeed via CI pipeline
+    - Priority adjusted from P0 to P2: CI auto-deploys on push to main (commit 8bd0acd); manual CLI auth is not a deploy failure — deploys succeed via CI pipeline. Developer tooling convenience, not user-facing.
 
 ---
 
