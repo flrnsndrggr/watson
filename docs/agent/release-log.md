@@ -1,5 +1,31 @@
 # Release Log
 
+## Release — 2026-04-20 15:30
+
+- Commits: 70cfbcf..17c2af7 (10 commits)
+- Netlify deploy: skipped (MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP not available)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
+
+### Notable commits
+- 87dbe18 feat: wrong-answer shake feedback for Schlagziil headline cards
+- 41077ee polish: AdSlot placeholder with dashed border and "Anzeige" label
+- 17c2af7 docs: mark skeleton loader polish item complete
+- 8299d89 docs: sync changelog and update documentation
+- be79180 review: incremental code review for temp-holder (AdSlot, Schlagziil shake)
+
+---
+
+## Last Verified
+- Commit: 17c2af7
+- Date: 2026-04-20
+
+---
+
 ## Release — 2026-04-20 00:15
 
 - Commits: a7859cd..70cfbcf (16 commits)
@@ -161,6 +187,3 @@ Chrome MCP / Netlify MCP / Supabase MCP permissions were not available. All four
 routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
-## Last Verified
-- Commit: 70cfbcf
-- Date: 2026-04-20
