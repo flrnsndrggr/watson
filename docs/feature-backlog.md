@@ -7,14 +7,14 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Supabase puzzle fetch: replace hardcoded `.data.ts` files with live Supabase queries for today's puzzle — done 2026-04-18
 - [x] Daily puzzle reset: implement midnight CET rollover — show "new puzzle available" if cached puzzle is stale — done 2026-04-18
 - [x] Game completion state: persist completed state per puzzle per day in localStorage (prevent replaying same puzzle) — done 2026-04-19
-- [ ] Share card generation: implement `generateShareText()` per game with proper emoji grids and watson.ch URL
-- [ ] Verbindige share: emoji grid format (colored squares for solve order)
-- [ ] Schlagziil share: accuracy grid (green/red squares) + "Ich lese watson, und du?"
-- [ ] Zämesetzli share: score + compounds found format
+- [x] Share card generation: implement `generateShareText()` per game with proper emoji grids and watson.ch URL — done 2026-04-19
+- [x] Verbindige share: emoji grid format (colored squares for solve order) — done 2026-04-19
+- [x] Schlagziil share: accuracy grid (green/red squares) + "Ich lese watson, und du?" — done 2026-04-19
+- [x] Zämesetzli share: score + compounds found format — done 2026-04-19
 
 ## Priority: Medium (User Engagement)
 
-- [ ] User accounts: Supabase Auth with email magic link — basic sign-up/sign-in flow
+- [x] User accounts: Supabase Auth with email magic link — basic sign-up/sign-in flow — done 2026-04-19
 - [ ] Streak tracking: calculate and display current streak per game (consecutive days played)
 - [ ] Streak prompt: show "Willst du deinen Streak behalten? Konto erstellen." after Day 3
 - [ ] Profile page: `/profil` route showing streaks, stats, games played per game
