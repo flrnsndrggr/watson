@@ -25,10 +25,18 @@ const ALL_GAMES = [
     description: 'Errate die Wörter in watson-Schlagzeilen.',
     accentColor: 'var(--color-green)',
   },
+  {
+    path: '/buchstaebli',
+    key: 'buchstaebli',
+    name: 'Buchstäbli',
+    emoji: '🔤',
+    description: 'Finde Wörter mit 7 Buchstaben.',
+    accentColor: 'var(--color-blue)',
+  },
 ];
 
 interface PostGameSectionProps {
-  currentGame: 'verbindige' | 'zaemesetzli' | 'schlagziil';
+  currentGame: 'verbindige' | 'zaemesetzli' | 'schlagziil' | 'buchstaebli';
 }
 
 export function PostGameSection({ currentGame }: PostGameSectionProps) {
