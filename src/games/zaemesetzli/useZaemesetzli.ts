@@ -17,6 +17,7 @@ interface ZaemesetzliState {
   currentRank: Rank;
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
+  status: 'playing' | 'complete';
   streak: StreakData;
 
   loadPuzzle: () => Promise<void>;
@@ -45,6 +46,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   currentRank: 'stift',
   hintsUsed: 0,
   lastResult: null,
+  status: 'playing',
   streak: getStreak('zaemesetzli'),
 
   loadPuzzle: async () => {
@@ -58,6 +60,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       score: 0,
       currentRank: 'stift',
       hintsUsed: 0,
+      status: 'playing',
     });
   },
 
@@ -108,6 +111,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const newScore = score + compound.points;
     const newRank = getRank(newScore, puzzle.rank_thresholds);
     const newFoundWords = [...foundWords, newFound];
+    const allFound = newFoundWords.length === puzzle.valid_compounds.length;
 
     // Record streak on first word found
     const streakUpdate = foundWords.length === 0
@@ -121,6 +125,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       currentInput: '',
       selectedEmojis: [],
       lastResult: compound.is_mundart ? 'mundart' : 'valid',
+      status: allFound ? 'complete' : 'playing',
       ...streakUpdate,
     });
   },

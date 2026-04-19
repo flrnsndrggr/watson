@@ -16,6 +16,7 @@ import { useDailyReset } from '@/lib/useDailyReset';
 import { RankBar } from '@/games/buchstaebli/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
+import { ZaemesetzliResult } from './ZaemesetzliResult';
 import { useZaemesetzli } from './useZaemesetzli';
 import type { Rank } from '@/types';
 
@@ -37,6 +38,7 @@ export function ZaemesetzliPage() {
     score,
     currentRank,
     lastResult,
+    status,
     streak,
     selectEmoji,
     clearEmojiSelection,
@@ -115,6 +117,18 @@ export function ZaemesetzliPage() {
     }
   }, [currentRank]);
 
+  // Confetti on game completion (all compounds found)
+  useEffect(() => {
+    if (status !== 'complete') return;
+    import('canvas-confetti').then(({ default: confetti }) => {
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 },
+      });
+    });
+  }, [status]);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     submitWord();
@@ -155,99 +169,105 @@ export function ZaemesetzliPage() {
         thresholds={puzzle.rank_thresholds}
       />
 
-      {/* Emoji pool */}
-      <EmojiPool
-        emojis={puzzle.emojis}
-        selectedEmojis={selectedEmojis}
-        onSelect={selectEmoji}
-      />
+      {status === 'playing' ? (
+        <>
+          {/* Emoji pool */}
+          <EmojiPool
+            emojis={puzzle.emojis}
+            selectedEmojis={selectedEmojis}
+            onSelect={selectEmoji}
+          />
 
-      {/* Combine slots */}
-      <CombineSlots
-        selectedEmojis={selectedEmojis}
-        onClear={clearEmojiSelection}
-      />
+          {/* Combine slots */}
+          <CombineSlots
+            selectedEmojis={selectedEmojis}
+            onClear={clearEmojiSelection}
+          />
 
-      {/* Word input */}
-      <form
-        onSubmit={handleSubmit}
-        className={`mx-auto mt-2 flex max-w-[360px] gap-2 transition-colors ${
-          shaking ? 'animate-[shake_400ms_ease]' : ''
-        } ${
-          lastResult === 'valid' || lastResult === 'mundart'
-            ? 'rounded ring-2 ring-[var(--color-green)]'
-            : ''
-        }`}
-      >
-        <input
-          ref={inputRef}
-          type="text"
-          value={currentInput}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={selectedEmojis.length < 2}
-          placeholder={selectedEmojis.length < 2 ? 'Wähle 2-3 Emojis...' : 'Zusammengesetztes Wort...'}
-          className="flex-1 rounded border-2 border-[var(--color-gray-bg)] px-3 py-2 text-sm font-semibold outline-none transition-colors focus:border-[var(--color-cyan)] disabled:opacity-50"
-        />
-        <button
-          type="submit"
-          disabled={selectedEmojis.length < 2 || !currentInput.trim()}
-          className="rounded bg-[var(--color-cyan)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
-        >
-          &rarr;
-        </button>
-      </form>
+          {/* Word input */}
+          <form
+            onSubmit={handleSubmit}
+            className={`mx-auto mt-2 flex max-w-[360px] gap-2 transition-colors ${
+              shaking ? 'animate-[shake_400ms_ease]' : ''
+            } ${
+              lastResult === 'valid' || lastResult === 'mundart'
+                ? 'rounded ring-2 ring-[var(--color-green)]'
+                : ''
+            }`}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              value={currentInput}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={selectedEmojis.length < 2}
+              placeholder={selectedEmojis.length < 2 ? 'Wähle 2-3 Emojis...' : 'Zusammengesetztes Wort...'}
+              className="flex-1 rounded border-2 border-[var(--color-gray-bg)] px-3 py-2 text-sm font-semibold outline-none transition-colors focus:border-[var(--color-cyan)] disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={selectedEmojis.length < 2 || !currentInput.trim()}
+              className="rounded bg-[var(--color-cyan)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
+            >
+              &rarr;
+            </button>
+          </form>
 
-      {/* Hint button */}
-      <div className="mt-3 text-center">
-        <button
-          onClick={handleHint}
-          className="text-xs text-[var(--color-gray-text)] underline hover:text-[var(--color-cyan)]"
-        >
-          💡 Tipp (-1 Pkt)
-        </button>
-      </div>
-
-      {/* Found words */}
-      {foundWords.length > 0 && (
-        <div className="mt-5">
-          <p className="text-sm text-[var(--color-gray-text)]">
-            Gefunden ({foundWords.length}/{puzzle.valid_compounds.length}):
-          </p>
-          <div className="mt-2 flex flex-col gap-1.5">
-            {foundWords.map((fw, i) => {
-              const isNewest = i === foundWords.length - 1 && lastResult !== null;
-              return (
-                <div
-                  key={fw.word}
-                  className={`flex items-center justify-between rounded px-3 py-1.5 text-sm ${
-                    fw.is_mundart
-                      ? 'bg-[var(--color-green)]/10 text-[var(--color-black)]'
-                      : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
-                  } ${isNewest ? 'animate-[popIn_300ms_ease]' : ''}`}
-                >
-                  <span>
-                    {fw.components.join('')}{' '}
-                    <span className="font-semibold">{fw.word}</span>
-                    {fw.is_mundart && <span className="ml-1">🇨🇭</span>}
-                  </span>
-                  <span className="text-xs text-[var(--color-gray-text)]">
-                    {fw.is_mundart && isNewest ? '🇨🇭 ' : ''}{fw.points}pt
-                  </span>
-                </div>
-              );
-            })}
+          {/* Hint button */}
+          <div className="mt-3 text-center">
+            <button
+              onClick={handleHint}
+              className="text-xs text-[var(--color-gray-text)] underline hover:text-[var(--color-cyan)]"
+            >
+              💡 Tipp (-1 Pkt)
+            </button>
           </div>
-        </div>
+
+          {/* Found words */}
+          {foundWords.length > 0 && (
+            <div className="mt-5">
+              <p className="text-sm text-[var(--color-gray-text)]">
+                Gefunden ({foundWords.length}/{puzzle.valid_compounds.length}):
+              </p>
+              <div className="mt-2 flex flex-col gap-1.5">
+                {foundWords.map((fw, i) => {
+                  const isNewest = i === foundWords.length - 1 && lastResult !== null;
+                  return (
+                    <div
+                      key={fw.word}
+                      className={`flex items-center justify-between rounded px-3 py-1.5 text-sm ${
+                        fw.is_mundart
+                          ? 'bg-[var(--color-green)]/10 text-[var(--color-black)]'
+                          : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
+                      } ${isNewest ? 'animate-[popIn_300ms_ease]' : ''}`}
+                    >
+                      <span>
+                        {fw.components.join('')}{' '}
+                        <span className="font-semibold">{fw.word}</span>
+                        {fw.is_mundart && <span className="ml-1">🇨🇭</span>}
+                      </span>
+                      <span className="text-xs text-[var(--color-gray-text)]">
+                        {fw.is_mundart && isNewest ? '🇨🇭 ' : ''}{fw.points}pt
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Streak + Share (during gameplay) */}
+          <div className="mt-6 flex flex-col items-center gap-3">
+            {streak.current >= 1 && <StreakBadge streak={streak} />}
+            <StreakPrompt streak={streak} />
+            <ShareButton text={shareText} />
+          </div>
+
+          <PostGameSection currentGame="zaemesetzli" />
+        </>
+      ) : (
+        <ZaemesetzliResult />
       )}
-
-      {/* Streak + Share */}
-      <div className="mt-6 flex flex-col items-center gap-3">
-        {streak.current >= 1 && <StreakBadge streak={streak} />}
-        <StreakPrompt streak={streak} />
-        <ShareButton text={shareText} />
-      </div>
-
-      <PostGameSection currentGame="zaemesetzli" />
     </GameShell>
   );
 }
