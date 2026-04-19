@@ -277,13 +277,14 @@ _Items from watson-qa-zaemesetzli agent_
    - Evidence: `zaemesetzli.data.ts` line 8: `🔑 alt_nouns: ['Key']`; line 13: `🔔 alt_nouns: []`; line 15: `☀️ alt_nouns: ['Licht']`. All five abstract compounds accepted in-game (confirmed). Observed 2026-04-18.
    - Related: Zämesetzli #8 — Bergsonntag is one of the 5 compounds here; #8 adds is_mundart fix; consider fixing together
 
-8. [ ] P1 - "Bergsonntag" requires two-hop etymology (☀️→Sonne→Sonntag) and is incorrectly marked non-Mundart
+8. [ ] P2 - "Bergsonntag" requires two-hop etymology (☀️→Sonne→Sonntag) and is incorrectly marked non-Mundart
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — reviewing d=3 compound data
    - Problem: `Bergsonntag` [⛰️+☀️] is the hardest compound (difficulty: 3, points: 3). ☀️'s canonical noun is "Sonne" but the compound needs "Sonntag" (Sunday). The leap from ☀️→Sonntag requires knowing German etymology (Sonntag = "Sonne" + "-tag" = "day of the sun") — two conceptual hops away from the emoji. The word "Bergsonntag" itself denotes a traditional Swiss Alpine Sunday celebration, making it regionally specific but it is marked `is_mundart: false`, so it receives no Mundart-Bonus toast and no 🇨🇭 marker in the found list. Players who find it get no signal it's culturally Swiss.
    - Suggested fix: Either mark `is_mundart: true` (triggering the "Mundart-Bonus! 🇨🇭" toast) or add a cultural-note tooltip. Also add `"Sonntag"` to ☀️'s `alt_nouns` (see finding #7).
    - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (line 33: `is_mundart: false`)
    - Evidence: `{ word: 'Bergsonntag', components: ['⛰️','☀️'], difficulty: 3, points: 3, is_mundart: false }` in data file. ☀️ alt_nouns only contains `'Licht'`, not `'Sonntag'`. Observed 2026-04-18.
+   - Priority adjusted from P1 to P2: unique fix is a data categorization tweak (is_mundart flag), not UX-blocking; emoji readability issue already covered by #7
    - Related: Zämesetzli #7 — alt_nouns fix for ☀️→Sonntag is covered there; this item adds the is_mundart correction; fix together
 
 9. [ ] P1 - max_score: 28 is incorrect — actual compound point sum is 29
