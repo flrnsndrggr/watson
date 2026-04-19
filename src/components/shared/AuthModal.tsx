@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUserAuth } from '@/lib/userAuth';
+import { useUserAuth } from '@/lib/userAuthContext';
 
 interface AuthModalProps {
   onClose: () => void;

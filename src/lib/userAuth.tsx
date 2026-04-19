@@ -1,26 +1,6 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  type ReactNode,
-} from 'react';
+import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from './supabase';
-import type { User, Session } from '@supabase/supabase-js';
-
-interface UserAuthState {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-}
-
-interface UserAuthContextValue extends UserAuthState {
-  signInWithMagicLink: (email: string) => Promise<{ error: string | null }>;
-  signOut: () => Promise<void>;
-}
-
-const UserAuthContext = createContext<UserAuthContextValue | null>(null);
+import { UserAuthContext, type UserAuthState } from './userAuthContext';
 
 export function UserAuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<UserAuthState>({
@@ -66,10 +46,4 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       {children}
     </UserAuthContext.Provider>
   );
-}
-
-export function useUserAuth() {
-  const ctx = useContext(UserAuthContext);
-  if (!ctx) throw new Error('useUserAuth must be used within UserAuthProvider');
-  return ctx;
 }

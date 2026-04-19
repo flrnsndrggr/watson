@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from '@/components/shared/Toast';
 import { useAuth } from '@/lib/auth';
-import { useUserAuth } from '@/lib/userAuth';
+import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
 
 const NAV_ITEMS = [
