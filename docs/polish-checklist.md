@@ -10,7 +10,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [ ] ShareButton: add Web Share API integration for mobile (navigator.share fallback to clipboard)
 - [ ] GameShell: add `prefers-reduced-motion` media query — disable confetti, use opacity instead of transforms
 - [ ] GameHeader: add streak counter display next to game title (when user has active streak)
-- [ ] ErrorDots: add subtle pulse animation on the dot that just filled
+- [x] ErrorDots: add subtle pulse animation on the dot that just filled (2026-04-19)
 - [ ] AdSlot: placeholder styling with watson gray background and "Anzeige" label
 - [ ] Loading state: add skeleton loader for puzzle data fetch (game-shaped placeholder)
 - [ ] 404 page: create a custom not-found page at unknown routes with link back to landing
