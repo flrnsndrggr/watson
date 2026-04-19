@@ -5,6 +5,7 @@ import { ErrorDots } from '@/components/shared/ErrorDots';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { useDailyReset } from '@/lib/useDailyReset';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
@@ -22,6 +23,7 @@ export function VerbindigePage() {
     maxMistakes,
   } = useVerbindige();
 
+  const reducedMotion = usePrefersReducedMotion();
   const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
 
   const handleShuffle = useCallback(() => {
@@ -42,12 +44,12 @@ export function VerbindigePage() {
   }, [loadPuzzle]);
 
   useEffect(() => {
-    if (status === 'won') {
+    if (status === 'won' && !reducedMotion) {
       import('canvas-confetti').then(({ default: confetti }) => {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
       });
     }
-  }, [status]);
+  }, [status, reducedMotion]);
 
   if (status === 'loading') return <PuzzleLoading />;
 

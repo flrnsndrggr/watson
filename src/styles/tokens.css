@@ -101,10 +101,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Reduced motion */
+/* Reduced motion — disable transforms, use opacity-only alternatives */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    transform: none !important;
   }
 }
