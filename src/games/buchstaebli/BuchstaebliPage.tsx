@@ -7,6 +7,7 @@ import { showToast } from '@/components/shared/Toast';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { generateShareText } from '@/lib/share';
 import { useDailyReset } from '@/lib/useDailyReset';
+import type { Rank } from '@/types';
 import { HexGrid } from './HexGrid';
 import { RankBar } from './RankBar';
 import { useBuchstaebli } from './useBuchstaebli';
@@ -20,6 +21,17 @@ const RESULT_MESSAGES: Record<string, string> = {
   'pangram': 'Pangram! +7 Bonus!',
   'mundart': 'Mundart-Bonus! 2× Punkte 🇨🇭',
 };
+
+const RANK_LABELS: Record<Rank, string> = {
+  stift: 'Stift',
+  lehrling: 'Lehrling',
+  geselle: 'Geselle',
+  meister: 'Meister',
+  bundesrat: 'Bundesrat',
+};
+
+const ERROR_RESULTS = new Set(['too-short', 'missing-center', 'already-found', 'not-valid']);
+const SUCCESS_RESULTS = new Set(['valid', 'pangram', 'mundart']);
 
 export function BuchstaebliPage() {
   const {
@@ -43,21 +55,82 @@ export function BuchstaebliPage() {
 
   const [shufflePhase, setShufflePhase] = useState<'out' | 'in' | null>(null);
   const shuffleTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [shaking, setShaking] = useState(false);
+  const [inputFlash, setInputFlash] = useState<'success' | 'error' | null>(null);
+  const prevRank = useRef<Rank>(currentRank);
+  const [newestWord, setNewestWord] = useState<string | null>(null);
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
 
+  // Toast + input feedback on guess result
   useEffect(() => {
     if (!lastResult) return;
+
+    // Toast message
     if (lastResult === 'missing-center' && puzzle) {
       showToast(`Der Buchstabe ${puzzle.center_letter} muss dabei sein`);
     } else if (RESULT_MESSAGES[lastResult]) {
       showToast(RESULT_MESSAGES[lastResult]);
     }
+
+    // Input field shake + color flash on errors
+    if (ERROR_RESULTS.has(lastResult)) {
+      setShaking(true);
+      setInputFlash('error');
+      setTimeout(() => setShaking(false), 400);
+      setTimeout(() => setInputFlash(null), 600);
+    }
+
+    // Input field green flash on success
+    if (SUCCESS_RESULTS.has(lastResult)) {
+      setInputFlash('success');
+      setTimeout(() => setInputFlash(null), 600);
+    }
+
+    // Confetti on pangram
+    if (lastResult === 'pangram') {
+      import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+      });
+    }
+
+    // Track newest word for pop-in animation
+    if (SUCCESS_RESULTS.has(lastResult) && foundWords.length > 0) {
+      const latest = foundWords[foundWords.length - 1].word;
+      setNewestWord(latest);
+      setTimeout(() => setNewestWord(null), 400);
+    }
+
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
-  }, [lastResult, puzzle, clearLastResult]);
+  }, [lastResult, puzzle, clearLastResult, foundWords]);
+
+  // Confetti + toast on rank milestones
+  useEffect(() => {
+    if (currentRank !== prevRank.current) {
+      const prev = prevRank.current;
+      prevRank.current = currentRank;
+
+      // Only celebrate rank-ups, not initial load
+      if (prev === 'stift' && currentRank === 'lehrling') {
+        showToast(`Aufgestiegen: ${RANK_LABELS[currentRank]}!`);
+      } else if (currentRank === 'geselle' || currentRank === 'meister' || currentRank === 'bundesrat') {
+        showToast(`🎉 ${RANK_LABELS[currentRank]} erreicht!`);
+
+        if (currentRank === 'meister' || currentRank === 'bundesrat') {
+          import('canvas-confetti').then(({ default: confetti }) => {
+            confetti({
+              particleCount: currentRank === 'bundesrat' ? 150 : 100,
+              spread: currentRank === 'bundesrat' ? 100 : 70,
+              origin: { y: 0.6 },
+            });
+          });
+        }
+      }
+    }
+  }, [currentRank]);
 
   // Animated shuffle: out → swap letters → in
   const handleShuffle = useCallback(() => {
@@ -124,7 +197,17 @@ export function BuchstaebliPage() {
       />
 
       {/* Input display */}
-      <div className="mx-auto mt-2 flex h-12 max-w-[320px] items-center justify-center rounded border-2 border-[var(--color-gray-bg)] bg-white px-4 text-lg font-bold tracking-widest">
+      <div
+        className={`mx-auto mt-2 flex h-12 max-w-[320px] items-center justify-center rounded border-2 bg-white px-4 text-lg font-bold tracking-widest transition-colors duration-[var(--transition-fast)] ${
+          shaking ? 'animate-[shake_400ms_ease]' : ''
+        } ${
+          inputFlash === 'success'
+            ? 'border-[var(--color-green)]'
+            : inputFlash === 'error'
+              ? 'border-[var(--color-pink)]'
+              : 'border-[var(--color-gray-bg)]'
+        }`}
+      >
         {currentInput || <span className="text-[var(--color-gray-text)] font-normal text-base">Tippe Buchstaben...</span>}
       </div>
 
@@ -169,7 +252,7 @@ export function BuchstaebliPage() {
                     : fw.is_mundart
                       ? 'bg-[var(--color-green)] text-white'
                       : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
-                }`}
+                } ${fw.word === newestWord ? 'animate-[popIn_300ms_ease]' : ''}`}
               >
                 {fw.word.toUpperCase()}
               </span>
