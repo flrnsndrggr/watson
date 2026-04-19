@@ -256,6 +256,14 @@ _Items from watson-qa-zaemesetzli agent_
 
 _Critical findings from watson-code-reviewer_
 
+1. [ ] P1 - `transform: none !important` in reduced-motion media query breaks Toast and EmojiPool tooltip centering
+   - Agent: watson-code-reviewer
+   - Scenario: Code review of `temp-holder` branch (2026-04-19)
+   - Problem: `tokens.css:109` adds `transform: none !important` inside `@media (prefers-reduced-motion: reduce)`. This overrides ALL CSS transforms, including layout transforms. `Toast.tsx:44` uses `-translate-x-1/2` with `left-1/2` for centering — with `transform: none`, the toast renders at left 50% with no offset (off-center, clipped on mobile). Same issue in `EmojiPool.tsx:34` tooltip. The existing `animation-duration: 0.01ms` + `transition-duration: 0.01ms` already neuters motion; the blanket `transform: none` is unnecessary and breaks non-animation transforms.
+   - Suggested fix: Remove `transform: none !important` from the reduced-motion media query. The 0.01ms duration rules already handle animation/transition disabling.
+   - Files: `src/styles/tokens.css` (line 109), `src/components/shared/Toast.tsx` (line 44), `src/games/zaemesetzli/EmojiPool.tsx` (line 34)
+   - Evidence: Code review of diff `main...temp-holder`. Confirmed `-translate-x-1/2` (Tailwind → `transform: translateX(-50%)`) used on `left-1/2` elements for centering in Toast.tsx and EmojiPool.tsx. `transform: none !important` would override these. Observed 2026-04-19.
+
 ---
 
 ## Architect Recommendations
