@@ -1,18 +1,23 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
+import { ArchiveBanner } from '@/components/shared/ArchiveBanner';
 import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { BUCHSTAEBLI_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { generateShareText } from '@/lib/share';
+import { StreakBadge } from '@/components/shared/StreakBadge';
+import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { useDailyReset } from '@/lib/useDailyReset';
 import type { Rank } from '@/types';
 import { HexGrid } from './HexGrid';
 import { RankBar } from './RankBar';
+import { BuchstaebliResult } from './BuchstaebliResult';
 import { useBuchstaebli } from './useBuchstaebli';
 
 const RESULT_MESSAGES: Record<string, string> = {
@@ -37,6 +42,9 @@ const ERROR_RESULTS = new Set(['too-short', 'missing-center', 'already-found', '
 const SUCCESS_RESULTS = new Set(['valid', 'pangram', 'mundart']);
 
 export function BuchstaebliPage() {
+  const [searchParams] = useSearchParams();
+  const archiveDate = searchParams.get('date');
+
   const {
     loadPuzzle,
     puzzle,
@@ -46,12 +54,16 @@ export function BuchstaebliPage() {
     currentRank,
     outerLetters,
     lastResult,
+    status,
+    streak,
+    isArchive,
     addLetter,
     deleteLetter,
     clearInput,
     shuffleLetters,
     submitWord,
     clearLastResult,
+    finishGame,
   } = useBuchstaebli();
 
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
@@ -65,11 +77,11 @@ export function BuchstaebliPage() {
   const [newestWord, setNewestWord] = useState<string | null>(null);
 
   useEffect(() => {
-    loadPuzzle();
+    loadPuzzle(archiveDate ?? undefined);
     if (!hasSeenHowToPlay('buchstaebli')) {
       setShowHowToPlay(true);
     }
-  }, [loadPuzzle]);
+  }, [loadPuzzle, archiveDate]);
 
   // Toast + input feedback on guess result
   useEffect(() => {
@@ -139,6 +151,18 @@ export function BuchstaebliPage() {
     }
   }, [currentRank]);
 
+  // Confetti on game completion
+  useEffect(() => {
+    if (status !== 'complete') return;
+    import('canvas-confetti').then(({ default: confetti }) => {
+      confetti({
+        particleCount: currentRank === 'bundesrat' ? 200 : 100,
+        spread: currentRank === 'bundesrat' ? 120 : 80,
+        origin: { y: 0.6 },
+      });
+    });
+  }, [status, currentRank]);
+
   // Animated shuffle: out → swap letters → in
   const handleShuffle = useCallback(() => {
     if (shufflePhase) return; // prevent double-clicks during animation
@@ -186,7 +210,8 @@ export function BuchstaebliPage() {
 
   return (
     <GameShell>
-      {isStale && <NewPuzzleBanner onRefresh={refresh} />}
+      {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
+      {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader title="Buchstäbli" puzzleId={puzzle?.date ?? ''} onInfoClick={() => setShowHowToPlay(true)} />
 
       {showHowToPlay && (
@@ -205,82 +230,98 @@ export function BuchstaebliPage() {
         thresholds={puzzle.rank_thresholds}
       />
 
-      <HexGrid
-        centerLetter={puzzle.center_letter}
-        outerLetters={outerLetters}
-        onLetterClick={addLetter}
-        shufflePhase={shufflePhase}
-      />
+      {status === 'playing' ? (
+        <>
+          <HexGrid
+            centerLetter={puzzle.center_letter}
+            outerLetters={outerLetters}
+            onLetterClick={addLetter}
+            shufflePhase={shufflePhase}
+          />
 
-      {/* Input display */}
-      <div
-        className={`mx-auto mt-2 flex h-12 max-w-[320px] items-center justify-center rounded border-2 bg-white px-4 text-lg font-bold tracking-widest transition-colors duration-[var(--transition-fast)] ${
-          shaking ? 'animate-[shake_400ms_ease]' : ''
-        } ${
-          inputFlash === 'success'
-            ? 'border-[var(--color-green)]'
-            : inputFlash === 'error'
-              ? 'border-[var(--color-pink)]'
-              : 'border-[var(--color-gray-bg)]'
-        }`}
-      >
-        {currentInput || <span className="text-[var(--color-gray-text)] font-normal text-base">Tippe Buchstaben...</span>}
-      </div>
-
-      {/* Action buttons */}
-      <div className="mt-3 flex justify-center gap-3">
-        <button
-          onClick={handleShuffle}
-          disabled={shufflePhase !== null}
-          className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-        >
-          Mischen
-        </button>
-        <button
-          onClick={clearInput}
-          disabled={!currentInput}
-          className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-        >
-          Löschen
-        </button>
-        <button
-          onClick={submitWord}
-          disabled={currentInput.length < 4}
-          className="rounded bg-[var(--color-cyan)] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
-        >
-          Enter ↵
-        </button>
-      </div>
-
-      {/* Found words */}
-      {foundWords.length > 0 && (
-        <div className="mt-6">
-          <p className="text-sm text-[var(--color-gray-text)]">
-            Gefundene Wörter ({foundWords.length}):
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {foundWords.map((fw) => (
-              <span
-                key={fw.word}
-                className={`inline-block rounded px-2 py-0.5 text-sm font-semibold ${
-                  fw.is_pangram
-                    ? 'bg-[var(--color-pink)] text-white'
-                    : fw.is_mundart
-                      ? 'bg-[var(--color-green)] text-white'
-                      : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
-                } ${fw.word === newestWord ? 'animate-[popIn_300ms_ease]' : ''}`}
-              >
-                {fw.word.toUpperCase()}
-              </span>
-            ))}
+          {/* Input display */}
+          <div
+            className={`mx-auto mt-2 flex h-12 max-w-[320px] items-center justify-center rounded border-2 bg-white px-4 text-lg font-bold tracking-widest transition-colors duration-[var(--transition-fast)] ${
+              shaking ? 'animate-[shake_400ms_ease]' : ''
+            } ${
+              inputFlash === 'success'
+                ? 'border-[var(--color-green)]'
+                : inputFlash === 'error'
+                  ? 'border-[var(--color-pink)]'
+                  : 'border-[var(--color-gray-bg)]'
+            }`}
+          >
+            {currentInput || <span className="text-[var(--color-gray-text)] font-normal text-base">Tippe Buchstaben...</span>}
           </div>
-        </div>
-      )}
 
-      {/* Share */}
-      <div className="mt-6 text-center">
-        <ShareButton text={shareText} />
-      </div>
+          {/* Action buttons */}
+          <div className="mt-3 flex justify-center gap-3">
+            <button
+              onClick={handleShuffle}
+              disabled={shufflePhase !== null}
+              className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
+            >
+              Mischen
+            </button>
+            <button
+              onClick={clearInput}
+              disabled={!currentInput}
+              className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
+            >
+              Löschen
+            </button>
+            <button
+              onClick={submitWord}
+              disabled={currentInput.length < 4}
+              className="rounded bg-[var(--color-cyan)] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
+            >
+              Enter ↵
+            </button>
+          </div>
+
+          {/* Found words */}
+          {foundWords.length > 0 && (
+            <div className="mt-6">
+              <p className="text-sm text-[var(--color-gray-text)]">
+                Gefundene Wörter ({foundWords.length}):
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {foundWords.map((fw) => (
+                  <span
+                    key={fw.word}
+                    className={`inline-block rounded px-2 py-0.5 text-sm font-semibold ${
+                      fw.is_pangram
+                        ? 'bg-[var(--color-pink)] text-white'
+                        : fw.is_mundart
+                          ? 'bg-[var(--color-green)] text-white'
+                          : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
+                    } ${fw.word === newestWord ? 'animate-[popIn_300ms_ease]' : ''}`}
+                  >
+                    {fw.word.toUpperCase()}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Finish button + Streak + Share */}
+          <div className="mt-6 flex flex-col items-center gap-3">
+            {foundWords.length > 0 && (
+              <button
+                onClick={finishGame}
+                className="rounded border border-[var(--color-gray-bg)] px-5 py-2 text-sm font-semibold text-[var(--color-gray-text)] transition-all hover:border-[var(--color-cyan)] hover:text-[var(--color-cyan)]"
+              >
+                Fertig — Ergebnis anzeigen
+              </button>
+            )}
+            {streak.current >= 1 && <StreakBadge streak={streak} />}
+            <StreakPrompt streak={streak} />
+            <ShareButton text={shareText} />
+          </div>
+        </>
+      ) : (
+        <BuchstaebliResult />
+      )}
     </GameShell>
   );
 }

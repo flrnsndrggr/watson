@@ -1,9 +1,10 @@
 import { create } from 'zustand';
-import type { BuchstaebliPuzzle, Rank } from '@/types';
+import type { BuchstaebliPuzzle, Rank, StreakData } from '@/types';
 import { SAMPLE_BUCHSTAEBLI, DEMO_VALID_WORDS } from './buchstaebli.data';
-import { fetchTodaysPuzzle } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
+import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
-interface FoundWord {
+export interface FoundWord {
   word: string;
   is_pangram: boolean;
   is_mundart: boolean;
@@ -18,14 +19,18 @@ interface BuchstaebliState {
   currentRank: Rank;
   outerLetters: string[];
   lastResult: 'valid' | 'pangram' | 'mundart' | 'already-found' | 'too-short' | 'not-valid' | 'missing-center' | null;
+  status: 'playing' | 'complete';
+  streak: StreakData;
+  isArchive: boolean;
 
-  loadPuzzle: () => Promise<void>;
+  loadPuzzle: (archiveDate?: string) => Promise<void>;
   addLetter: (letter: string) => void;
   deleteLetter: () => void;
   clearInput: () => void;
   shuffleLetters: () => void;
   submitWord: () => void;
   clearLastResult: () => void;
+  finishGame: () => void;
 }
 
 function getRank(score: number, thresholds: BuchstaebliPuzzle['rank_thresholds']): Rank {
@@ -53,9 +58,15 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
   currentRank: 'stift',
   outerLetters: [],
   lastResult: null,
+  status: 'playing',
+  streak: getStreak('buchstaebli'),
+  isArchive: false,
 
-  loadPuzzle: async () => {
-    const fetched = await fetchTodaysPuzzle<BuchstaebliPuzzle>('buchstaebli');
+  loadPuzzle: async (archiveDate?: string) => {
+    set({ isArchive: !!archiveDate });
+    const fetched = archiveDate
+      ? await fetchPuzzleByDate<BuchstaebliPuzzle>('buchstaebli', archiveDate)
+      : await fetchTodaysPuzzle<BuchstaebliPuzzle>('buchstaebli');
     const puzzle = fetched ?? SAMPLE_BUCHSTAEBLI;
     set({
       puzzle,
@@ -64,6 +75,7 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
       foundWords: [],
       score: 0,
       currentRank: 'stift',
+      status: 'playing',
     });
   },
 
@@ -114,13 +126,30 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
     const newFound: FoundWord = { word, ...result };
     const newScore = score + result.points;
     const newRank = getRank(newScore, puzzle.rank_thresholds);
+    const newFoundWords = [...foundWords, newFound];
+
+    // Record streak on first word found (skip for archive)
+    const streakUpdate = foundWords.length === 0 && !get().isArchive
+      ? { streak: recordGamePlayed('buchstaebli') }
+      : {};
+
+    // Auto-complete if all demo words found
+    const allFound = Object.keys(DEMO_VALID_WORDS).every(
+      (w) => newFoundWords.some((fw) => fw.word === w),
+    );
 
     set({
-      foundWords: [...foundWords, newFound],
+      foundWords: newFoundWords,
       score: newScore,
       currentRank: newRank,
       currentInput: '',
       lastResult: result.is_pangram ? 'pangram' : result.is_mundart ? 'mundart' : 'valid',
+      ...(allFound ? { status: 'complete' as const } : {}),
+      ...streakUpdate,
     });
+  },
+
+  finishGame: () => {
+    set({ status: 'complete' });
   },
 }));
