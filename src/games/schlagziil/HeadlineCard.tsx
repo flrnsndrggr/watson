@@ -109,7 +109,7 @@ export function HeadlineCard({
               isCorrect ? 'bg-[var(--color-green)] text-white' : 'bg-[var(--color-pink)] text-white'
             }`}
           >
-            {revealedAnswer.charAt(0).toUpperCase() + revealedAnswer.slice(1)}
+            {revealedAnswer}
           </span>
           {hintUsed && <span className="ml-1 text-xs">💡</span>}
           {articleDate && (

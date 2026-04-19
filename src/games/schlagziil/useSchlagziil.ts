@@ -1,16 +1,18 @@
 import { create } from 'zustand';
 import type { SchlagziilPuzzle, StreakData } from '@/types';
-import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS } from './schlagziil.data';
+import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagziil.data';
 import { fetchTodaysPuzzle } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
+  display_answers?: string[];
 }
 
 interface SchlagziilState {
   puzzle: SchlagziilPuzzle | null;
   answers: string[][];
+  displayAnswers: string[];
   currentIndex: number;
   totalErrors: number;
   maxErrors: number;
@@ -60,6 +62,7 @@ function levenshtein(a: string, b: string): number {
 export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   puzzle: null,
   answers: [],
+  displayAnswers: [],
   currentIndex: 0,
   totalErrors: 0,
   maxErrors: 3,
@@ -75,9 +78,11 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     const fetched = await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
     const puzzle: SchlagziilPuzzle = fetched ?? SAMPLE_SCHLAGZIIL;
     const answers = fetched?.answers ?? DEMO_ANSWERS;
+    const displayAnswers = fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS;
     set({
       puzzle,
       answers,
+      displayAnswers,
       currentIndex: 0,
       totalErrors: 0,
       results: Array(puzzle.headlines.length).fill(null),
@@ -95,7 +100,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   },
 
   submitGuess: (guess: string) => {
-    const { currentIndex, totalErrors, maxErrors, results, revealedAnswers, answers: allAnswers } = get();
+    const { currentIndex, totalErrors, maxErrors, results, revealedAnswers, answers: allAnswers, displayAnswers } = get();
     const answers = allAnswers[currentIndex];
     if (!answers) return;
 
@@ -113,7 +118,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
 
     if (isCorrect) {
       newResults[currentIndex] = 'correct';
-      newRevealed[currentIndex] = answers[0];
+      newRevealed[currentIndex] = displayAnswers[currentIndex] ?? answers[0];
       set({ results: newResults, revealedAnswers: newRevealed, lastGuessResult: 'correct' });
     } else {
       const newErrors = totalErrors + 1;
@@ -121,7 +126,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         for (let i = currentIndex; i < newResults.length; i++) {
           if (newResults[i] === null) {
             newResults[i] = 'wrong';
-            newRevealed[i] = allAnswers[i]?.[0] ?? '';
+            newRevealed[i] = displayAnswers[i] ?? allAnswers[i]?.[0] ?? '';
           }
         }
         set({

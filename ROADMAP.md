@@ -158,7 +158,7 @@ _Items from watson-qa-buchstaebli agent_
 
 _Items from watson-qa-schlagziil agent_
 
-1. [ ] P1 - Revealed answers show normalized non-German strings
+1. [x] P1 - Revealed answers show normalized non-German strings
    - Agent: watson-qa-schlagziil
    - Scenario: Error Counting — game-over after 3 total errors on headline 1
    - Problem: When an answer is revealed (game-over), `revealedAnswers[i]` is set to `DEMO_ANSWERS[i][0]` which is the lowercase normalized form. `HeadlineCard` only uppercases the first character. Result: "Missstaende" instead of "Missstände", "Ubs" instead of "UBS", "Co2-gesetz" instead of "CO2-Gesetz".
