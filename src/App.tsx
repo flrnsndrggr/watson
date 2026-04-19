@@ -2,6 +2,7 @@ import { lazy, Suspense, useState, useEffect, type ReactNode } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/lib/auth';
 import { Layout } from '@/pages/Layout';
+import { NotFoundPage } from '@/pages/NotFoundPage';
 
 // Lazy-load UserAuthProvider so the Supabase SDK (~50KB gzip) is deferred
 // from the critical rendering path. Auth resolves asynchronously anyway.
@@ -52,6 +53,9 @@ export default function App() {
               <Route path="verbindige" element={<AdminVerbindige />} />
               <Route path="zaemesetzli" element={<AdminZaemesetzli />} />
               <Route path="schlagziil" element={<AdminSchlagziil />} />
+            </Route>
+            <Route element={<Layout />}>
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
         </Suspense>
