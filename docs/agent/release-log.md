@@ -1,5 +1,44 @@
 # Release Log
 
+## Release — 2026-04-20 00:15
+
+- Commits: a7859cd..70cfbcf (16 commits)
+- Netlify deploy: skipped (MCP permission not granted)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP permission not granted)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
+
+### Notable commits
+- 70cfbcf feat: how-to-play onboarding modal for all 4 games
+- f2d35ab feat: streak prompt — nudge unauthenticated users to create an account after Day 3
+- bccba68 feat: polished Schlagziil results screen — share-first layout, countdown, performance tiers
+- 6df141c feat: staggered loss reveal for Verbindige — dramatic group-by-group answer unveil
+- 2f37b10 feat: streak tracking — calculate and display current streak per game
+- 353c9f7 perf: defer Supabase SDK from critical path — entry 60.95KB → 3.65KB gzipped
+
+---
+
+## Release — 2026-04-19 22:30
+
+- Commits: 56df671..a7859cd (3 commits)
+- Netlify deploy: skipped (MCP permission not granted)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP permission not granted)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
+
+### Notable commits
+- 31bc00d fix: standardize puzzle identifier across header, result, and share text
+- 503cf71 review: code review findings for temp-holder branch
+- a7859cd polish: add subtle pulse animation to ErrorDots on latest filled dot
+
+---
+
 ## Release — 2026-04-19 19:45
 
 - Commits: dfe2fa9..56df671 (13 commits)
@@ -123,5 +162,5 @@ routes returned HTTP 200, confirming the Netlify deployment is serving the app
 shell correctly.
 
 ## Last Verified
-- Commit: 56df671
-- Date: 2026-04-19
+- Commit: 70cfbcf
+- Date: 2026-04-20
