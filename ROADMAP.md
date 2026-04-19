@@ -309,14 +309,14 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component used by both games)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
-11. [ ] P2 - Netlify deploy failing — CLI not authenticated and MCP deploy tool unavailable
+11. [ ] P0 - Netlify deploy failing — GitHub Actions budget exhausted and CLI not authenticated
     - Agent: watson-roadmap-worker
-    - Scenario: Automated deploy after fixing Verbindige #5
-    - Problem: `netlify deploy --prod` returns "Unauthorized: could not retrieve project". `netlify status` shows "Not logged in". The MCP tool `mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__netlify-deploy-services-updater` is not available in the current tool set. No deploy path exists.
-    - Suggested fix: Run `netlify login` interactively to authenticate the CLI, or ensure the Netlify MCP tool is configured in the Claude Code MCP settings.
-    - Files: CLI auth / MCP config
-    - Evidence: `netlify deploy --prod --dir=dist --site=cfaa1817-72f7-47cd-8a95-8c998529bcf9` → "Error: Unauthorized: could not retrieve project". `netlify status` → "Not logged in." Observed 2026-04-18.
-    - Priority adjusted from P0 to P2: CI auto-deploys on push to main (commit 8bd0acd); manual CLI auth is not a deploy failure — deploys succeed via CI pipeline. Developer tooling convenience, not user-facing.
+    - Scenario: Automated deploy after fixing Zämesetzli #7, Architect #2, #3
+    - Problem: GitHub Actions budget exhausted ("The job was not started because an Actions budget is preventing further use"). Netlify CLI not authenticated (`netlify status` → "Not logged in"). Netlify MCP tool not available in current session. No deploy path exists. Three commits pushed to main (bd70b29, 72ed260, 77b21d5) are undeployed.
+    - Suggested fix: Either (1) add GitHub Actions budget, (2) run `netlify login` interactively, or (3) configure Netlify MCP tool.
+    - Files: CLI auth / MCP config / GitHub billing
+    - Evidence: `gh run view` → "The job was not started because an Actions budget is preventing further use". `netlify deploy --prod` → "Error: Unauthorized". Observed 2026-04-20.
+    - Priority re-escalated to P0: CI pipeline was the only deploy path and it is now broken; 3 fixes on main are undeployed.
 
 ---
 
