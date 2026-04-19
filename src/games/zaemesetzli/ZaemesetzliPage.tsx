@@ -146,7 +146,7 @@ export function ZaemesetzliPage() {
     else showToast('Alle Wörter gefunden!');
   }
 
-  if (!puzzle) return <PuzzleLoading />;
+  if (!puzzle) return <PuzzleLoading variant="zaemesetzli" />;
 
   const shareText = generateShareText(
     'zaemesetzli',

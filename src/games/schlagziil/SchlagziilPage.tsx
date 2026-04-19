@@ -90,7 +90,7 @@ export function SchlagziilPage() {
     prevStatus.current = status;
   }, [status, results]);
 
-  if (!puzzle) return <PuzzleLoading />;
+  if (!puzzle) return <PuzzleLoading variant="schlagziil" />;
 
   const headline = puzzle.headlines[currentIndex];
   const isFinished = status === 'finished';

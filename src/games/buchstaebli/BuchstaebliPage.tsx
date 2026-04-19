@@ -200,7 +200,7 @@ export function BuchstaebliPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  if (!puzzle) return <PuzzleLoading />;
+  if (!puzzle) return <PuzzleLoading variant="buchstaebli" />;
 
   const shareText = generateShareText(
     'buchstaebli',

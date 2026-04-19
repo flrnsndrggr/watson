@@ -1,5 +1,7 @@
 import { GameShell } from './GameShell';
 
+type PuzzleVariant = 'verbindige' | 'schlagziil' | 'zaemesetzli' | 'buchstaebli';
+
 function SkeletonBlock({ className }: { className?: string }) {
   return (
     <div
@@ -14,27 +16,94 @@ function SkeletonBlock({ className }: { className?: string }) {
   );
 }
 
-export function PuzzleLoading() {
+function VerbindigeSkeleton() {
   return (
-    <GameShell>
-      {/* Header skeleton */}
-      <div className="mb-4 flex flex-col items-center gap-2">
-        <SkeletonBlock className="h-7 w-48" />
-        <SkeletonBlock className="h-4 w-32" />
-      </div>
-
-      {/* 4x4 tile grid skeleton */}
+    <>
       <div className="grid grid-cols-4 gap-[var(--game-tile-gap)]">
         {Array.from({ length: 16 }, (_, i) => (
           <SkeletonBlock key={i} className="aspect-square" />
         ))}
       </div>
-
-      {/* Action buttons skeleton */}
       <div className="mt-4 flex justify-center gap-3">
         <SkeletonBlock className="h-10 w-28 rounded-full" />
         <SkeletonBlock className="h-10 w-28 rounded-full" />
       </div>
+    </>
+  );
+}
+
+function SchlagziilSkeleton() {
+  return (
+    <>
+      <div className="flex flex-col gap-3">
+        <SkeletonBlock className="h-24 w-full rounded-xl" />
+        <SkeletonBlock className="h-5 w-24 self-center" />
+      </div>
+      <div className="mt-6 flex flex-col gap-2">
+        <SkeletonBlock className="h-12 w-full rounded-lg" />
+        <SkeletonBlock className="h-12 w-full rounded-lg" />
+        <SkeletonBlock className="h-12 w-full rounded-lg" />
+      </div>
+      <div className="mt-4 flex justify-center">
+        <SkeletonBlock className="h-3 w-20" />
+      </div>
+    </>
+  );
+}
+
+function ZaemesetzliSkeleton() {
+  return (
+    <>
+      <div className="flex flex-wrap justify-center gap-3">
+        {Array.from({ length: 8 }, (_, i) => (
+          <SkeletonBlock key={i} className="h-14 w-14 rounded-xl" />
+        ))}
+      </div>
+      <div className="mt-6">
+        <SkeletonBlock className="h-12 w-full rounded-lg" />
+      </div>
+      <div className="mt-4 flex items-center gap-2">
+        <SkeletonBlock className="h-4 w-16" />
+        <SkeletonBlock className="h-3 flex-1 rounded-full" />
+      </div>
+    </>
+  );
+}
+
+function BuchstaebliSkeleton() {
+  return (
+    <>
+      <div className="flex justify-center">
+        <SkeletonBlock className="h-32 w-32 rounded-2xl" />
+      </div>
+      <div className="mt-6">
+        <SkeletonBlock className="h-12 w-full rounded-lg" />
+      </div>
+      <div className="mt-4 flex justify-center gap-2">
+        {Array.from({ length: 5 }, (_, i) => (
+          <SkeletonBlock key={i} className="h-10 w-10 rounded-lg" />
+        ))}
+      </div>
+    </>
+  );
+}
+
+const skeletons: Record<PuzzleVariant, React.FC> = {
+  verbindige: VerbindigeSkeleton,
+  schlagziil: SchlagziilSkeleton,
+  zaemesetzli: ZaemesetzliSkeleton,
+  buchstaebli: BuchstaebliSkeleton,
+};
+
+export function PuzzleLoading({ variant = 'verbindige' }: { variant?: PuzzleVariant }) {
+  const Skeleton = skeletons[variant];
+  return (
+    <GameShell>
+      <div className="mb-4 flex flex-col items-center gap-2">
+        <SkeletonBlock className="h-7 w-48" />
+        <SkeletonBlock className="h-4 w-32" />
+      </div>
+      <Skeleton />
     </GameShell>
   );
 }
