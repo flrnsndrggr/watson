@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
@@ -12,14 +12,14 @@ import { RankBar } from '@/games/buchstaebli/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
 import { useZaemesetzli } from './useZaemesetzli';
+import type { Rank } from '@/types';
 
-const RESULT_MESSAGES: Record<string, string> = {
-  'valid': '',
-  'mundart': 'Mundart-Bonus! 🇨🇭',
-  'not-in-puzzle': "Gutes Wort, aber nicht in der heutigen Lösung!",
-  'invalid': 'Kein gültiges Wort',
-  'already-found': 'Schon gefunden!',
-  'wrong-emojis': 'Stimmt, aber andere Emojis!',
+const RANK_LABELS: Record<Rank, string> = {
+  stift: 'Stift',
+  lehrling: 'Lehrling',
+  geselle: 'Geselle',
+  meister: 'Meister',
+  bundesrat: 'Bundesrat',
 };
 
 export function ZaemesetzliPage() {
@@ -41,18 +41,69 @@ export function ZaemesetzliPage() {
   } = useZaemesetzli();
 
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
+  const [shaking, setShaking] = useState(false);
+  const prevRank = useRef<Rank>(currentRank);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadPuzzle();
   }, [loadPuzzle]);
 
+  // Handle guess results: shake on wrong, celebrate on correct
   useEffect(() => {
     if (!lastResult) return;
-    const msg = RESULT_MESSAGES[lastResult];
-    if (msg) showToast(msg);
+
+    const isError = lastResult === 'invalid' || lastResult === 'already-found'
+      || lastResult === 'wrong-emojis' || lastResult === 'not-in-puzzle';
+
+    if (isError) {
+      setShaking(true);
+      const shakeTimer = setTimeout(() => setShaking(false), 400);
+
+      if (lastResult === 'invalid') showToast('Kein gültiges Wort');
+      else if (lastResult === 'already-found') showToast('Schon gefunden!');
+      else if (lastResult === 'wrong-emojis') showToast('Stimmt, aber andere Emojis!');
+      else if (lastResult === 'not-in-puzzle') showToast('Gutes Wort, aber nicht in der heutigen Lösung!');
+
+      // Re-focus input for quick retry
+      inputRef.current?.focus();
+
+      const clearTimer = setTimeout(clearLastResult, 2000);
+      return () => { clearTimeout(shakeTimer); clearTimeout(clearTimer); };
+    }
+
+    if (lastResult === 'mundart') {
+      showToast('Mundart-Bonus! 🇨🇭 +1');
+    }
+
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
   }, [lastResult, clearLastResult]);
+
+  // Confetti + toast on rank milestones
+  useEffect(() => {
+    if (currentRank !== prevRank.current) {
+      const prev = prevRank.current;
+      prevRank.current = currentRank;
+
+      // Only celebrate rank-ups, not initial load
+      if (prev === 'stift' && currentRank === 'lehrling') {
+        showToast(`Aufgestiegen: ${RANK_LABELS[currentRank]}!`);
+      } else if (currentRank === 'geselle' || currentRank === 'meister' || currentRank === 'bundesrat') {
+        showToast(`🎉 ${RANK_LABELS[currentRank]} erreicht!`);
+
+        if (currentRank === 'meister' || currentRank === 'bundesrat') {
+          import('canvas-confetti').then(({ default: confetti }) => {
+            confetti({
+              particleCount: currentRank === 'bundesrat' ? 150 : 100,
+              spread: currentRank === 'bundesrat' ? 100 : 70,
+              origin: { y: 0.6 },
+            });
+          });
+        }
+      }
+    }
+  }, [currentRank]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -99,8 +150,18 @@ export function ZaemesetzliPage() {
       />
 
       {/* Word input */}
-      <form onSubmit={handleSubmit} className="mx-auto mt-2 flex max-w-[360px] gap-2">
+      <form
+        onSubmit={handleSubmit}
+        className={`mx-auto mt-2 flex max-w-[360px] gap-2 transition-colors ${
+          shaking ? 'animate-[shake_400ms_ease]' : ''
+        } ${
+          lastResult === 'valid' || lastResult === 'mundart'
+            ? 'rounded ring-2 ring-[var(--color-green)]'
+            : ''
+        }`}
+      >
         <input
+          ref={inputRef}
           type="text"
           value={currentInput}
           onChange={(e) => setInput(e.target.value)}
@@ -134,23 +195,28 @@ export function ZaemesetzliPage() {
             Gefunden ({foundWords.length}/{puzzle.valid_compounds.length}):
           </p>
           <div className="mt-2 flex flex-col gap-1.5">
-            {foundWords.map((fw) => (
-              <div
-                key={fw.word}
-                className={`flex items-center justify-between rounded px-3 py-1.5 text-sm ${
-                  fw.is_mundart
-                    ? 'bg-[var(--color-green)]/10 text-[var(--color-black)]'
-                    : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
-                }`}
-              >
-                <span>
-                  {fw.components.join('')}{' '}
-                  <span className="font-semibold">{fw.word}</span>
-                  {fw.is_mundart && <span className="ml-1">🇨🇭</span>}
-                </span>
-                <span className="text-xs text-[var(--color-gray-text)]">{fw.points}pt</span>
-              </div>
-            ))}
+            {foundWords.map((fw, i) => {
+              const isNewest = i === foundWords.length - 1 && lastResult !== null;
+              return (
+                <div
+                  key={fw.word}
+                  className={`flex items-center justify-between rounded px-3 py-1.5 text-sm ${
+                    fw.is_mundart
+                      ? 'bg-[var(--color-green)]/10 text-[var(--color-black)]'
+                      : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
+                  } ${isNewest ? 'animate-[popIn_300ms_ease]' : ''}`}
+                >
+                  <span>
+                    {fw.components.join('')}{' '}
+                    <span className="font-semibold">{fw.word}</span>
+                    {fw.is_mundart && <span className="ml-1">🇨🇭</span>}
+                  </span>
+                  <span className="text-xs text-[var(--color-gray-text)]">
+                    {fw.is_mundart && isNewest ? '🇨🇭 ' : ''}{fw.points}pt
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
