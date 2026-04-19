@@ -75,5 +75,45 @@ _None._
    - File: `src/components/shared/ErrorDots.tsx`
    - Problem: The error dots have no ARIA attributes. Screen readers won't announce when a new error occurs. Consider `aria-live="polite"` on the container and an `aria-label` like `"Fehler: {used} von {total}"` so error progression is accessible to non-visual users. (This predates this commit but is worth noting alongside the visual enhancement.)
 
+---
+
+## Review — 2026-04-19 (incremental 2)
+
+### Branch: temp-holder (commits 90cc78d..87dbe18)
+
+2 application commits: AdSlot placeholder styling (`41077ee`), Schlagziil wrong-answer shake feedback (`87dbe18`).
+
+**CRITICAL** (must fix before merge):
+
+_None._
+
+**WARNING** (should fix):
+
+1. Shake animation on HeadlineCard uses `transform: translateX()` — broken under existing `transform: none !important` reduced-motion rule.
+   - File: `src/styles/tokens.css:49-53` (shake keyframe), `src/games/schlagziil/HeadlineCard.tsx:58`
+   - Problem: The `shake` keyframe uses `transform: translateX(±8px)`. The existing CRITICAL from the first review (`transform: none !important` in the `prefers-reduced-motion` media query at `tokens.css:116`) kills this animation's visual effect entirely — the transform is overridden to `none`. The `animation-duration: 0.01ms !important` rule fires first, so the animation is already effectively hidden for reduced-motion users (correct). However, this is yet another transform-based animation affected by the `transform: none !important` rule. This reinforces the urgency of fixing the original CRITICAL.
+   - Suggested fix: Fix the original CRITICAL (remove `transform: none !important`). No changes needed to the shake animation itself.
+
+2. `wrongFlash` state is not scoped to the current headline — all headlines would flash if rendered simultaneously.
+   - File: `src/games/schlagziil/SchlagziilPage.tsx:45,113-118`
+   - Problem: `wrongFlash` is a single boolean in SchlagziilPage state, passed to the HeadlineCard at `currentIndex`. Currently only one HeadlineCard renders at a time (the active one), so this works. But if the layout ever changes to show multiple headlines (e.g., a grid view, or showing the previous card during transition), all visible cards would receive the same `wrongFlash` prop. Low risk since the current UI is single-card, but the state should ideally be scoped (e.g., `wrongFlashIndex: number | null`).
+   - Suggested fix: Store `wrongFlashIndex` instead of a boolean, and only pass `wrongFlash={wrongFlashIndex === currentIndex}` to HeadlineCard.
+
+**NOTE** (consider):
+
+1. Schlagziil wrong-answer feedback resolves ROADMAP P1 item #2 (Schlagziil section).
+   - File: `ROADMAP.md:94-100`
+   - The implementation matches the suggested fix exactly: `useEffect` on `lastGuessResult === 'wrong'`, shows toast ("Falsch!"), passes `wrongFlash` prop for red-border + shake animation. This ROADMAP item can be marked as resolved once the branch merges.
+
+2. AdSlot uses `text-[10px]` which is below WCAG minimum recommended font size.
+   - File: `src/components/shared/AdSlot.tsx:17`
+   - Problem: The "Anzeige" label uses `text-[10px]` (10px font size). WCAG does not mandate a minimum font size, but 10px is difficult to read for many users, especially on mobile. Since this is a placeholder label on an ad slot, readability is less critical, but consider `text-[11px]` or `text-xs` (12px) for better legibility.
+
+3. AdSlot placeholder lacks `role` or `aria-label` to indicate it's an ad placeholder.
+   - File: `src/components/shared/AdSlot.tsx:14`
+   - Problem: Screen readers will encounter a container with just the text "Anzeige" and no semantic role. Consider `role="complementary"` or `aria-label="Werbefläche"` so assistive technology can identify and skip the ad region.
+
+4. AdSlot uses watson design tokens correctly (`--color-gray-bg`, `--color-gray-text`, `--game-tile-radius`) — good brand compliance.
+
 ## Last Reviewed
-- temp-holder: 90cc78d
+- temp-holder: 87dbe18
