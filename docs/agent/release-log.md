@@ -1,5 +1,30 @@
 # Release Log
 
+## Release — 2026-04-20 23:45
+
+- Commits: 49f6fe5..84370e2 (4 commits)
+- Netlify deploy: skipped (MCP not granted)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP not granted)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Skipped checks: Netlify deploy (MCP not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not granted)
+
+### Notable commits
+- 84370e2 feat: add daily sweep celebration + combined share card on landing page
+- 141ecb7 feat: add analytics event tracking for all games
+- 50d5059 polish: improve ShareButton feedback for Web Share API vs clipboard
+- 0690a67 triage: deduplicate and clean up roadmap findings
+
+---
+
+## Last Verified
+- Commit: 84370e2
+- Date: 2026-04-20
+
+---
+
 ## Release — 2026-04-20 21:00
 
 - Commits: 17c2af7..49f6fe5 (39 commits)
@@ -22,12 +47,6 @@
 - 691fd16 feat: add Buchstäbli game completion flow with results screen, streak tracking, and archive support
 - adac8e5 feat: archive mode with calendar view of past puzzles
 - d72136e feat: profile page with streak stats per game
-
----
-
-## Last Verified
-- Commit: 49f6fe5
-- Date: 2026-04-20
 
 ---
 
