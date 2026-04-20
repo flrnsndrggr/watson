@@ -281,7 +281,7 @@ export function ZaemesetzliPage() {
           <div className="mt-6 flex flex-col items-center gap-3">
             {streak.current >= 1 && <StreakBadge streak={streak} />}
             <StreakPrompt streak={streak} />
-            <ShareButton text={shareText} />
+            <ShareButton text={shareText} game="zaemesetzli" />
           </div>
 
           <PostGameSection currentGame="zaemesetzli" />

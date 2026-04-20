@@ -4,6 +4,7 @@ import { SAMPLE_BUCHSTAEBLI, DEMO_VALID_WORDS } from './buchstaebli.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
 
 export interface FoundWord {
   word: string;
@@ -78,6 +79,7 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
       currentRank: 'stift',
       status: 'playing',
     });
+    trackGameStarted('buchstaebli', !!archiveDate);
   },
 
   addLetter: (letter) => {
@@ -131,7 +133,11 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
 
     // Record streak on first word found (skip for archive)
     const streakUpdate = foundWords.length === 0 && !get().isArchive
-      ? { streak: recordGamePlayed('buchstaebli') }
+      ? (() => {
+          const streak = recordGamePlayed('buchstaebli');
+          checkStreakMilestone('buchstaebli', streak.current);
+          return { streak };
+        })()
       : {};
 
     // Auto-complete if all demo words found
@@ -142,6 +148,10 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
     // Submit to leaderboard on each word found (upsert keeps latest score)
     if (!get().isArchive) {
       void submitLeaderboardEntry('buchstaebli', newScore, null);
+    }
+
+    if (allFound) {
+      trackGameCompleted('buchstaebli', 'complete', get().isArchive, newScore);
     }
 
     set({
@@ -156,6 +166,7 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
   },
 
   finishGame: () => {
+    trackGameCompleted('buchstaebli', 'complete', get().isArchive, get().score);
     set({ status: 'complete' });
   },
 }));

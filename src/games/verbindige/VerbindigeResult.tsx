@@ -211,7 +211,7 @@ export function VerbindigeResult() {
 
       {/* Share button */}
       <div className="mt-5 flex justify-center animate-[resultSlideUp_400ms_ease-out_800ms_both]">
-        <ShareButton text={shareText} label="Ergebnis teilen" />
+        <ShareButton text={shareText} label="Ergebnis teilen" game="verbindige" />
       </div>
 
       {/* Puzzle number */}

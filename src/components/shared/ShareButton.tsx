@@ -1,17 +1,23 @@
 import { useState } from 'react';
 import { share } from '@/lib/share';
+import { trackGameShared } from '@/lib/analytics';
+import type { GameType } from '@/types';
 
 interface ShareButtonProps {
   text: string;
   label?: string;
+  game?: GameType;
 }
 
-export function ShareButton({ text, label = 'Teilen' }: ShareButtonProps) {
+export function ShareButton({ text, label = 'Teilen', game }: ShareButtonProps) {
   const [feedback, setFeedback] = useState<'shared' | 'copied' | null>(null);
 
   async function handleShare() {
     const result = await share(text);
     setFeedback(result);
+    if (game) {
+      trackGameShared(game, result === 'shared' ? 'share_api' : 'clipboard');
+    }
     setTimeout(() => setFeedback(null), 2000);
   }
 

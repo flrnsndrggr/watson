@@ -4,6 +4,7 @@ import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagz
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
@@ -101,6 +102,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       startedAt: Date.now(),
       elapsedSeconds: null,
     });
+    trackGameStarted('schlagziil', !!archiveDate);
   },
 
   useHint: (index: number) => {
@@ -145,6 +147,12 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         if (!get().isArchive) {
           void submitLeaderboardEntry('schlagziil', correctCount, elapsed);
         }
+        const streakUpdate = get().isArchive ? {} : (() => {
+          const streak = recordGamePlayed('schlagziil');
+          checkStreakMilestone('schlagziil', streak.current);
+          return { streak };
+        })();
+        trackGameCompleted('schlagziil', 'lost', get().isArchive, correctCount, elapsed);
         set({
           totalErrors: newErrors,
           results: newResults,
@@ -152,7 +160,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           status: 'finished',
           lastGuessResult: 'wrong',
           elapsedSeconds: elapsed,
-          ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }),
+          ...streakUpdate,
         });
       } else {
         set({ totalErrors: newErrors, lastGuessResult: 'wrong' });
@@ -170,7 +178,13 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       if (!get().isArchive) {
         void submitLeaderboardEntry('schlagziil', correctCount, elapsed);
       }
-      set({ status: 'finished', elapsedSeconds: elapsed, ...(get().isArchive ? {} : { streak: recordGamePlayed('schlagziil') }) });
+      const streakUpdate2 = get().isArchive ? {} : (() => {
+          const streak = recordGamePlayed('schlagziil');
+          checkStreakMilestone('schlagziil', streak.current);
+          return { streak };
+        })();
+      trackGameCompleted('schlagziil', 'won', get().isArchive, correctCount, elapsed);
+      set({ status: 'finished', elapsedSeconds: elapsed, ...streakUpdate2 });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
     }

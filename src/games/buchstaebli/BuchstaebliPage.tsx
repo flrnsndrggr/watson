@@ -316,7 +316,7 @@ export function BuchstaebliPage() {
             )}
             {streak.current >= 1 && <StreakBadge streak={streak} />}
             <StreakPrompt streak={streak} />
-            <ShareButton text={shareText} />
+            <ShareButton text={shareText} game="buchstaebli" />
           </div>
         </>
       ) : (

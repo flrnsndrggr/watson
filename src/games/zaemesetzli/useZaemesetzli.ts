@@ -4,6 +4,7 @@ import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -68,6 +69,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       hintsUsed: 0,
       status: 'playing',
     });
+    trackGameStarted('zaemesetzli', !!archiveDate);
   },
 
   selectEmoji: (emoji) => {
@@ -121,12 +123,20 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
     // Record streak on first word found (skip for archive)
     const streakUpdate = foundWords.length === 0 && !get().isArchive
-      ? { streak: recordGamePlayed('zaemesetzli') }
+      ? (() => {
+          const streak = recordGamePlayed('zaemesetzli');
+          checkStreakMilestone('zaemesetzli', streak.current);
+          return { streak };
+        })()
       : {};
 
     // Submit to leaderboard on each word found (upsert keeps latest score)
     if (!get().isArchive) {
       void submitLeaderboardEntry('zaemesetzli', newScore, null);
+    }
+
+    if (allFound) {
+      trackGameCompleted('zaemesetzli', 'complete', get().isArchive, newScore);
     }
 
     set({

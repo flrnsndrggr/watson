@@ -5,6 +5,7 @@ import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -79,6 +80,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     const puzzle = fetched ?? SAMPLE_VERBINDIGE;
     const allItems = shuffleArray(puzzle.groups.flatMap((g) => g.items));
     set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0, previousGuesses: [], startedAt: Date.now(), elapsedSeconds: null });
+    trackGameStarted('verbindige', !!archiveDate);
   },
 
   toggleItem: (item) => {
@@ -117,12 +119,16 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       pendingCorrect: null,
       status: won ? 'won' : 'playing',
     };
-    if (won && !get().isArchive) {
-      updates.streak = recordGamePlayed('verbindige');
+    if (won) {
       const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
       updates.elapsedSeconds = elapsed;
       const score = 4 - get().mistakes;
-      void submitLeaderboardEntry('verbindige', score, elapsed);
+      if (!get().isArchive) {
+        updates.streak = recordGamePlayed('verbindige');
+        checkStreakMilestone('verbindige', updates.streak.current);
+        void submitLeaderboardEntry('verbindige', score, elapsed);
+      }
+      trackGameCompleted('verbindige', 'won', get().isArchive, score, elapsed);
     }
     set(updates);
   },
@@ -191,11 +197,15 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         previousGuesses: newPreviousGuesses,
         status: lost ? 'lost' : 'playing',
       };
-      if (lost && !get().isArchive) {
-        lostUpdates.streak = recordGamePlayed('verbindige');
+      if (lost) {
         const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
         lostUpdates.elapsedSeconds = elapsed;
-        void submitLeaderboardEntry('verbindige', 0, elapsed);
+        if (!get().isArchive) {
+          lostUpdates.streak = recordGamePlayed('verbindige');
+          checkStreakMilestone('verbindige', lostUpdates.streak.current);
+          void submitLeaderboardEntry('verbindige', 0, elapsed);
+        }
+        trackGameCompleted('verbindige', 'lost', get().isArchive, 0, elapsed);
       }
       set(lostUpdates);
 
