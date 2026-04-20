@@ -142,6 +142,34 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes cardEnter {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes correctPulse {
+  0% { box-shadow: 0 0 0 0 rgba(123, 212, 0, 0.5); }
+  40% { box-shadow: 0 0 0 12px rgba(123, 212, 0, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(123, 212, 0, 0); }
+}
+
+@keyframes answerReveal {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes linkSlideIn {
+  from { transform: translateX(-8px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
 /* ===== BASE STYLES ===== */
 
 body {

@@ -122,13 +122,13 @@ export function SchlagziilPage() {
               {puzzle.headlines.map((_h, i) => (
                 <span
                   key={i}
-                  className={`h-2.5 w-2.5 rounded-full ${
+                  className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
                     results[i] === 'correct'
-                      ? 'bg-[var(--color-green)]'
+                      ? 'bg-[var(--color-green)] scale-110'
                       : results[i] === 'wrong'
-                        ? 'bg-[var(--color-pink)]'
+                        ? 'bg-[var(--color-pink)] scale-110'
                         : i === currentIndex
-                          ? 'bg-[var(--color-cyan)]'
+                          ? 'bg-[var(--color-cyan)] scale-125'
                           : 'bg-[var(--color-gray-bg)]'
                   }`}
                 />
@@ -204,6 +204,7 @@ export function SchlagziilPage() {
                   disabled
                   hintUsed={hintsUsed[i]}
                   onUseHint={() => {}}
+                  skipEntrance
                 />
               ))}
             </div>
