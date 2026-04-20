@@ -5,6 +5,7 @@ import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { saveDailyResult } from '@/lib/dailyResults';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
@@ -153,6 +154,15 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           return { streak };
         })();
         trackGameCompleted('schlagziil', 'lost', get().isArchive, correctCount, elapsed);
+        if (!get().isArchive) {
+          const emojiLine = newResults.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
+          saveDailyResult('schlagziil', {
+            outcome: 'lost',
+            summary: `${correctCount}/${newResults.length}`,
+            emojiLine,
+            timeSeconds: elapsed,
+          });
+        }
         set({
           totalErrors: newErrors,
           results: newResults,
@@ -184,6 +194,15 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           return { streak };
         })();
       trackGameCompleted('schlagziil', 'won', get().isArchive, correctCount, elapsed);
+      if (!get().isArchive) {
+        const emojiLine = results.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
+        saveDailyResult('schlagziil', {
+          outcome: 'won',
+          summary: `${correctCount}/${puzzle.headlines.length}`,
+          emojiLine,
+          timeSeconds: elapsed,
+        });
+      }
       set({ status: 'finished', elapsedSeconds: elapsed, ...streakUpdate2 });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });

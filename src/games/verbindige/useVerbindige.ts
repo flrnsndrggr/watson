@@ -6,6 +6,7 @@ import { showToast } from '@/components/shared/Toast';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { saveDailyResult } from '@/lib/dailyResults';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -129,6 +130,19 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         void submitLeaderboardEntry('verbindige', score, elapsed);
       }
       trackGameCompleted('verbindige', 'won', get().isArchive, score, elapsed);
+      if (!get().isArchive) {
+        const emojiMap: Record<number, string> = { 1: '\u{1F7E8}', 2: '\u{1F7E9}', 3: '\u{1F7E6}', 4: '\u{1F7EA}' };
+        const emojiLine = [...newSolvedGroups]
+          .sort((a, b) => a.guessOrder - b.guessOrder)
+          .map((g) => (emojiMap[g.difficulty] ?? '').repeat(4))
+          .join('\n');
+        saveDailyResult('verbindige', {
+          outcome: 'won',
+          summary: `${get().mistakes}/4 Fehler`,
+          emojiLine,
+          timeSeconds: elapsed,
+        });
+      }
     }
     set(updates);
   },
@@ -206,6 +220,13 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           void submitLeaderboardEntry('verbindige', 0, elapsed);
         }
         trackGameCompleted('verbindige', 'lost', get().isArchive, 0, elapsed);
+        if (!get().isArchive) {
+          saveDailyResult('verbindige', {
+            outcome: 'lost',
+            summary: 'Knapp daneben',
+            timeSeconds: elapsed,
+          });
+        }
       }
       set(lostUpdates);
 

@@ -5,6 +5,7 @@ import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { saveDailyResult } from '@/lib/dailyResults';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -137,6 +138,13 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
     if (allFound) {
       trackGameCompleted('zaemesetzli', 'complete', get().isArchive, newScore);
+      if (!get().isArchive) {
+        const rankLabel = newRank.charAt(0).toUpperCase() + newRank.slice(1);
+        saveDailyResult('zaemesetzli', {
+          outcome: 'complete',
+          summary: `${newFoundWords.length}/${puzzle.valid_compounds.length} \u00B7 ${rankLabel}`,
+        });
+      }
     }
 
     set({

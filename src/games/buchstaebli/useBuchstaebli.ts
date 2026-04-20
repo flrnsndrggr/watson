@@ -5,6 +5,7 @@ import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { saveDailyResult } from '@/lib/dailyResults';
 
 export interface FoundWord {
   word: string;
@@ -152,6 +153,13 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
 
     if (allFound) {
       trackGameCompleted('buchstaebli', 'complete', get().isArchive, newScore);
+      if (!get().isArchive) {
+        const rankLabel = newRank.charAt(0).toUpperCase() + newRank.slice(1);
+        saveDailyResult('buchstaebli', {
+          outcome: 'complete',
+          summary: `${newScore} Pkt \u00B7 ${rankLabel}`,
+        });
+      }
     }
 
     set({
@@ -167,6 +175,14 @@ export const useBuchstaebli = create<BuchstaebliState>((set, get) => ({
 
   finishGame: () => {
     trackGameCompleted('buchstaebli', 'complete', get().isArchive, get().score);
+    if (!get().isArchive) {
+      const rank = get().currentRank;
+      const rankLabel = rank.charAt(0).toUpperCase() + rank.slice(1);
+      saveDailyResult('buchstaebli', {
+        outcome: 'complete',
+        summary: `${get().score} Pkt \u00B7 ${rankLabel}`,
+      });
+    }
     set({ status: 'complete' });
   },
 }));

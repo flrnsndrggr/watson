@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { AdSlot } from '@/components/shared/AdSlot';
+import { ShareButton } from '@/components/shared/ShareButton';
 import { getStreak } from '@/lib/streaks';
 import { getTodayDateCET } from '@/lib/supabase';
+import { getDailyResults, type DailyResult } from '@/lib/dailyResults';
 import type { GameType, StreakData } from '@/types';
 
 interface GameConfig {
@@ -18,29 +20,29 @@ const GAMES: GameConfig[] = [
   {
     path: '/verbindige',
     name: 'Verbindige',
-    emoji: '🇨🇭',
-    description: 'Finde 4 Gruppen à 4. Schweizer Themen, watson-Twist.',
+    emoji: '\u{1F1E8}\u{1F1ED}',
+    description: 'Finde 4 Gruppen \u00E0 4. Schweizer Themen, watson-Twist.',
     gameType: 'verbindige',
   },
   {
     path: '/buchstaebli',
-    name: 'Buchstäbli',
-    emoji: '🐝',
-    description: 'Bilde Wörter aus 7 Buchstaben. Mundart-Bonus!',
+    name: 'Buchst\u00E4bli',
+    emoji: '\u{1F41D}',
+    description: 'Bilde W\u00F6rter aus 7 Buchstaben. Mundart-Bonus!',
     gameType: 'buchstaebli',
   },
   {
     path: '/zaemesetzli',
-    name: 'Zämesetzli',
-    emoji: '🧩',
-    description: 'Kombiniere Emojis zu zusammengesetzten Wörtern. Mundart-Bonus!',
+    name: 'Z\u00E4mesetzli',
+    emoji: '\u{1F9E9}',
+    description: 'Kombiniere Emojis zu zusammengesetzten W\u00F6rtern. Mundart-Bonus!',
     gameType: 'zaemesetzli',
   },
   {
     path: '/schlagziil',
     name: 'Schlagziil',
-    emoji: '📰',
-    description: 'Errate die fehlenden Wörter in watson-Schlagzeilen.',
+    emoji: '\u{1F4F0}',
+    description: 'Errate die fehlenden W\u00F6rter in watson-Schlagzeilen.',
     gameType: 'schlagziil',
   },
 ];
@@ -48,35 +50,12 @@ const GAMES: GameConfig[] = [
 interface GameStatus {
   playedToday: boolean;
   streak: StreakData;
-}
-
-function useGameStatuses(): Record<GameType, GameStatus> {
-  const [statuses, setStatuses] = useState<Record<GameType, GameStatus>>(() => loadStatuses());
-
-  // Re-check when user returns to this page (e.g. after playing a game)
-  useEffect(() => {
-    function handleFocus() {
-      setStatuses(loadStatuses());
-    }
-    window.addEventListener('focus', handleFocus);
-    // Also re-check on visibility change (mobile tab switching)
-    function handleVisibility() {
-      if (document.visibilityState === 'visible') {
-        setStatuses(loadStatuses());
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
-  }, []);
-
-  return statuses;
+  result: DailyResult | null;
 }
 
 function loadStatuses(): Record<GameType, GameStatus> {
   const today = getTodayDateCET();
+  const dailyResults = getDailyResults();
   const gameTypes: GameType[] = ['verbindige', 'buchstaebli', 'zaemesetzli', 'schlagziil'];
   const result = {} as Record<GameType, GameStatus>;
   for (const gt of gameTypes) {
@@ -84,15 +63,102 @@ function loadStatuses(): Record<GameType, GameStatus> {
     result[gt] = {
       playedToday: streak.last_played === today,
       streak,
+      result: dailyResults.results[gt] ?? null,
     };
   }
   return result;
+}
+
+function useGameStatuses(): Record<GameType, GameStatus> {
+  const [statuses, setStatuses] = useState<Record<GameType, GameStatus>>(() => loadStatuses());
+
+  useEffect(() => {
+    function reload() {
+      setStatuses(loadStatuses());
+    }
+    window.addEventListener('focus', reload);
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') reload();
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('focus', reload);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, []);
+
+  return statuses;
+}
+
+function useNextPuzzleCountdown(): string {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    function update() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const diff = tomorrow.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`);
+    }
+    update();
+    const interval = setInterval(update, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return timeLeft;
+}
+
+function buildDailySweepShareText(
+  statuses: Record<GameType, GameStatus>,
+): string {
+  const today = new Date().toLocaleDateString('de-CH', {
+    day: 'numeric',
+    month: 'numeric',
+    year: undefined,
+    timeZone: 'Europe/Zurich',
+  });
+  const lines: string[] = [`watson Spiele \u{1F1E8}\u{1F1ED} ${today}`];
+
+  for (const game of GAMES) {
+    const s = statuses[game.gameType];
+    if (s.result) {
+      const emoji = s.result.emojiLine ?? '';
+      const prefix = emoji ? `${emoji} ` : `${game.emoji} `;
+      lines.push(`${prefix}${game.name} ${s.result.summary}`);
+    }
+  }
+
+  lines.push('Spiel, aber deep.');
+  lines.push('games-watson.netlify.app');
+  return lines.join('\n');
 }
 
 export function LandingPage() {
   const statuses = useGameStatuses();
   const playedCount = GAMES.filter((g) => statuses[g.gameType].playedToday).length;
   const totalStreak = GAMES.reduce((sum, g) => sum + statuses[g.gameType].streak.current, 0);
+  const allPlayed = playedCount === GAMES.length;
+  const hasAnyResult = GAMES.some((g) => statuses[g.gameType].result !== null);
+  const countdown = useNextPuzzleCountdown();
+  const confettiFired = useRef(false);
+
+  // Confetti when all games are completed
+  useEffect(() => {
+    if (allPlayed && hasAnyResult && !confettiFired.current) {
+      confettiFired.current = true;
+      import('canvas-confetti').then(({ default: confetti }) => {
+        // Double burst for the daily sweep celebration
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.5, x: 0.3 } });
+        setTimeout(() => {
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.5, x: 0.7 } });
+        }, 200);
+      });
+    }
+  }, [allPlayed, hasAnyResult]);
 
   return (
     <GameShell>
@@ -142,6 +208,8 @@ export function LandingPage() {
         {GAMES.map((game) => {
           const status = statuses[game.gameType];
           const played = status.playedToday;
+          const result = status.result;
+
           return (
             <Link
               key={game.path}
@@ -153,7 +221,7 @@ export function LandingPage() {
               }`}
             >
               <span
-                className={`relative flex h-14 w-14 items-center justify-center rounded-lg text-2xl transition-transform group-hover:scale-105 ${
+                className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg text-2xl transition-transform group-hover:scale-105 ${
                   played ? 'bg-[var(--color-green)]/10' : 'bg-[var(--color-gray-bg)]'
                 }`}
               >
@@ -175,7 +243,7 @@ export function LandingPage() {
                     </span>
                   ) : (
                     <span className="rounded bg-[var(--color-cyan)] px-1.5 py-0.5 text-[10px] font-bold text-white">
-                      TÄGLICH
+                      T\u00C4GLICH
                     </span>
                   )}
                   {status.streak.current >= 2 && (
@@ -184,11 +252,22 @@ export function LandingPage() {
                     </span>
                   )}
                 </div>
-                <p className="mt-0.5 text-sm text-[var(--color-gray-text)]">
-                  {played ? `Weiter spielen oder Ergebnis ansehen` : game.description}
-                </p>
+                {result ? (
+                  <p className="mt-0.5 text-sm font-semibold text-[var(--color-black)]">
+                    {result.summary}
+                    {result.emojiLine && (
+                      <span className="ml-2 text-xs tracking-wide">
+                        {result.emojiLine.split('\n')[0]}
+                      </span>
+                    )}
+                  </p>
+                ) : (
+                  <p className="mt-0.5 text-sm text-[var(--color-gray-text)]">
+                    {played ? 'Weiter spielen oder Ergebnis ansehen' : game.description}
+                  </p>
+                )}
               </div>
-              <span className="text-[var(--color-gray-text)] transition-transform group-hover:translate-x-1">
+              <span className="text-[var(--color-gray-text)] transition-transform group-hover:translate-x-1 shrink-0">
                 &rarr;
               </span>
             </Link>
@@ -196,14 +275,64 @@ export function LandingPage() {
         })}
       </div>
 
-      {/* Encouragement when all games played */}
-      {playedCount === GAMES.length && (
+      {/* Daily sweep celebration */}
+      {allPlayed && hasAnyResult && (
+        <div className="mt-6 animate-[popIn_400ms_ease-out] rounded-xl border-2 border-[var(--color-pink)]/20 bg-gradient-to-br from-[var(--color-pink)]/[0.04] to-[var(--color-cyan)]/[0.04] p-5 text-center">
+          <p className="text-2xl" aria-hidden>&#x1F389;</p>
+          <h3 className="mt-1 font-[family-name:var(--font-heading)] text-xl font-bold text-[var(--color-pink)]">
+            Tages-Sweep!
+          </h3>
+          <p className="mt-1 text-sm text-[var(--color-gray-text)]">
+            Alle {GAMES.length} Spiele geschafft. Starke Leistung!
+          </p>
+
+          {/* Mini results grid */}
+          <div className="mx-auto mt-3 flex max-w-[280px] flex-col gap-1.5">
+            {GAMES.map((game) => {
+              const r = statuses[game.gameType].result;
+              if (!r) return null;
+              return (
+                <div key={game.gameType} className="flex items-center justify-between text-sm">
+                  <span>
+                    <span className="mr-1.5">{game.emoji}</span>
+                    <span className="font-semibold">{game.name}</span>
+                  </span>
+                  <span className="text-xs text-[var(--color-gray-text)]">{r.summary}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-4">
+            <ShareButton
+              text={buildDailySweepShareText(statuses)}
+              label="Tages-Ergebnis teilen"
+              game="verbindige"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Simple "all played" when no results stored */}
+      {allPlayed && !hasAnyResult && (
         <div className="mt-5 rounded-lg bg-[var(--color-green)]/[0.06] p-4 text-center">
           <p className="text-sm font-semibold">
             Alle Spiele gespielt!
           </p>
           <p className="mt-0.5 text-xs text-[var(--color-gray-text)]">
-            Morgen gibt&apos;s neue Rätsel. Bis denn!
+            Morgen gibt&apos;s neue R\u00E4tsel. Bis denn!
+          </p>
+        </div>
+      )}
+
+      {/* Next puzzle countdown */}
+      {allPlayed && (
+        <div className="mt-4 text-center animate-[resultSlideUp_400ms_ease-out_200ms_both]">
+          <p className="text-xs text-[var(--color-gray-text)]">
+            Neue R\u00E4tsel in{' '}
+            <span className="font-semibold text-[var(--color-black)]">
+              {countdown}
+            </span>
           </p>
         </div>
       )}
