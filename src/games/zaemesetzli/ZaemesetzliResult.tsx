@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
+import { ShareImageButton } from '@/components/shared/ShareImageButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
 import { generateShareText } from '@/lib/share';
+import type { ShareCardData } from '@/lib/shareImage';
 import { useZaemesetzli } from './useZaemesetzli';
 import type { Rank } from '@/types';
 
@@ -56,6 +58,14 @@ function getPerformanceTier(rank: Rank): PerformanceTier {
       };
   }
 }
+
+const TIER_HEX: Record<string, string> = {
+  'text-[var(--color-pink)]': '#F40F97',
+  'text-[var(--color-green)]': '#7BD400',
+  'text-[var(--color-cyan)]': '#00C6FF',
+  'text-[var(--color-blue)]': '#0F6CF5',
+  'text-[var(--color-gray-text)]': '#777777',
+};
 
 function useNextPuzzleCountdown(): string {
   const [timeLeft, setTimeLeft] = useState('');
@@ -115,6 +125,26 @@ export function ZaemesetzliResult() {
     puzzle.date,
     `${foundWords.length}/${puzzle.valid_compounds.length} · ${score} Pkt · ${RANK_LABELS[currentRank]}\n${compoundEmojis}${extraCount ? ` ${extraCount}` : ''}`,
   );
+
+  const cardData: ShareCardData = {
+    gameName: 'Zämesetzli',
+    gamePath: 'zaemesetzli',
+    puzzleId: puzzle.date,
+    heading: tier.heading,
+    subheading: tier.sub,
+    accentColor: TIER_HEX[tier.accentClass] ?? '#00C6FF',
+    grid: {
+      type: 'zaemesetzli',
+      found: foundWords.length,
+      total: puzzle.valid_compounds.length,
+      rank: RANK_LABELS[currentRank],
+      score,
+      maxScore: puzzle.max_score,
+    },
+    stats: mundartCount > 0
+      ? `${score} Pkt · ${RANK_LABELS[currentRank]} · ${mundartCount}× Mundart`
+      : `${score} Pkt · ${RANK_LABELS[currentRank]}`,
+  };
 
   return (
     <div
@@ -192,9 +222,10 @@ export function ZaemesetzliResult() {
       {/* Leaderboard */}
       <LeaderboardPanel gameType="zaemesetzli" puzzleDate={puzzle.date} />
 
-      {/* Share button */}
-      <div className="mt-5 flex justify-center animate-[resultSlideUp_400ms_ease-out_800ms_both]">
+      {/* Share buttons */}
+      <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">
         <ShareButton text={shareText} label="Ergebnis teilen" game="zaemesetzli" />
+        <ShareImageButton cardData={cardData} game="zaemesetzli" />
       </div>
 
       {/* Puzzle date */}
