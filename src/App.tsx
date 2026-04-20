@@ -12,6 +12,7 @@ const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m 
 const AdminVerbindige = lazy(() => import('@/pages/admin/AdminVerbindige').then(m => ({ default: m.AdminVerbindige })));
 const AdminZaemesetzli = lazy(() => import('@/pages/admin/AdminZaemesetzli').then(m => ({ default: m.AdminZaemesetzli })));
 const AdminSchlagziil = lazy(() => import('@/pages/admin/AdminSchlagziil').then(m => ({ default: m.AdminSchlagziil })));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
               <Route path="verbindige" element={<VerbindigePage />} />
               <Route path="zaemesetzli" element={<ZaemesetzliPage />} />
               <Route path="schlagziil" element={<SchlagziilPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />

@@ -13,7 +13,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [x] ErrorDots: add subtle pulse animation on the dot that just filled (2026-04-19)
 - [x] AdSlot: placeholder styling with watson gray background and "Anzeige" label (2026-04-19)
 - [x] Loading state: add skeleton loader for puzzle data fetch (game-shaped placeholder) (2026-04-19)
-- [ ] 404 page: create a custom not-found page at unknown routes with link back to landing
+- [x] 404 page: create a custom not-found page at unknown routes with link back to landing (2026-04-20)
 
 ## Verbindige
 
