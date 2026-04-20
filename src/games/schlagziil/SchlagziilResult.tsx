@@ -8,6 +8,7 @@ import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
 import type { ShareCardData } from '@/lib/shareImage';
+import type { SchlagziilHeadline } from '@/types';
 import { useSchlagziil } from './useSchlagziil';
 
 interface PerformanceTier {
@@ -90,8 +91,105 @@ function useNextPuzzleCountdown(): string {
   return timeLeft;
 }
 
+interface HeadlineReviewItemProps {
+  headline: SchlagziilHeadline;
+  result: 'correct' | 'wrong' | null;
+  revealedAnswer: string | null;
+  hintUsed: boolean;
+  index: number;
+}
+
+function HeadlineReviewItem({
+  headline,
+  result,
+  revealedAnswer,
+  hintUsed,
+  index,
+}: HeadlineReviewItemProps) {
+  const isCorrect = result === 'correct';
+
+  // Replace the blank _____ with the revealed answer inline
+  const renderedHeadline = revealedAnswer
+    ? headline.display.replace(
+        /_+/,
+        revealedAnswer,
+      )
+    : headline.display;
+
+  return (
+    <div
+      className="rounded-lg border-2 px-3 py-2.5 animate-[resultSlideUp_400ms_ease-out_both]"
+      style={{
+        animationDelay: `${600 + index * 120}ms`,
+        borderColor: isCorrect
+          ? 'var(--color-green)'
+          : 'var(--color-pink)',
+        backgroundColor: isCorrect
+          ? 'rgba(123, 212, 0, 0.06)'
+          : 'rgba(244, 15, 151, 0.06)',
+      }}
+    >
+      {/* Category + result indicator */}
+      <div className="flex items-center gap-1.5">
+        <span className="inline-block rounded bg-[var(--color-gray-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--color-gray-text)]">
+          {headline.category}
+        </span>
+        <span className="text-[11px] text-[var(--color-gray-text)]">
+          {headline.article_date || headline.article_year}
+        </span>
+        {hintUsed && (
+          <span className="text-[11px]" aria-label="Tipp benutzt">💡</span>
+        )}
+        <span
+          className="ml-auto text-sm"
+          aria-label={isCorrect ? 'Richtig' : 'Falsch'}
+        >
+          {isCorrect ? '✓' : '✗'}
+        </span>
+      </div>
+
+      {/* Headline with answer highlighted */}
+      <p className="mt-1 text-sm leading-snug">
+        &laquo;{revealedAnswer
+          ? renderedHeadline.split(revealedAnswer).reduce<React.ReactNode[]>(
+              (acc, part, i) => {
+                if (i > 0) {
+                  acc.push(
+                    <span
+                      key={`answer-${i}`}
+                      className={`font-bold ${
+                        isCorrect
+                          ? 'text-[var(--color-green)]'
+                          : 'text-[var(--color-pink)]'
+                      }`}
+                    >
+                      {revealedAnswer}
+                    </span>,
+                  );
+                }
+                acc.push(<span key={`text-${i}`}>{part}</span>);
+                return acc;
+              },
+              [],
+            )
+          : headline.display}&raquo;
+      </p>
+
+      {/* Article link */}
+      <a
+        href={headline.article_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-1.5 inline-block text-xs font-semibold text-[var(--color-cyan)] hover:underline"
+      >
+        watson-Artikel lesen →
+      </a>
+    </div>
+  );
+}
+
 export function SchlagziilResult() {
-  const { results, hintsUsed, puzzle, status, streak } = useSchlagziil();
+  const { results, revealedAnswers, hintsUsed, puzzle, status, streak } = useSchlagziil();
   const countdown = useNextPuzzleCountdown();
 
   if (status !== 'finished' || !puzzle) return null;
@@ -169,6 +267,25 @@ export function SchlagziilResult() {
             {square}
           </span>
         ))}
+      </div>
+
+      {/* Headline review — always visible, the key product differentiator */}
+      <div className="mt-5" role="list" aria-label="Alle Schlagzeilen mit Antworten">
+        <h3 className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-[var(--color-gray-text)] animate-[resultSlideUp_400ms_ease-out_500ms_both]">
+          Alle Schlagzeilen
+        </h3>
+        <div className="flex flex-col gap-2">
+          {puzzle.headlines.map((headline, i) => (
+            <HeadlineReviewItem
+              key={i}
+              headline={headline}
+              result={results[i]}
+              revealedAnswer={revealedAnswers[i]}
+              hintUsed={hintsUsed[i]}
+              index={i}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Streak badge */}

@@ -41,7 +41,6 @@ export function SchlagziilPage() {
   const { current: streak, recordPlay } = useStreak('schlagziil');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
-  const [reviewExpanded, setReviewExpanded] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevStatus = useRef(status);
 
@@ -171,59 +170,8 @@ export function SchlagziilPage() {
         </>
       )}
 
-      {/* Results summary first — share button visible without scrolling */}
+      {/* Results — includes headline review with article links */}
       {isFinished && <SchlagziilResult />}
-
-      {/* Headline review — expandable section below results */}
-      {isFinished && (
-        <div className="mt-6 animate-[resultSlideUp_400ms_ease-out_1000ms_both]">
-          <button
-            onClick={() => setReviewExpanded(!reviewExpanded)}
-            className="flex w-full items-center justify-between rounded-lg border-2 border-[var(--color-gray-bg)] px-4 py-3 text-left transition-colors hover:border-[var(--color-cyan)]"
-            aria-expanded={reviewExpanded}
-            aria-controls="headline-review"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-base" aria-hidden>📰</span>
-              <span className="text-sm font-semibold">
-                Alle Schlagzeilen anzeigen
-              </span>
-            </div>
-            <span
-              className={`text-sm text-[var(--color-gray-text)] transition-transform ${reviewExpanded ? 'rotate-180' : ''}`}
-              aria-hidden
-            >
-              ▼
-            </span>
-          </button>
-
-          {reviewExpanded && (
-            <div
-              id="headline-review"
-              className="mt-3 flex flex-col gap-3 animate-[resultSlideUp_300ms_ease-out]"
-            >
-              {puzzle.headlines.map((h, i) => (
-                <HeadlineCard
-                  key={i}
-                  display={h.display}
-                  category={h.category}
-                  articleYear={h.article_year}
-                  articleDate={h.article_date}
-                  articleUrl={h.article_url}
-                  contextHint={h.context_hint}
-                  onSubmit={() => {}}
-                  isCorrect={results[i] === 'correct'}
-                  revealedAnswer={revealedAnswers[i]}
-                  disabled
-                  hintUsed={hintsUsed[i]}
-                  onUseHint={() => {}}
-                  skipEntrance
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </GameShell>
   );
 }
