@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
-import { ShareButton } from '@/components/shared/ShareButton';
-import { PostGameSection } from '@/components/shared/PostGameSection';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
@@ -12,9 +10,6 @@ import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { ZAEMESETZLI_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
-import { generateShareText } from '@/lib/share';
-import { StreakBadge } from '@/components/shared/StreakBadge';
-import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { useStreak } from '@/lib/useStreak';
 import { RankBar } from '@/components/shared/RankBar';
@@ -47,12 +42,12 @@ export function ZaemesetzliPage() {
     lastResult,
     lastResultId,
     status,
-    streak,
     isArchive,
     selectEmoji,
     clearEmojiSelection,
     setInput,
     submitWord,
+    finishGame,
     useHint,
     clearLastResult,
   } = useZaemesetzli();
@@ -146,17 +141,18 @@ export function ZaemesetzliPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Confetti on game completion (all compounds found)
+  // Confetti on game completion (all compounds found) or finishing with high rank
   useEffect(() => {
-    if (status !== 'complete') return;
-    import('canvas-confetti').then(({ default: confetti }) => {
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { y: 0.6 },
+    if (status === 'complete') {
+      import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
       });
-    });
-  }, [status]);
+    } else if (status === 'finished' && (currentRank === 'meister' || currentRank === 'bundesrat')) {
+      import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      });
+    }
+  }, [status, currentRank]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -170,12 +166,6 @@ export function ZaemesetzliPage() {
   }
 
   if (!puzzle) return <PuzzleLoading variant="zaemesetzli" />;
-
-  const shareText = generateShareText(
-    'zaemesetzli',
-    puzzle.date,
-    `${foundWords.length}/${puzzle.valid_compounds.length} gefunden · ${score} Pkt · ${currentRank.charAt(0).toUpperCase() + currentRank.slice(1)}`,
-  );
 
   return (
     <GameShell>
@@ -293,14 +283,17 @@ export function ZaemesetzliPage() {
             </div>
           )}
 
-          {/* Streak + Share (during gameplay) */}
-          <div className="mt-6 flex flex-col items-center gap-3">
-            {streak.current >= 1 && <StreakBadge streak={streak} />}
-            <StreakPrompt streak={streak} />
-            <ShareButton text={shareText} game="zaemesetzli" />
-          </div>
-
-          <PostGameSection currentGame="zaemesetzli" />
+          {/* Finish button — appears after finding at least 1 word */}
+          {foundWords.length > 0 && (
+            <div className="mt-6 flex justify-center animate-[resultSlideUp_300ms_ease-out]">
+              <button
+                onClick={finishGame}
+                className="rounded border-2 border-[var(--color-gray-bg)] px-5 py-2.5 text-sm font-semibold text-[var(--color-gray-text)] transition-all hover:border-[var(--color-cyan)] hover:text-[var(--color-cyan)]"
+              >
+                Ich bi fertig
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <ZaemesetzliResult />

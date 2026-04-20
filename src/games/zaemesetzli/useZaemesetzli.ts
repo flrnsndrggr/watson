@@ -21,7 +21,7 @@ interface ZaemesetzliState {
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
   lastResultId: number;
-  status: 'playing' | 'complete';
+  status: 'playing' | 'complete' | 'finished';
   streak: StreakData;
   isArchive: boolean;
 
@@ -30,6 +30,7 @@ interface ZaemesetzliState {
   clearEmojiSelection: () => void;
   setInput: (input: string) => void;
   submitWord: () => void;
+  finishGame: () => void;
   useHint: () => string | null;
   clearLastResult: () => void;
 }
@@ -158,6 +159,40 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       lastResult: compound.is_mundart ? 'mundart' : 'valid',
       lastResultId: get().lastResultId + 1,
       status: allFound ? 'complete' : 'playing',
+      ...streakUpdate,
+    });
+  },
+
+  finishGame: () => {
+    const { puzzle, foundWords, score, currentRank, status, isArchive } = get();
+    if (!puzzle || status !== 'playing' || foundWords.length === 0) return;
+
+    if (!isArchive) {
+      void submitLeaderboardEntry('zaemesetzli', score, null);
+    }
+
+    const streakUpdate = !isArchive
+      ? (() => {
+          const streak = recordGamePlayed('zaemesetzli');
+          checkStreakMilestone('zaemesetzli', streak.current);
+          return { streak };
+        })()
+      : {};
+
+    trackGameCompleted('zaemesetzli', 'complete', isArchive, score);
+
+    if (!isArchive) {
+      const rankLabel = currentRank.charAt(0).toUpperCase() + currentRank.slice(1);
+      saveDailyResult('zaemesetzli', {
+        outcome: 'complete',
+        summary: `${foundWords.length}/${puzzle.valid_compounds.length} · ${rankLabel}`,
+      });
+    }
+
+    set({
+      status: 'finished',
+      selectedEmojis: [],
+      currentInput: '',
       ...streakUpdate,
     });
   },

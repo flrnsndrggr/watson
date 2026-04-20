@@ -93,7 +93,12 @@ export function ZaemesetzliResult() {
   const countdown = useNextPuzzleCountdown();
   const [showAllWords, setShowAllWords] = useState(false);
 
-  if (status !== 'complete' || !puzzle) return null;
+  if ((status !== 'complete' && status !== 'finished') || !puzzle) return null;
+
+  const foundWordSet = new Set(foundWords.map((fw) => fw.word.toLowerCase()));
+  const unfoundWords = puzzle.valid_compounds.filter(
+    (c) => !foundWordSet.has(c.word.toLowerCase()),
+  );
 
   const tier = getPerformanceTier(currentRank);
   const mundartCount = foundWords.filter((fw) => fw.is_mundart).length;
@@ -197,7 +202,7 @@ export function ZaemesetzliResult() {
         Zämesetzli #{puzzle.date}
       </p>
 
-      {/* Expandable found words list */}
+      {/* Expandable words list — found + unfound */}
       <div className="mt-4 animate-[resultSlideUp_400ms_ease-out_900ms_both]">
         <button
           onClick={() => setShowAllWords(!showAllWords)}
@@ -232,6 +237,28 @@ export function ZaemesetzliResult() {
                 </span>
               </div>
             ))}
+            {unfoundWords.length > 0 && (
+              <>
+                <div className="mt-2 mb-1 text-xs font-semibold text-[var(--color-gray-text)]">
+                  Nicht gefunden:
+                </div>
+                {unfoundWords.map((c) => (
+                  <div
+                    key={c.word}
+                    className="flex items-center justify-between rounded px-3 py-1.5 text-sm bg-[var(--color-gray-bg)]/50 text-[var(--color-gray-text)]"
+                  >
+                    <span>
+                      {c.components.join('')}{' '}
+                      <span className="font-semibold">{c.word}</span>
+                      {c.is_mundart && <span className="ml-1">🇨🇭</span>}
+                    </span>
+                    <span className="text-xs">
+                      {c.points}pt
+                    </span>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
       </div>
