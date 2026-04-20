@@ -93,8 +93,8 @@ _Items from watson-qa-verbindige agent_
    - Scenario: Mobile UX — measuring interactive element heights at 390px viewport
    - Problem: "Prüfen" and "Löschen" render at 38px tall (`py-2` = 8px padding each side + `text-sm` 20px line height). Nav links render at 32px tall (`py-1.5` = 6px each side). WCAG 2.5.5 recommends 44×44px minimum touch targets. Action buttons fall short by 6px, nav links by 12px. On a phone, tapping "Prüfen" right after tile selection is error-prone given the button's narrow vertical hit area.
    - Suggested fix: Change action buttons from `py-2` to `py-3` (raises height to 44px). Change nav links from `py-1.5` to `py-2.5` (raises height to 44px). The header's `h-[56px]` has room for 44px nav links. Alternatively add `min-h-[44px]` to both.
-   - Files: `src/games/verbindige/VerbindigePage.tsx:92,99` (action buttons `py-2`), `src/pages/Layout.tsx:100` (nav links `py-1.5`)
-   - Evidence: JS measurement: Prüfen=82×38px, Löschen=87×38px, nav links ~85×32px. Confirmed via source: VerbindigePage.tsx:92,99 uses `py-2`; Layout.tsx:100 uses `py-1.5`. Observed 2026-04-20.
+   - Files: `src/games/verbindige/VerbindigePage.tsx:142,149,156` (action buttons `py-2`), `src/pages/Layout.tsx:100` (nav links `py-1.5`)
+   - Evidence: JS measurement: Prüfen=82×38px, Löschen=87×38px, nav links ~85×32px. Confirmed via source: VerbindigePage.tsx:142,149,156 uses `py-2`; Layout.tsx:100 uses `py-1.5`. Observed 2026-04-20.
    - Related: #7 — both affect `Layout.tsx` nav on mobile; consider fixing together
 
 ---
@@ -161,7 +161,7 @@ _Items from watson-qa-schlagziil agent_
    - Files: `src/games/schlagziil/HeadlineCard.tsx`, `src/games/schlagziil/SchlagziilPage.tsx`
    - Evidence: Clicked "Tipp anzeigen" on headline 1 (2026/Solarenergie). Screenshots of headlines 2 (2025), 3 (2023), 4 (2021), 5 (2024) all showed hint text immediately without any click. `hintsUsed` Zustand state tracked only the intentional click correctly (💡 shown only for 2026 in final score), confirming the bug is isolated to local component state. Observed 2026-04-18.
 
-7. [ ] P2 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
+7. [ ] P1 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
    - Agent: watson-qa-schlagziil
    - Scenario: Mobile Input — page load on 390px viewport
    - Problem: `HeadlineCard.tsx:122` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.
@@ -177,7 +177,7 @@ _Items from watson-qa-schlagziil agent_
    - Suggested fix: Sort entries by `article_year` before joining: map headlines+results to objects, sort ascending by year, then join. This decouples puzzle storage order from the user-facing output.
    - Files: `src/games/schlagziil/SchlagziilResult.tsx` (lines 13-19)
    - Evidence: Live results screen showed "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — out-of-order years confirmed by screenshot. Observed 2026-04-18.
-   - Triage note (2026-04-20): **Code may have changed.** Current `SchlagziilResult.tsx` builds an emoji accuracy grid (`🟩`/`🟥` squares), not a year line. No `article_year` field or year-based mapping found at lines 13-19. The year-order display may have been removed or refactored since observation. Verify in production before acting.
+   - Triage note (2026-04-20): **Partially resolved.** Share text no longer includes a year line — it uses an emoji accuracy grid (`🟩`/`🟥` squares) instead. However, `article_year` still exists in data and is displayed per-headline in the results screen (`SchlagziilResult.tsx:139`). Headlines are still rendered in puzzle storage order (2026, 2025, 2023, 2021, 2024), not chronological. The share text half of this issue is resolved; the results screen ordering remains if deemed important.
 
 ---
 
@@ -291,9 +291,9 @@ _Critical findings from watson-code-reviewer_
 1. [ ] P1 - `transform: none !important` in reduced-motion media query breaks Toast and EmojiPool tooltip centering
    - Agent: watson-code-reviewer
    - Scenario: Code review of `temp-holder` branch (2026-04-19)
-   - Problem: `tokens.css:109` adds `transform: none !important` inside `@media (prefers-reduced-motion: reduce)`. This overrides ALL CSS transforms, including layout transforms. `Toast.tsx:44` uses `-translate-x-1/2` with `left-1/2` for centering — with `transform: none`, the toast renders at left 50% with no offset (off-center, clipped on mobile). Same issue in `EmojiPool.tsx:34` tooltip. The existing `animation-duration: 0.01ms` + `transition-duration: 0.01ms` already neuters motion; the blanket `transform: none` is unnecessary and breaks non-animation transforms.
+   - Problem: `tokens.css:216` adds `transform: none !important` inside `@media (prefers-reduced-motion: reduce)`. This overrides ALL CSS transforms, including layout transforms. `Toast.tsx:44` uses `-translate-x-1/2` with `left-1/2` for centering — with `transform: none`, the toast renders at left 50% with no offset (off-center, clipped on mobile). Same issue in `EmojiPool.tsx:34` tooltip. The existing `animation-duration: 0.01ms` + `transition-duration: 0.01ms` already neuters motion; the blanket `transform: none` is unnecessary and breaks non-animation transforms.
    - Suggested fix: Remove `transform: none !important` from the reduced-motion media query. The 0.01ms duration rules already handle animation/transition disabling.
-   - Files: `src/styles/tokens.css` (line 109), `src/components/shared/Toast.tsx` (line 44), `src/games/zaemesetzli/EmojiPool.tsx` (line 34)
+   - Files: `src/styles/tokens.css` (line 216), `src/components/shared/Toast.tsx` (line 44), `src/games/zaemesetzli/EmojiPool.tsx` (line 34)
    - Evidence: Code review of diff `main...temp-holder`. Confirmed `-translate-x-1/2` (Tailwind → `transform: translateX(-50%)`) used on `left-1/2` elements for centering in Toast.tsx and EmojiPool.tsx. `transform: none !important` would override these. Observed 2026-04-19.
 
 ---
