@@ -5,7 +5,7 @@ import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackVerbindigeGuess } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 
@@ -207,6 +207,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     // Check for duplicate guess — don't consume a mistake
     if (previousGuesses.includes(guessKey)) {
       showToast('Schon probiert!');
+      trackVerbindigeGuess('duplicate', previousGuesses.length + 1, mistakes);
       set({ selected: [], lastGuessResult: 'duplicate' });
       return;
     }
@@ -221,6 +222,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
     );
 
     if (matchedGroup) {
+      trackVerbindigeGuess('correct', previousGuesses.length + 1, mistakes, matchedGroup.difficulty);
       // Phase 1: Flash tiles with difficulty color — don't remove yet
       const pending: PendingCorrectGroup = {
         group: { ...matchedGroup, guessOrder: solvedGroups.length },
@@ -244,6 +246,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       const newMistakes = mistakes + 1;
       const lost = newMistakes >= maxMistakes;
       const result = isOneAway ? 'one-away' : 'wrong';
+      trackVerbindigeGuess(result, newPreviousGuesses.length, newMistakes);
 
       if (result === 'one-away') {
         showToast('Fast! Nur 1 falsch.');

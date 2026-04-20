@@ -25,9 +25,9 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 
 - [x] Sponsor bar: "Presented by [Brand]" banner above game area (728x90 leaderboard slot) — done 2026-04-20
 - [x] Post-game ad slot: MREC 300x250 ad unit in results screen — done 2026-04-20
-- [ ] Pre-game interstitial: 5-second ad shown once per session on mobile
+- [x] Pre-game interstitial: 5-second ad shown once per session on mobile — done 2026-04-20
 - [x] Analytics events: implement core tracking (game_started, game_completed, game_shared, streak_milestone) — done 2026-04-20
-- [ ] Analytics: game-specific events (verbindige_guess, schlagziil_headline_solved)
+- [x] Analytics: game-specific events (verbindige_guess, schlagziil_headline_guess, zaemesetzli_word_found, zaemesetzli_hint_used) — done 2026-04-20
 - [ ] Push notification opt-in: daily reminder prompt with configurable time
 - [ ] Instagram story share: generate 1080x1920 canvas image with watson branding + result grid
 

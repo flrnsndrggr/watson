@@ -4,7 +4,7 @@ import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackZaemesetzliWordFound, trackZaemesetzliHintUsed } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 
@@ -169,6 +169,8 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const newFoundWords = [...foundWords, newFound];
     const allFound = newFoundWords.length === puzzle.valid_compounds.length;
 
+    trackZaemesetzliWordFound(compound.difficulty, compound.is_mundart, compound.points, newScore, newFoundWords.length);
+
     // Record streak on first word found (skip for archive)
     const streakUpdate = foundWords.length === 0 && !get().isArchive
       ? (() => {
@@ -258,8 +260,10 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     if (unfound.length === 0) return null;
 
     const hint = unfound[0];
+    const newHintsUsed = hintsUsed + 1;
+    trackZaemesetzliHintUsed(newHintsUsed);
     set({
-      hintsUsed: hintsUsed + 1,
+      hintsUsed: newHintsUsed,
       score: Math.max(0, score - 1),
       selectedEmojis: hint.components,
       currentInput: '',

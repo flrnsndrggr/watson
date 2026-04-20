@@ -29,11 +29,47 @@ interface StreakMilestoneEvent {
   streak_length: number;
 }
 
+// ---- Game-specific event types ----
+
+interface VerbindigeGuessEvent {
+  event: 'verbindige_guess';
+  result: 'correct' | 'wrong' | 'one-away' | 'duplicate';
+  guess_number: number;
+  mistakes: number;
+  difficulty?: 1 | 2 | 3 | 4;
+}
+
+interface SchlagziilHeadlineGuessEvent {
+  event: 'schlagziil_headline_guess';
+  result: 'correct' | 'wrong';
+  headline_index: number;
+  difficulty: 1 | 2 | 3;
+  hint_used: boolean;
+}
+
+interface ZaemesetzliWordFoundEvent {
+  event: 'zaemesetzli_word_found';
+  word_difficulty: 1 | 2 | 3;
+  is_mundart: boolean;
+  points: number;
+  score_after: number;
+  words_found: number;
+}
+
+interface ZaemesetzliHintUsedEvent {
+  event: 'zaemesetzli_hint_used';
+  hints_used: number;
+}
+
 type AnalyticsEvent =
   | GameStartedEvent
   | GameCompletedEvent
   | GameSharedEvent
-  | StreakMilestoneEvent;
+  | StreakMilestoneEvent
+  | VerbindigeGuessEvent
+  | SchlagziilHeadlineGuessEvent
+  | ZaemesetzliWordFoundEvent
+  | ZaemesetzliHintUsedEvent;
 
 // ---- Listener registry ----
 
@@ -115,4 +151,38 @@ export function checkStreakMilestone(game: GameType, streakLength: number): void
   if (MILESTONE_THRESHOLDS.includes(streakLength)) {
     trackStreakMilestone(game, streakLength);
   }
+}
+
+// ---- Game-specific tracking functions ----
+
+export function trackVerbindigeGuess(
+  result: 'correct' | 'wrong' | 'one-away' | 'duplicate',
+  guessNumber: number,
+  mistakes: number,
+  difficulty?: 1 | 2 | 3 | 4,
+): void {
+  emit({ event: 'verbindige_guess', result, guess_number: guessNumber, mistakes, difficulty });
+}
+
+export function trackSchlagziilHeadlineGuess(
+  result: 'correct' | 'wrong',
+  headlineIndex: number,
+  difficulty: 1 | 2 | 3,
+  hintUsed: boolean,
+): void {
+  emit({ event: 'schlagziil_headline_guess', result, headline_index: headlineIndex, difficulty, hint_used: hintUsed });
+}
+
+export function trackZaemesetzliWordFound(
+  wordDifficulty: 1 | 2 | 3,
+  isMundart: boolean,
+  points: number,
+  scoreAfter: number,
+  wordsFound: number,
+): void {
+  emit({ event: 'zaemesetzli_word_found', word_difficulty: wordDifficulty, is_mundart: isMundart, points, score_after: scoreAfter, words_found: wordsFound });
+}
+
+export function trackZaemesetzliHintUsed(hintsUsed: number): void {
+  emit({ event: 'zaemesetzli_hint_used', hints_used: hintsUsed });
 }

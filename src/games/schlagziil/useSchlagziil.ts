@@ -4,7 +4,7 @@ import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagz
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlagziilHeadlineGuess } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 
@@ -180,9 +180,17 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     if (isCorrect) {
       newResults[currentIndex] = 'correct';
       newRevealed[currentIndex] = displayAnswers[currentIndex] ?? answers[0];
+      const headline = get().puzzle?.headlines[currentIndex];
+      if (headline) {
+        trackSchlagziilHeadlineGuess('correct', currentIndex, headline.difficulty, get().hintsUsed[currentIndex]);
+      }
       set({ results: newResults, revealedAnswers: newRevealed, lastGuessResult: 'correct' });
       persistSchlagziil(get());
     } else {
+      const headline = get().puzzle?.headlines[currentIndex];
+      if (headline) {
+        trackSchlagziilHeadlineGuess('wrong', currentIndex, headline.difficulty, get().hintsUsed[currentIndex]);
+      }
       const newErrors = totalErrors + 1;
       if (newErrors >= maxErrors) {
         for (let i = currentIndex; i < newResults.length; i++) {
