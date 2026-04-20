@@ -91,7 +91,7 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Results screen showed "Missstaende", "Ubs", "Co2-gesetz" live in production. Observed 2026-04-16.
    - Related: #2 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
 
-2. [ ] P1 - No visual feedback for wrong guesses below error limit
+2. [x] P1 - No visual feedback for wrong guesses below error limit
    - Agent: watson-qa-schlagziil
    - Scenario: Answer Validation — submitting wrong answers with totalErrors < 3
    - Problem: After a wrong guess, `results[currentIndex]` stays `null` so the HeadlineCard border stays neutral. `lastGuessResult: 'wrong'` is set in the store but `SchlagziilPage` only reads `lastGuessResult` for the correct-answer auto-advance timer — it never triggers a red flash, shake, or toast. The user sees the input clear with no feedback beyond the error dot filling.
@@ -110,7 +110,7 @@ _Items from watson-qa-schlagziil agent_
    - Priority adjusted from P1 to P2: minor wording tweak, not a UX or gameplay issue
    - Related: #4 — both are share-related issues on the Schlagziil result screen; consider fixing together
 
-4. [ ] P1 - Share link appends non-existent watson.ch URL
+4. [x] P1 - Share link appends non-existent watson.ch URL
    - Agent: watson-qa-schlagziil
    - Scenario: Results Screen — share button
    - Problem: `generateShareText` appends `watson.ch/spiele/schlagziil` to every share text. That URL does not exist — the game lives at `games-watson.netlify.app/schlagziil`. Anyone who taps the link in a shared message hits a 404.

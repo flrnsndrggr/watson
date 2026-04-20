@@ -17,7 +17,7 @@ export function generateShareText(
 ): string {
   const label = GAME_LABELS[game] ?? game;
   const emoji = GAME_EMOJIS[game] ?? '';
-  return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\nwatson.ch/spiele/${game}`;
+  return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\ngames-watson.netlify.app/${game}`;
 }
 
 /** Returns 'shared' if Web Share API was used, 'copied' if clipboard fallback. */
