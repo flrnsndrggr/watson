@@ -4,6 +4,7 @@ import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
+import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
 import { useSchlagziil } from './useSchlagziil';
 
@@ -176,6 +177,10 @@ export function SchlagziilResult() {
             {countdown}
           </span>
         </p>
+      </div>
+
+      <div className="mt-6 flex justify-center">
+        <AdSlot type="mrec" />
       </div>
 
       <PostGameSection currentGame="schlagziil" />

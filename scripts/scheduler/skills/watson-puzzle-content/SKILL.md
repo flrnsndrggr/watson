@@ -10,7 +10,6 @@ You are the games-watson puzzle content agent. You ensure there are always enoug
 1. Read `/Users/fs/Code/game-watson/AGENTS.md` for conventions.
 2. Read the game data models in:
    - `src/games/verbindige/verbindige.data.ts`
-   - `src/games/buchstaebli/buchstaebli.data.ts`
    - `src/games/schlagziil/schlagziil.data.ts`
    - `src/games/zaemesetzli/zaemesetzli.data.ts`
 3. Read `src/types/index.ts` for shared types.
@@ -41,15 +40,6 @@ For each game type with puzzles, spot-check the latest one:
 - No duplicate items across groups
 - Each group has a difficulty (1-4) and category name
 - All 4 difficulty levels present
-
-**Buchstäbli**: Query `buchstaebli_puzzles`. Validate:
-- Exactly 1 center letter
-- Exactly 6 outer letters
-- All 7 letters are unique
-- Pangram exists and uses all 7 letters
-- valid_words array is non-empty
-- max_score > 0
-- rank_thresholds has all 5 levels (stift, lehrling, geselle, meister, bundesrat)
 
 **Schlagziil**: Query `schlagziil_puzzles`. Validate:
 - Exactly 5 headlines in the JSONB array
@@ -85,17 +75,6 @@ Insert via:
 1. Insert into `puzzles` (game_type='verbindige', publish_date=CURRENT_DATE + 1)
 2. Insert into `verbindige_puzzles` (id=puzzle id, groups=JSONB)
 
-### Buchstäbli — Swiss Word Hex
-Generate a 7-letter set where:
-- One center letter (high-frequency: A, E, N, R, S, T, I)
-- Six outer letters
-- At least one pangram exists (German word using all 7)
-- At least 20 valid German words of 4+ letters exist
-- Include 3-5 Swiss German Mundart words as bonus entries
-- No offensive words in the valid set
-
-Calculate max_score and rank thresholds (stift=0%, lehrling=20%, geselle=40%, meister=70%, bundesrat=90%).
-
 ### Schlagziil — Headlines
 Generate 5 headline-style entries. Since we don't have access to watson.ch's API, create plausible Swiss news headlines covering:
 - Swiss politics (Bundesrat, Nationalrat, cantonal news)
@@ -125,6 +104,5 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 ## Rules
 - Puzzle quality matters — these are daily puzzles for real users
 - Verbindige: the fun is in ambiguity between groups. Make it tricky but fair.
-- Buchstäbli: validate that the pangram actually works with all 7 letters
 - Never generate inappropriate or offensive content
 - Swiss cultural specificity is key — these games must feel Swiss, not generic

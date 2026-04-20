@@ -9,7 +9,7 @@ export function ErrorDots({ total, used }: ErrorDotsProps) {
       <span className="text-xs text-[var(--color-gray-text)] mr-1">Fehler:</span>
       {Array.from({ length: total }, (_, i) => {
         const isFilled = i < used;
-        const isLatest = i === used - 1;
+        const isLatest = i === used - 1 && used > 0;
         return (
           <span
             key={isLatest ? `dot-${i}-${used}` : i}

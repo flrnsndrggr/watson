@@ -65,7 +65,7 @@ If ANY fails: debug and fix. If unfixable within reason, revert, mark item `[!] 
 - ONE feature per run (unless trivially small and related)
 - NEVER change brand immutables
 - NEVER introduce new dependencies without strong justification (keep bundle < 80KB gzipped per game)
-- NEVER send word lists to the client (cheating prevention for Buchstäbli)
+- NEVER send word lists to the client (cheating prevention)
 - Always handle loading and error states
 - Write code that matches the existing codebase style
 - If a feature requires DB schema changes, use Supabase MCP `apply_migration` with project_id `fosnshalcgwvatejpdok`

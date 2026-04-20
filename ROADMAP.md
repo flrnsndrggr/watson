@@ -81,79 +81,6 @@ _Items from watson-qa-verbindige agent_
 
 ---
 
-## Buchstäbli QA Findings
-
-_Items from watson-qa-buchstaebli agent_
-
-1. [x] P0 - Route `/buchstaebli` does not exist — blank white screen
-   - Agent: watson-qa-buchstaebli
-   - Scenario: First Play — navigate directly to https://games-watson.netlify.app/buchstaebli
-   - Problem: The route `/buchstaebli` is not registered in the React Router config. Navigating to it produces a blank white page with no content or error message shown to the user.
-   - Suggested fix: Add a `<Route path="/buchstaebli" element={<BuchstaebliPage />} />` entry in the router (likely `src/App.tsx` or equivalent routing file). The game files exist at `src/games/buchstaebli/` per AGENTS.md but the route is missing.
-   - Files: `src/App.tsx` (or router config), `src/games/buchstaebli/`
-   - Evidence: Console warning "No routes matched location '/buchstaebli'" (React Router). Page renders empty white body. Observed 2026-04-16.
-
-2. [x] P1 - Buchstäbli absent from landing page nav and game card list
-   - Agent: watson-qa-buchstaebli
-   - Scenario: First Play — navigating from landing page to discover games
-   - Problem: The landing page shows Verbindige, Zämesetzli and Schlagziil as clickable game cards. The nav bar also links only to those three games. Buchstäbli has no card and no nav entry, so a real user can never discover it from the homepage.
-   - Suggested fix: Add a Buchstäbli game card in `LandingPage.tsx` and a nav link in the Layout/nav component, matching the pattern used by the other three games.
-   - Files: `src/pages/LandingPage.tsx`, `src/pages/Layout.tsx` (or wherever nav links live)
-   - Evidence: Accessibility tree of https://games-watson.netlify.app shows nav with only `/verbindige`, `/zaemesetzli`, `/schlagziil`. No Buchstäbli card in main landmark. Observed 2026-04-16.
-
-3. [x] P1 - Demo word list contains entries that violate puzzle letter constraints
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Word Entry / Validation Responses — code review of demo data
-   - Problem: `DEMO_VALID_WORDS` in `buchstaebli.data.ts` includes three invalid entries for the puzzle (center A, outer R/E/T/N/S/L): `stern` (no center letter A), `anlage` (contains G, not in puzzle), `znacht` (Mundart example — contains Z, C, H, none in puzzle). These entries are unreachable through normal input (keyboard filter + hex buttons both restrict to puzzle letters) but the data is incorrect and will cause issues if validation ever moves server-side against this word list.
-   - Suggested fix: Remove or replace these three entries with valid words. Replace `znacht` with a Mundart word using only the letters A/R/E/T/N/S/L (e.g. `ränzel` or similar). Remove `stern`/`anlage` or correct them.
-   - Files: `src/games/buchstaebli/buchstaebli.data.ts`
-   - Evidence: `stern`=S-T-E-R-N (no A), `anlage`=A-N-L-A-G-E (G absent), `znacht`=Z-N-A-C-H-T (Z,C,H absent). Cross-checked against SAMPLE_BUCHSTAEBLI.outer_letters=['R','E','T','N','S','L'], center='A'. Observed 2026-04-16.
-
-4. [x] P1 - RankBar `thresholds` prop declared but unused — rank milestones invisible
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Scoring & Ranks — code review of RankBar component
-   - Problem: `RankBar.tsx` declares `thresholds: BuchstaebliPuzzle['rank_thresholds']` in its `RankBarProps` interface but the function signature only destructures `{ currentRank, score, maxScore }`. The thresholds are never used. As a result the rank bar is a plain linear fill with no visual markers showing where Lehrling / Geselle / Meister / Bundesrat boundaries sit. Players can see their current rank label but cannot see how many points they need to advance — a key motivational feature of this genre.
-   - Suggested fix: Destructure `thresholds` and render tick marks (or segmented fills) at each threshold percentage along the bar. At minimum, add a text hint like "noch X Pkt bis Lehrling".
-   - Files: `src/games/buchstaebli/RankBar.tsx`
-   - Evidence: `export function RankBar({ currentRank, score, maxScore }: RankBarProps)` — `thresholds` is in the type but not destructured. Bar renders as `width: ${pct}%` only. Observed 2026-04-16.
-
-5. [ ] P2 - No success toast on regular valid word submission (silent success)
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Validation Responses — valid standard word
-   - Problem: `RESULT_MESSAGES['valid']` is set to `''` (empty string). When a player submits a correct non-pangram, non-mundart word, the `showToast` call is guarded by `if (RESULT_MESSAGES[lastResult])` which is falsy for an empty string, so no toast fires. The word appears in the found-words list below, but there is no immediate affirmative feedback at the point of submission. Compare to pangram (toast fires) and mundart (toast fires) — the baseline success case is the odd one out.
-   - Suggested fix: Show a brief positive toast for valid words, e.g. `+${points} Pkt` or a short exclamation ("Gut!"). Alternatively, animate the input field green on success.
-   - Files: `src/games/buchstaebli/BuchstaebliPage.tsx` (RESULT_MESSAGES constant)
-   - Evidence: `RESULT_MESSAGES = { 'valid': '', ... }` + toast guard `if (RESULT_MESSAGES[lastResult])`. Observed 2026-04-16.
-   - Related: Buchstäbli #6 — both are submission feedback gaps; consider fixing together
-
-6. [x] P1 - No feedback when submitting an already-found word
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Validation Responses — duplicate word submission
-   - Problem: When a player types and submits a word they have already found, nothing happens — no toast, no shake/flash animation, no visual change. The input clears silently. The player cannot tell whether their word was silently rejected as a duplicate or if the submit action failed entirely. All other error cases (too short, missing center letter, not in dictionary) show a toast; the duplicate case is the only blind spot.
-   - Suggested fix: Add a `'already_found'` result case with a toast like "Schon gefunden!" in `RESULT_MESSAGES`. Return that result from the submit handler when the word is already in `foundWords`.
-   - Files: `src/games/buchstaebli/BuchstaebliPage.tsx`, `src/games/buchstaebli/useBuchstaebli.ts`
-   - Evidence: Submitted RATEN twice. Second submission: no fixed-position elements (toast container empty), wordCount unchanged at 1, score unchanged at 5/112 Pkt. Input cleared silently with zero user feedback. Observed 2026-04-18.
-   - Related: Buchstäbli #5 — both are submission feedback gaps; consider fixing together
-
-7. [x] P1 - Buchstäbli nav link still missing (incomplete fix for #2)
-   - Agent: watson-qa-buchstaebli
-   - Scenario: First Play — navigating between games via the persistent nav bar
-   - Problem: The nav bar on every page links only to Verbindige, Zämesetzli, and Schlagziil. Buchstäbli has no nav link. Issue #2 (landing page card) was marked resolved, but the nav entry was not added. A player on the Verbindige results screen has no way to navigate directly to Buchstäbli without going back to the landing page first.
-   - Suggested fix: Add a nav link `<Link to="/buchstaebli">Buchstäbli</Link>` in the nav component alongside the other three games.
-   - Files: `src/pages/Layout.tsx` (or whichever component renders the persistent nav)
-   - Evidence: Production nav links: Spiele, Verbindige, Zämesetzli, Schlagziil — Buchstäbli absent. Observed 2026-04-18.
-
-8. [x] P2 - Heading renders "Buchstäbli#001" without a space before the puzzle number
-   - Agent: watson-qa-buchstaebli
-   - Scenario: First Play — visual inspection of the game header
-   - Problem: The `<h1>` text reads "Buchstäbli#001" with no whitespace between game name and puzzle number badge. The missing space makes the heading look like a concatenation bug and reduces readability at a glance.
-   - Suggested fix: Add a literal space or `&nbsp;` text node between `{title}` and the `#{puzzleId}` span in `GameHeader.tsx:12-17`. The current `ml-2` CSS class provides visual spacing but `textContent` concatenates without a space, affecting screen readers and text extraction.
-   - Files: `src/components/shared/GameHeader.tsx` (lines 12-17)
-   - Evidence: `document.querySelector('[role="heading"]').textContent === "Buchstäbli#001"` in production. Observed 2026-04-18.
-   - Related: Verbindige #3 — both involve GameHeader puzzle number display; may share root cause in `GameHeader.tsx`
-
----
-
 ## Schlagziil QA Findings
 
 _Items from watson-qa-schlagziil agent_
@@ -216,6 +143,22 @@ _Items from watson-qa-schlagziil agent_
    - Files: `src/games/schlagziil/HeadlineCard.tsx`, `src/games/schlagziil/SchlagziilPage.tsx`
    - Evidence: Clicked "Tipp anzeigen" on headline 1 (2026/Solarenergie). Screenshots of headlines 2 (2025), 3 (2023), 4 (2021), 5 (2024) all showed hint text immediately without any click. `hintsUsed` Zustand state tracked only the intentional click correctly (💡 shown only for 2026 in final score), confirming the bug is isolated to local component state. Observed 2026-04-18.
 
+7. [ ] P2 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
+   - Agent: watson-qa-schlagziil
+   - Scenario: Mobile Input — page load on 390px viewport
+   - Problem: `HeadlineCard.tsx:122` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.
+   - Suggested fix: Remove `autoFocus` from the input. On desktop it can be re-added via a `useEffect` with `inputRef.focus()` guarded by `window.innerWidth > 768` or a media-query check.
+   - Files: `src/games/schlagziil/HeadlineCard.tsx` (line 122)
+   - Evidence: `autoFocus` attribute confirmed in source. Standard browser behaviour on iOS/Android: `autoFocus` on an `<input>` opens the soft keyboard on mount. Observed 2026-04-18.
+
+8. [ ] P2 - Year line in results/share uses puzzle order, not chronological order
+   - Agent: watson-qa-schlagziil
+   - Scenario: Results Screen — completing all 5 headlines
+   - Problem: `SchlagziilResult.tsx:13-19` builds the year line by mapping `puzzle.headlines` in stored order. SAMPLE_SCHLAGZIIL stores headlines as 2026, 2025, 2023, 2021, 2024. The results panel and share text show "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — 2021 appears after 2023, breaking any readable timeline. A recipient reading a shared result cannot scan it as a chronology.
+   - Suggested fix: Sort entries by `article_year` before joining: map headlines+results to objects, sort ascending by year, then join. This decouples puzzle storage order from the user-facing output.
+   - Files: `src/games/schlagziil/SchlagziilResult.tsx` (lines 13-19)
+   - Evidence: Live results screen showed "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — out-of-order years confirmed by screenshot. Observed 2026-04-18.
+
 ---
 
 ## Zämesetzli QA Findings
@@ -226,7 +169,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Agent: watson-qa-zaemesetzli
    - Scenario: Invalid Combinations — submitting a nonsense word for selected emojis
    - Problem: When a user submits a word that does not match any valid compound for the selected emoji pair, the input field clears silently. No toast, no shake/error animation, no error text — the user has zero signal that their guess was rejected.
-   - Suggested fix: Show a brief error toast (e.g. "Nicht gefunden 🚫") or apply a shake animation + red border on the input on invalid submission. Mirror the feedback pattern used in Buchstäbli's error toast.
+   - Suggested fix: Show a brief error toast (e.g. "Nicht gefunden 🚫") or apply a shake animation + red border on the input on invalid submission.
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx` (submit handler), `src/components/shared/Toast.tsx`
    - Evidence: Submitted "Haussonnen" for 🏠+☀️ pair. Input cleared, score unchanged (2/28), found list unchanged (2/16), no console errors, no visual change. Observed 2026-04-16.
    - Related: #4 — both are submission feedback issues in Zämesetzli (error + success); consider fixing together
@@ -294,7 +237,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Priority adjusted from P1 to P2: unique fix is a data categorization tweak (is_mundart flag), not UX-blocking; emoji readability issue already covered by #7
    - Related: Zämesetzli #7 — alt_nouns fix for ☀️→Sonntag is covered there; this item adds the is_mundart correction; fix together
 
-9. [x] P1 - max_score: 28 is incorrect — actual compound point sum is 29
+9. [x] P1 - max_score: 28 is incorrect — actual compound point sum is 29 _(fixed in e862f18)_
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — summing all compound points
    - Problem: `zaemesetzli.data.ts` sets `max_score: 28`, but summing all 16 compound `points` values gives 29 (7×1pt + 5×2pt + 4×3pt = 7+10+12 = 29). `RankBar.tsx:21` uses `maxScore` to compute the bar fill percentage and at Bundesrat (nextRank=null) renders `${score}/${maxScore} Pkt`. A player who finds all 16 compounds scores 29pt and sees "29/28 Pkt" — an impossible-looking score. The progress bar caps correctly at 100% due to `Math.min(100, …)`, but the label is misleading.
@@ -305,10 +248,9 @@ _Items from watson-qa-zaemesetzli agent_
 10. [ ] P2 - Current numeric score hidden during play; only relative "noch X Pkt" shown
     - Agent: watson-qa-zaemesetzli
     - Scenario: Scoring & Ranks — tracking progress during active play
-    - Problem: While playing, the RankBar right-side text always reads "noch X Pkt bis Y" (e.g. "noch 7 Pkt bis Meister"), never showing the actual score (e.g. "13 Pkt"). The raw score only becomes visible once Bundesrat is reached (when `nextRank` is null). Players cannot easily tell where they are on the full scale without mentally summing individual compound scores from the found list. By contrast, Buchstäbli prominently shows the running score (e.g. "5/112 Pkt") at all times.
+    - Problem: While playing, the RankBar right-side text always reads "noch X Pkt bis Y" (e.g. "noch 7 Pkt bis Meister"), never showing the actual score (e.g. "13 Pkt"). The raw score only becomes visible once Bundesrat is reached (when `nextRank` is null). Players cannot easily tell where they are on the full scale without mentally summing individual compound scores from the found list.
     - Suggested fix: In `RankBar.tsx:38-40`, change the right-side label to show both: `${score} Pkt (noch ${pointsToNext} bis ${RANK_LABELS[nextRank]})` or add a small score label above/below the bar.
-    - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component imported by both Buchstäbli and Zämesetzli)
-    - Related: Buchstäbli #4 — both involve RankBar display improvements; consider fixing together
+    - Files: `src/components/shared/RankBar.tsx` (lines 38-41)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
 11. [ ] P0 - Netlify deploy failing — GitHub Actions budget exhausted and CLI not authenticated
@@ -326,43 +268,90 @@ _Items from watson-qa-zaemesetzli agent_
 
 _Critical findings from watson-code-reviewer_
 
+1. [ ] P1 - `transform: none !important` in reduced-motion media query breaks Toast and EmojiPool tooltip centering
+   - Agent: watson-code-reviewer
+   - Scenario: Code review of `temp-holder` branch (2026-04-19)
+   - Problem: `tokens.css:109` adds `transform: none !important` inside `@media (prefers-reduced-motion: reduce)`. This overrides ALL CSS transforms, including layout transforms. `Toast.tsx:44` uses `-translate-x-1/2` with `left-1/2` for centering — with `transform: none`, the toast renders at left 50% with no offset (off-center, clipped on mobile). Same issue in `EmojiPool.tsx:34` tooltip. The existing `animation-duration: 0.01ms` + `transition-duration: 0.01ms` already neuters motion; the blanket `transform: none` is unnecessary and breaks non-animation transforms.
+   - Suggested fix: Remove `transform: none !important` from the reduced-motion media query. The 0.01ms duration rules already handle animation/transition disabling.
+   - Files: `src/styles/tokens.css` (line 109), `src/components/shared/Toast.tsx` (line 44), `src/games/zaemesetzli/EmojiPool.tsx` (line 34)
+   - Evidence: Code review of diff `main...temp-holder`. Confirmed `-translate-x-1/2` (Tailwind → `transform: translateX(-50%)`) used on `left-1/2` elements for centering in Toast.tsx and EmojiPool.tsx. `transform: none !important` would override these. Observed 2026-04-19.
+
 ---
 
 ## Architect Recommendations
 
 _Weekly architecture review findings from watson-architect_
 
-1. [ ] P2 - Deduplicate `shuffleArray` and `getRank` utility functions
+1. [ ] P2 - Extract `shuffleArray` utility function
    - Agent: watson-architect
    - Scenario: Cross-game code duplication audit (2026-04-16)
-   - Problem: `shuffleArray<T>` is copy-pasted in `useVerbindige.ts:26` and `useBuchstaebli.ts:38`. `getRank()` is copy-pasted in `useBuchstaebli.ts:30` and `useZaemesetzli.ts:28`. Both pairs are semantically identical.
-   - Suggested fix: Extract both to `src/lib/utils.ts`. Add `RankThresholds` type to `src/types/index.ts` so `getRank` is typesafe across games.
-   - Files: `src/lib/utils.ts` (create), `src/types/index.ts`, `src/games/verbindige/useVerbindige.ts`, `src/games/buchstaebli/useBuchstaebli.ts`, `src/games/zaemesetzli/useZaemesetzli.ts`
-   - Priority adjusted from P1 to P2: pure code deduplication with no user-facing impact; fits P2 polish/tech-debt category
+   - Problem: `shuffleArray<T>` is copy-pasted in `useVerbindige.ts:26` and `useZaemesetzli.ts`. Semantically identical.
+   - Suggested fix: Extract to `src/lib/utils.ts`.
+   - Files: `src/lib/utils.ts` (create), `src/games/verbindige/useVerbindige.ts`, `src/games/zaemesetzli/useZaemesetzli.ts`
+   - Priority: P2 — pure code deduplication with no user-facing impact
 
 2. [x] P1 - Add keyboard navigation to Verbindige and Zaemesetzli
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-16)
-   - Problem: Only Buchstaebli has keyboard support (`BuchstaebliPage.tsx:68-69`). Verbindige and Zaemesetzli have no keyboard interaction — keyboard-only users cannot play.
-   - Suggested fix: Add `window.addEventListener('keydown', ...)` in VerbindigePage and ZaemesetzliPage following the Buchstaebli pattern. Verbindige: Enter=submitGuess, Backspace=clearSelection. Zaemesetzli: Enter=submitWord, Backspace=clearEmojiSelection.
+   - Problem: Verbindige and Zaemesetzli have no keyboard interaction — keyboard-only users cannot play.
+   - Suggested fix: Add `window.addEventListener('keydown', ...)` in VerbindigePage and ZaemesetzliPage. Verbindige: Enter=submitGuess, Backspace=clearSelection. Zaemesetzli: Enter=submitWord, Backspace=clearEmojiSelection.
    - Files: `src/games/verbindige/VerbindigePage.tsx`, `src/games/zaemesetzli/ZaemesetzliPage.tsx`
    - Related: #3 (ARIA labels) — both are accessibility issues affecting the same files; consider fixing in one pass
 
 3. [x] P1 - Add ARIA labels to interactive game elements
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-16)
-   - Problem: Only 1 `aria-label` found across all 4 game directories (`EmojiPool.tsx:30`). Tile buttons, hex letter buttons, combine slots, and action buttons across all games lack ARIA labels — screen reader inaccessible.
-   - Suggested fix: Add `aria-label` to all interactive button-like elements. Minimum viable: VerbindigeTile, HexGrid letters, CombineSlots, game action buttons.
-   - Files: `src/games/verbindige/VerbindigeTile.tsx`, `src/games/buchstaebli/HexGrid.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
+   - Problem: Only 1 `aria-label` found across game directories (`EmojiPool.tsx:30`). Tile buttons, combine slots, and action buttons across games lack ARIA labels — screen reader inaccessible.
+   - Suggested fix: Add `aria-label` to all interactive button-like elements. Minimum viable: VerbindigeTile, CombineSlots, game action buttons.
+   - Files: `src/games/verbindige/VerbindigeTile.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
    - Related: #2 (keyboard navigation) — both are accessibility issues affecting the same files; consider fixing in one pass
 
-4. [ ] P2 - Create AdminBuchstaebli page and route
-   - Agent: watson-architect
-   - Scenario: Cross-game consistency audit (2026-04-16)
-   - Problem: All other games have admin pages (AdminVerbindige, AdminZaemesetzli, AdminSchlagziil) but Buchstaebli has none. No `/admin/buchstaebli` route in App.tsx.
-   - Suggested fix: Create `src/pages/admin/AdminBuchstaebli.tsx` following `AdminZaemesetzli.tsx` pattern. Add route inside admin block in `src/App.tsx`.
-   - Files: `src/pages/admin/AdminBuchstaebli.tsx` (create), `src/App.tsx`
-   - Priority adjusted from P1 to P2: internal tooling gap, not user-facing; players are unaffected
+---
+
+## Buchstäbli QA Findings
+
+_Items from watson-qa-buchstaebli agent_
+
+1. [ ] P1 - No toast for "not in word list" — silent rejection on invalid words
+   - Agent: watson-qa-buchstaebli
+   - Scenario: Validation Responses — submitting valid German words not in puzzle list
+   - Problem: When a word passes all pre-checks (4+ letters, contains center letter A, uses available letters) but is not in the puzzle's valid word list, the input clears silently with no feedback toast. LASTERN, LASTEN, and RASTEN were all rejected this way. Players have no indication whether their word was wrong, misspelled, or simply not in this puzzle's set.
+   - Suggested fix: Show a "Kein gültiges Wort" toast (mirroring the center-letter toast that already fires) when submission fails the word-list validation step.
+   - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler), `src/components/shared/Toast.tsx`
+   - Evidence: LASTERN (all 7 letters, pangram attempt), LASTEN (6 letters), RASTEN (6 letters) all silently rejected — input cleared, score unchanged, MutationObserver captured zero toast DOM insertions. Center-letter toast ("Der Buchstabe A muss dabei sein") fires correctly via same observer confirming toast infrastructure works. Observed 2026-04-19.
+
+2. [ ] P1 - No "already found" toast on duplicate word submission
+   - Agent: watson-qa-buchstaebli
+   - Scenario: Validation Responses — re-submitting an already-found word (RATEN twice)
+   - Problem: After RATEN was accepted (score 22→17 Pkt), submitting RATEN again produced no "Schon gefunden!" toast, did not clear the input (word stayed visible), and silently blocked the re-add. Player has zero feedback about why Enter had no effect.
+   - Suggested fix: Show "Schon gefunden! ✓" toast and clear the input when a duplicate is detected.
+   - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler)
+   - Evidence: Second RATEN: found count stayed at 1, score stayed "noch 17 Pkt bis Lehrling", MutationObserver captured no DOM insertions, input ref still showed "RATEN". Observed 2026-04-19.
+
+3. [ ] P2 - No "too short" toast for sub-4-letter submissions
+   - Agent: watson-qa-buchstaebli
+   - Scenario: Validation Responses — submitting TAN (3 letters, contains center letter A)
+   - Problem: Submitting TAN (T, A, N) causes the input to clear silently with no "Zu kurz!" toast. The center-letter check fires a toast but the minimum-length check does not. A player who types a short word gets no feedback about the 4-letter minimum.
+   - Suggested fix: Show "Zu kurz! (mind. 4 Buchstaben)" toast for words under 4 letters, consistent with the center-letter toast pattern.
+   - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler)
+   - Evidence: TAN submitted, MutationObserver empty, input cleared to placeholder. Observed 2026-04-19.
+   - Related: #1 — all three validation-toast gaps can be fixed in one pass through the submit handler
+
+4. [ ] P2 - Center letter button missing aria-label indicating it is required
+   - Agent: watson-qa-buchstaebli
+   - Scenario: First Play — reviewing ARIA labels on hex grid
+   - Problem: All 7 hex letter buttons have no `aria-label`. The center letter A is visually distinct (cyan background) but has no accessible label indicating it must appear in every word. Screen reader users hear only "A" with no hint it is mandatory.
+   - Suggested fix: Add `aria-label="A – Pflichtbuchstabe"` to the center button and `aria-label="R"` etc. to outer buttons. Add `role="group" aria-label="Buchstaben"` to the hex container.
+   - Files: `src/games/buchstaebli/BuchstaebliGrid.tsx` (or equivalent hex letter component)
+   - Evidence: All 7 buttons returned `null` for `getAttribute('aria-label')`. Computed bg confirmed A is `rgb(0,198,255)` (cyan), others `rgb(236,236,236)`. Observed 2026-04-19.
+
+5. [ ] P2 - Buchstäbli is an orphaned route — live but not linked from navigation
+   - Agent: watson-qa-buchstaebli
+   - Scenario: First Play — navigating to game from landing page
+   - Problem: The main nav shows only Verbindige, Zämesetzli, Schlagziil. The game is fully playable at `/buchstaebli` but a user starting at the homepage cannot discover it. The game appears to have been removed from the nav while the route and game logic remain deployed, leaving it in a half-removed state.
+   - Suggested fix: Either restore the nav link (if the game is meant to stay live) or remove the route from the production deploy to avoid confusion.
+   - Files: Nav component, React router config
+   - Evidence: Nav links on production: [Spiele, Verbindige, Zämesetzli, Schlagziil]. Direct navigation to `/buchstaebli` loads a fully functional game. Observed 2026-04-19.
 
 ---
 

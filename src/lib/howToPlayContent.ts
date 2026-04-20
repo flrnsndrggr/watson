@@ -14,13 +14,6 @@ export const SCHLAGZIIL_STEPS: HowToPlayStep[] = [
   { icon: '🔗', text: 'Nach jeder Schlagzeile kannst du den ganzen Artikel lesen.' },
 ];
 
-export const BUCHSTAEBLI_STEPS: HowToPlayStep[] = [
-  { icon: '🐝', text: 'Bilde Wörter mit den 7 Buchstaben. Der mittlere muss immer dabei sein.' },
-  { icon: '📏', text: 'Jedes Wort braucht mindestens 4 Buchstaben.' },
-  { icon: '⭐', text: 'Pangram = alle 7 Buchstaben in einem Wort. Gibt Bonus!' },
-  { icon: '🏔️', text: 'Steige auf: Stift → Lehrling → Geselle → Meister → Bundesrat.' },
-];
-
 export const ZAEMESETZLI_STEPS: HowToPlayStep[] = [
   { icon: '🧩', text: 'Kombiniere 2–3 Emojis zu zusammengesetzten Wörtern.' },
   { icon: '👆', text: 'Wähle Emojis aus, tippe das Wort ein und drücke Enter.' },

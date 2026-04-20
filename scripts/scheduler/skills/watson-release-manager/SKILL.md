@@ -39,7 +39,6 @@ Use Chrome MCP:
 3. Screenshot — verify landing page renders (game cards visible)
 4. Navigate to each game route:
    - `/verbindige` — verify grid renders
-   - `/buchstaebli` — verify hex grid renders (or check if route exists)
    - `/schlagziil` — verify headline card renders
    - `/zaemesetzli` — verify emoji pool renders
 5. Check console: `mcp__Claude_in_Chrome__read_console_messages` with pattern `error|Error|FATAL|Uncaught`
@@ -75,7 +74,7 @@ Create/update `docs/agent/release-log.md`:
 - Production health: <HEALTHY|DEGRADED|BROKEN|DOWN|UNKNOWN>
 - Console errors: <none | list | skipped>
 - Supabase: <healthy | errors found | skipped>
-- Routes checked: landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓, buchstaebli ✓/✗ (note which were curl-only vs. JS-rendered)
+- Routes checked: landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓ (note which were curl-only vs. JS-rendered)
 - Skipped checks: <list, with reason — e.g. "chrome MCP not granted", "netlify MCP not granted">
 
 ## Last Verified

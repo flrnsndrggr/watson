@@ -7,11 +7,11 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [x] Toast notifications: add auto-dismiss after 3s with fade-out animation (2026-04-16)
 - [x] Toast: ensure toast stacks if multiple fire (e.g., "Schon gefunden!" then "Mundart-Bonus!") (2026-04-18)
 - [x] ShareButton: verify share text format matches spec for each game (emoji grid, score, URL) (2026-04-18)
-- [x] ShareButton: add Web Share API integration for mobile (navigator.share fallback to clipboard) (2026-04-20)
-- [ ] GameShell: add `prefers-reduced-motion` media query — disable confetti, use opacity instead of transforms
-- [ ] GameHeader: add streak counter display next to game title (when user has active streak)
+- [x] ShareButton: add Web Share API integration for mobile (navigator.share fallback to clipboard) (2026-04-19)
+- [x] GameShell: add `prefers-reduced-motion` media query — disable confetti, use opacity instead of transforms (2026-04-19)
+- [x] GameHeader: add streak counter display next to game title (when user has active streak) (2026-04-19)
 - [x] ErrorDots: add subtle pulse animation on the dot that just filled (2026-04-19)
-- [ ] AdSlot: placeholder styling with watson gray background and "Anzeige" label
+- [x] AdSlot: placeholder styling with watson gray background and "Anzeige" label (2026-04-19)
 - [x] Loading state: add skeleton loader for puzzle data fetch (game-shaped placeholder) (2026-04-19)
 - [x] 404 page: create a custom not-found page at unknown routes with link back to landing (2026-04-20)
 
@@ -25,19 +25,6 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [ ] Solved groups: show category label with difficulty color background
 - [ ] Tile grid: ensure 44x44px minimum touch targets on mobile (WCAG AA)
 - [ ] Deselect all: add "Auswahl löschen" button that clears all selected tiles
-
-## Buchstäbli
-
-- [ ] Hex grid: ensure center letter is visually distinct (cyan/pink highlight)
-- [ ] Word input: support physical keyboard on desktop (type letters directly)
-- [ ] "Mischen" button: animate outer letters shuffling to new positions
-- [ ] Rank bar: smooth progress animation when score increases
-- [ ] Pangram found: special celebration animation + "+7 Bonus!" toast
-- [ ] Mundart word found: toast "Mundart-Bonus! 2x Punkte" with Swiss flag emoji
-- [ ] Already-found word: toast "Schon gefunden!" with no score change
-- [ ] Too-short word: toast "Mindestens 4 Buchstaben"
-- [ ] Missing center letter: toast "Der Buchstabe [X] muss dabei sein"
-- [ ] Found words list: collapsible, sorted alphabetically, pangrams highlighted
 
 ## Schlagziil
 

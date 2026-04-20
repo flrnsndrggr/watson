@@ -1,13 +1,11 @@
 const GAME_LABELS: Record<string, string> = {
   verbindige: 'Verbindige',
-  buchstaebli: 'Buchstäbli',
   zaemesetzli: 'Zämesetzli',
   schlagziil: 'Schlagziil',
 };
 
 const GAME_EMOJIS: Record<string, string> = {
   verbindige: '🇨🇭',
-  buchstaebli: '🔤',
   zaemesetzli: '🧩',
   schlagziil: '📰',
 };
@@ -22,7 +20,7 @@ export function generateShareText(
   return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\ngames-watson.netlify.app/${game}`;
 }
 
-/** Returns 'shared' if native share was used, 'copied' if clipboard fallback. */
+/** Returns 'shared' if Web Share API was used, 'copied' if clipboard fallback. */
 export async function share(text: string): Promise<'shared' | 'copied'> {
   if (navigator.share) {
     try {

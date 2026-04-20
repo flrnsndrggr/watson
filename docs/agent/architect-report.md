@@ -3,17 +3,14 @@
 ### Cross-Game Consistency
 
 **Compliant:**
-- All 4 games follow the required file structure: `<Game>Page.tsx`, `use<Game>.ts`, `<game>.data.ts`.
-- `GameShell` wraps all 4 game pages correctly.
-- `GameHeader` used consistently across all 4 games.
-- `ShareButton` used in all 4 games (VerbindigeResult, SchlagziilResult, ZaemesetzliPage, BuchstaebliPage).
-- `showToast` used in Verbindige, Zaemesetzli, Buchstaebli; Schlagziil appropriately omits it (inline card feedback).
+- All games follow the required file structure: `<Game>Page.tsx`, `use<Game>.ts`, `<game>.data.ts`.
+- `GameShell` wraps all game pages correctly.
+- `GameHeader` used consistently across all games.
+- `ShareButton` used in all games (VerbindigeResult, SchlagziilResult, ZaemesetzliPage).
+- `showToast` used in Verbindige, Zaemesetzli; Schlagziil appropriately omits it (inline card feedback).
 - `ErrorDots` used only where applicable (Verbindige, Schlagziil) — not forced on rank-based games.
 
 **Gaps:**
-- **[P0] Buchstaebli has no route in `src/App.tsx`.** The game exists at `src/games/buchstaebli/` but is unreachable. Already filed in ROADMAP (#1 Buchstäbli QA Findings).
-- **[P1] No `AdminBuchstaebli` page.** `src/pages/admin/` has AdminVerbindige, AdminZaemesetzli, AdminSchlagziil but no equivalent for Buchstaebli. Admin router at `src/App.tsx:33` also has no `/admin/buchstaebli` route.
-- **[P2] Buchstaebli absent from landing page.** Confirm `src/pages/LandingPage.tsx` links to all four games — Buchstaebli may be missing a card since the route doesn't exist yet.
 
 ---
 
@@ -36,13 +33,11 @@
 
 **P1 — `shuffleArray<T>` duplicated:**
 - `src/games/verbindige/useVerbindige.ts:26-33`
-- `src/games/buchstaebli/useBuchstaebli.ts:38-45`
-- Identical implementation. Extract to `src/lib/utils.ts` and import in both hooks.
+- Identical implementation. Extract to `src/lib/utils.ts` and import in the hook.
 
 **P1 — `getRank()` duplicated:**
-- `src/games/buchstaebli/useBuchstaebli.ts:30-36` (takes `BuchstaebliPuzzle['rank_thresholds']`)
 - `src/games/zaemesetzli/useZaemesetzli.ts:28-34` (takes `ZaemesetzliPuzzle['rank_thresholds']`)
-- Both thresholds share the same 5 keys (`bundesrat`, `meister`, `geselle`, `lehrling`, `stift`). Extract a shared `getRank(score: number, thresholds: RankThresholds): Rank` to `src/lib/utils.ts` with a `RankThresholds` type in `src/types/index.ts`.
+- Extract a shared `getRank(score: number, thresholds: RankThresholds): Rank` to `src/lib/utils.ts` with a `RankThresholds` type in `src/types/index.ts`.
 
 **P2 — `normalize()` + `levenshtein()` inline in game hook:**
 - `src/games/schlagziil/useSchlagziil.ts:23-50` — 30 lines of utility code inside a game-specific file.
@@ -61,14 +56,13 @@
 
 **Gaps:**
 - **[P1] No keyboard navigation in Verbindige, Schlagziil, or Zaemesetzli.**
-  - Buchstaebli has a full `keydown` listener at `src/games/buchstaebli/BuchstaebliPage.tsx:55-70`.
   - Verbindige tiles (`src/games/verbindige/VerbindigeTile.tsx`) suppress tap highlight but have no `onKeyDown` or `role="button"` — keyboard users cannot select tiles.
   - Schlagziil's guess input (`src/games/schlagziil/HeadlineCard.tsx`) likely relies on native `<input>` Enter — confirm Enter submits; the hint button needs keyboard support.
   - Zaemesetzli emoji pool buttons (`src/games/zaemesetzli/EmojiPool.tsx`) need `onKeyDown` for Space/Enter activation.
 
 - **[P1] Insufficient ARIA labels on interactive elements:**
-  - Only 1 `aria-label` found across all 4 game directories (`EmojiPool.tsx:30` — emoji item).
-  - Verbindige tiles, Schlagziil hint buttons, Zaemesetzli combine slots, Buchstaebli hex letter buttons all lack `aria-label`.
+  - Only 1 `aria-label` found across all game directories (`EmojiPool.tsx:30` — emoji item).
+  - Verbindige tiles, Schlagziil hint buttons, Zaemesetzli combine slots all lack `aria-label`.
 
 - **[P2] Schlagziil progress dots are color-only indicators.**
   - `src/games/schlagziil/SchlagziilPage.tsx:54-66`: 5 colored dots (green=correct, pink=wrong, cyan=current, gray=pending) convey state through color alone.
@@ -76,9 +70,7 @@
 
 - **[P2] Touch target audit partially passing:**
   - Zaemesetzli combine slots: `h-12 w-12` (48px) — compliant.
-  - Buchstaebli input display is `h-12` — compliant.
   - Verbindige tiles: no explicit min-height — verify rendered height ≥ 44px.
-  - Buchstaebli action buttons (`src/games/buchstaebli/BuchstaebliPage.tsx:104-123`): `py-2` without `min-h-11` — may fall below 44px on small text.
 
 ---
 
@@ -93,18 +85,14 @@
 
 ### Recommendations (prioritized)
 
-1. **[P0] Wire up Buchstaebli route** — add `<Route path="buchstaebli" element={<BuchstaebliPage />} />` in `src/App.tsx:26` block. (Already in ROADMAP; architectural blocker for the game's entire existence.)
+1. **[P1] Extract `shuffleArray` and `getRank` to `src/lib/utils.ts`** — eliminates the two highest-impact duplications. Define `RankThresholds` type in `src/types/index.ts` so the shared `getRank` is typesafe. Estimated: ~30 lines removed across files.
 
-2. **[P1] Extract `shuffleArray` and `getRank` to `src/lib/utils.ts`** — eliminates the two highest-impact duplications. Define `RankThresholds` type in `src/types/index.ts` so the shared `getRank` is typesafe. Estimated: ~30 lines removed across 3 files.
+2. **[P1] Keyboard navigation for Verbindige and Zaemesetzli** — add `window.addEventListener('keydown', ...)` in each Page component. For Verbindige: Enter = submitGuess, Backspace = clearSelection, letter keys = no-op (tiles are click-based). For Zaemesetzli: Enter = submitWord, Backspace = clearEmojiSelection.
 
-3. **[P1] Keyboard navigation for Verbindige and Zaemesetzli** — add `window.addEventListener('keydown', ...)` in each Page component following the Buchstaebli pattern. For Verbindige: Enter = submitGuess, Backspace = clearSelection, letter keys = no-op (tiles are click-based). For Zaemesetzli: Enter = submitWord, Backspace = clearEmojiSelection.
+3. **[P1] ARIA labels on all interactive elements** — minimum viable: add `aria-label` to tile buttons and game action buttons. Target files: `VerbindigeTile.tsx`, `EmojiPool.tsx`, `CombineSlots.tsx`, and action buttons in each `*Page.tsx`.
 
-4. **[P1] ARIA labels on all interactive elements** — minimum viable: add `aria-label` to tile/hex buttons and game action buttons across all 4 games. Target files: `VerbindigeTile.tsx`, `HexGrid.tsx`, `EmojiPool.tsx`, `CombineSlots.tsx`, and action buttons in each `*Page.tsx`.
+4. **[P2] Fix admin hardcoded hex colors** — replace `#f5f5f5` in AdminLayout with `bg-gray-100`, replace `#f0fdf4`/`#fffbeb` with Tailwind semantic classes or add `--color-status-success-bg`/`--color-status-warning-bg` tokens.
 
-5. **[P1] Add AdminBuchstaebli page** — create `src/pages/admin/AdminBuchstaebli.tsx` following the pattern of `AdminZaemesetzli.tsx`, add route `/admin/buchstaebli` in `src/App.tsx:33`.
+5. **[P2] Plan `src/lib/puzzles.ts`** — before any Supabase integration lands in game hooks, define typed fetch functions per game table here. Prevents each hook from writing its own query pattern.
 
-6. **[P2] Fix admin hardcoded hex colors** — replace `#f5f5f5` in AdminLayout with `bg-gray-100`, replace `#f0fdf4`/`#fffbeb` with Tailwind semantic classes or add `--color-status-success-bg`/`--color-status-warning-bg` tokens.
-
-7. **[P2] Plan `src/lib/puzzles.ts`** — before any Supabase integration lands in game hooks, define typed fetch functions per game table here. Prevents each hook from writing its own query pattern.
-
-8. **[P2] Schlagziil progress dot ARIA labels** — `src/games/schlagziil/SchlagziilPage.tsx:54-66`, add `aria-label` to each dot describing its state.
+6. **[P2] Schlagziil progress dot ARIA labels** — `src/games/schlagziil/SchlagziilPage.tsx:54-66`, add `aria-label` to each dot describing its state.

@@ -4,6 +4,7 @@ import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
+import { AdSlot } from '@/components/shared/AdSlot';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { ArchiveBanner } from '@/components/shared/ArchiveBanner';
@@ -15,7 +16,8 @@ import { generateShareText } from '@/lib/share';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { useDailyReset } from '@/lib/useDailyReset';
-import { RankBar } from '@/games/buchstaebli/RankBar';
+import { useStreak } from '@/lib/useStreak';
+import { RankBar } from '@/components/shared/RankBar';
 import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
 import { ZaemesetzliResult } from './ZaemesetzliResult';
@@ -55,6 +57,7 @@ export function ZaemesetzliPage() {
     clearLastResult,
   } = useZaemesetzli();
 
+  const { current: streakCount, recordPlay } = useStreak('zaemesetzli');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -69,6 +72,12 @@ export function ZaemesetzliPage() {
   }, [loadPuzzle, archiveDate]);
 
   // Handle guess results: shake on wrong, celebrate on correct
+  useEffect(() => {
+    if (foundWords.length > 0 && puzzle?.date) {
+      recordPlay(puzzle.date);
+    }
+  }, [foundWords.length, puzzle?.date, recordPlay]);
+
   useEffect(() => {
     if (!lastResult) return;
 
@@ -172,7 +181,13 @@ export function ZaemesetzliPage() {
     <GameShell>
       {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
       {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
-      <GameHeader title="Zämesetzli" puzzleId={puzzle?.date ?? ''} subtitle="Kombiniere Emojis zu deutschen Wörtern" onInfoClick={() => setShowHowToPlay(true)} />
+      <GameHeader
+        title="Zämesetzli"
+        puzzleId={puzzle?.date ?? ''}
+        subtitle="Kombiniere Emojis zu deutschen Wörtern"
+        onInfoClick={() => setShowHowToPlay(true)}
+        streak={streakCount}
+      />
 
       {showHowToPlay && (
         <HowToPlayModal
@@ -290,6 +305,10 @@ export function ZaemesetzliPage() {
       ) : (
         <ZaemesetzliResult />
       )}
+
+      <div className="mt-6 flex justify-center">
+        <AdSlot type="mrec" />
+      </div>
     </GameShell>
   );
 }

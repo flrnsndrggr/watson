@@ -25,13 +25,6 @@ const GAMES: GameConfig[] = [
     gameType: 'verbindige',
   },
   {
-    path: '/buchstaebli',
-    name: 'Buchst\u00E4bli',
-    emoji: '\u{1F41D}',
-    description: 'Bilde W\u00F6rter aus 7 Buchstaben. Mundart-Bonus!',
-    gameType: 'buchstaebli',
-  },
-  {
     path: '/zaemesetzli',
     name: 'Z\u00E4mesetzli',
     emoji: '\u{1F9E9}',
@@ -56,7 +49,7 @@ interface GameStatus {
 function loadStatuses(): Record<GameType, GameStatus> {
   const today = getTodayDateCET();
   const dailyResults = getDailyResults();
-  const gameTypes: GameType[] = ['verbindige', 'buchstaebli', 'zaemesetzli', 'schlagziil'];
+  const gameTypes: GameType[] = ['verbindige', 'zaemesetzli', 'schlagziil'];
   const result = {} as Record<GameType, GameStatus>;
   for (const gt of gameTypes) {
     const streak = getStreak(gt);

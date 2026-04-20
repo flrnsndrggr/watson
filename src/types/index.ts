@@ -60,17 +60,6 @@ export interface RankThresholds {
 
 export type Rank = keyof RankThresholds;
 
-// ===== Buchstäbli (legacy, kept for RankBar reuse) =====
-
-export interface BuchstaebliPuzzle {
-  id: string;
-  date: string;
-  center_letter: string;
-  outer_letters: string[];
-  max_score: number;
-  rank_thresholds: RankThresholds;
-}
-
 // ===== Schlagziil (The watson Archive Headline Game) =====
 
 export interface SchlagziilPuzzle {
@@ -116,6 +105,6 @@ export interface StreakData {
 
 // ===== Game State =====
 
-export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil' | 'buchstaebli';
+export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil';
 
 export type GameStatus = 'loading' | 'playing' | 'won' | 'lost';

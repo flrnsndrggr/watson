@@ -23,7 +23,6 @@ const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ defaul
 const VerbindigePage = lazy(() => import('@/games/verbindige/VerbindigePage').then(m => ({ default: m.VerbindigePage })));
 const ZaemesetzliPage = lazy(() => import('@/games/zaemesetzli/ZaemesetzliPage').then(m => ({ default: m.ZaemesetzliPage })));
 const SchlagziilPage = lazy(() => import('@/games/schlagziil/SchlagziilPage').then(m => ({ default: m.SchlagziilPage })));
-const BuchstaebliPage = lazy(() => import('@/games/buchstaebli/BuchstaebliPage').then(m => ({ default: m.BuchstaebliPage })));
 const ProfilPage = lazy(() => import('@/pages/ProfilPage').then(m => ({ default: m.ProfilPage })));
 const ArchivPage = lazy(() => import('@/pages/ArchivPage').then(m => ({ default: m.ArchivPage })));
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -44,7 +43,6 @@ export default function App() {
               <Route path="verbindige" element={<VerbindigePage />} />
               <Route path="zaemesetzli" element={<ZaemesetzliPage />} />
               <Route path="schlagziil" element={<SchlagziilPage />} />
-              <Route path="buchstaebli" element={<BuchstaebliPage />} />
               <Route path="profil" element={<ProfilPage />} />
               <Route path="archiv" element={<ArchivPage />} />
             </Route>

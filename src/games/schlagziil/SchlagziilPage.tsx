@@ -11,6 +11,7 @@ import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { SCHLAGZIIL_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
 import { useDailyReset } from '@/lib/useDailyReset';
+import { useStreak } from '@/lib/useStreak';
 import { HeadlineCard } from './HeadlineCard';
 import { SchlagziilResult } from './SchlagziilResult';
 import { useSchlagziil } from './useSchlagziil';
@@ -34,8 +35,10 @@ export function SchlagziilPage() {
     submitGuess,
     advanceToNext,
     useHint,
+    clearLastResult,
   } = useSchlagziil();
 
+  const { current: streak, recordPlay } = useStreak('schlagziil');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
   const [reviewExpanded, setReviewExpanded] = useState(false);
@@ -49,6 +52,12 @@ export function SchlagziilPage() {
     }
   }, [loadPuzzle, archiveDate]);
 
+  useEffect(() => {
+    if (status === 'finished' && puzzle?.date) {
+      recordPlay(puzzle.date);
+    }
+  }, [status, puzzle?.date, recordPlay]);
+
   // Handle guess results: toasts, shake, auto-advance
   useEffect(() => {
     if (lastGuessResult === 'correct') {
@@ -60,7 +69,10 @@ export function SchlagziilPage() {
     if (lastGuessResult === 'wrong') {
       // Shake the card
       setShaking(true);
-      const shakeTimer = setTimeout(() => setShaking(false), 400);
+      const shakeTimer = setTimeout(() => {
+        setShaking(false);
+        clearLastResult();
+      }, 400);
 
       if (totalErrors >= maxErrors) {
         showToast('Keine Versuche mehr!');
@@ -75,7 +87,7 @@ export function SchlagziilPage() {
 
       return () => clearTimeout(shakeTimer);
     }
-  }, [lastGuessResult, advanceToNext, totalErrors, maxErrors]);
+  }, [lastGuessResult, advanceToNext, totalErrors, maxErrors, clearLastResult]);
 
   // Confetti on good finish (4+ correct)
   useEffect(() => {
@@ -104,6 +116,7 @@ export function SchlagziilPage() {
         puzzleId={puzzle?.date ?? ''}
         subtitle="Errate das fehlende Wort"
         onInfoClick={() => setShowHowToPlay(true)}
+        streak={streak}
       />
 
       {showHowToPlay && (

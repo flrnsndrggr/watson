@@ -81,7 +81,6 @@ If any fails, revert changes and mark the item with `[!]` + reason.
 | Game | Route | Admin Route | Key Files |
 |---|---|---|---|
 | Verbindige | `/verbindige` | `/admin/verbindige` | `src/games/verbindige/` |
-| Buchstäbli | `/buchstaebli` | _(no admin yet)_ | `src/games/buchstaebli/` (note: no player route yet — P0) |
 | Schlagziil | `/schlagziil` | `/admin/schlagziil` | `src/games/schlagziil/` |
 | Zämesetzli | `/zaemesetzli` | `/admin/zaemesetzli` | `src/games/zaemesetzli/` |
 
@@ -89,7 +88,6 @@ If any fails, revert changes and mark the item with `[!]` + reason.
 
 - `puzzles` — parent table (id, game_type, publish_date)
 - `verbindige_puzzles` — groups JSONB
-- `buchstaebli_puzzles` — letters, valid_words, rank_thresholds
 - `schlagziil_puzzles` — headlines JSONB
 - `zaemesetzli_puzzles` — emojis, valid_compounds, rank_thresholds
 - `game_sessions` — user play history

@@ -1,6 +1,6 @@
 import { GameShell } from './GameShell';
 
-type PuzzleVariant = 'verbindige' | 'schlagziil' | 'zaemesetzli' | 'buchstaebli';
+type PuzzleVariant = 'verbindige' | 'schlagziil' | 'zaemesetzli';
 
 function SkeletonBlock({ className }: { className?: string }) {
   return (
@@ -70,29 +70,10 @@ function ZaemesetzliSkeleton() {
   );
 }
 
-function BuchstaebliSkeleton() {
-  return (
-    <>
-      <div className="flex justify-center">
-        <SkeletonBlock className="h-32 w-32 rounded-2xl" />
-      </div>
-      <div className="mt-6">
-        <SkeletonBlock className="h-12 w-full rounded-lg" />
-      </div>
-      <div className="mt-4 flex justify-center gap-2">
-        {Array.from({ length: 5 }, (_, i) => (
-          <SkeletonBlock key={i} className="h-10 w-10 rounded-lg" />
-        ))}
-      </div>
-    </>
-  );
-}
-
 const skeletons: Record<PuzzleVariant, React.FC> = {
   verbindige: VerbindigeSkeleton,
   schlagziil: SchlagziilSkeleton,
   zaemesetzli: ZaemesetzliSkeleton,
-  buchstaebli: BuchstaebliSkeleton,
 };
 
 export function PuzzleLoading({ variant = 'verbindige' }: { variant?: PuzzleVariant }) {

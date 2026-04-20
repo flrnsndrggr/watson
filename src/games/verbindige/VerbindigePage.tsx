@@ -10,6 +10,8 @@ import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
 import { VERBINDIGE_STEPS } from '@/lib/howToPlayContent';
 import { useDailyReset } from '@/lib/useDailyReset';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { useStreak } from '@/lib/useStreak';
 import { VerbindigeBoard } from './VerbindigeBoard';
 import { VerbindigeResult } from './VerbindigeResult';
 import { useVerbindige } from './useVerbindige';
@@ -32,6 +34,8 @@ export function VerbindigePage() {
     isArchive,
   } = useVerbindige();
 
+  const reducedMotion = usePrefersReducedMotion();
+  const { current: streak, recordPlay } = useStreak('verbindige');
   const [shufflePhase, setShufflePhase] = useState<'idle' | 'out' | 'in'>('idle');
   const [revealComplete, setRevealComplete] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -83,12 +87,18 @@ export function VerbindigePage() {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (status === 'won') {
+    if ((status === 'won' || status === 'lost') && puzzle?.date) {
+      recordPlay(puzzle.date);
+    }
+  }, [status, puzzle?.date, recordPlay]);
+
+  useEffect(() => {
+    if (status === 'won' && !reducedMotion) {
       import('canvas-confetti').then(({ default: confetti }) => {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
       });
     }
-  }, [status]);
+  }, [status, reducedMotion]);
 
   if (status === 'loading') return <PuzzleLoading />;
 
@@ -105,6 +115,7 @@ export function VerbindigePage() {
         puzzleId={puzzle?.date ?? ''}
         subtitle="Finde 4 Gruppen à 4"
         onInfoClick={() => setShowHowToPlay(true)}
+        streak={streak}
       />
 
       {showHowToPlay && (

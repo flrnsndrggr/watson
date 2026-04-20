@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { path: '/verbindige', label: 'Verbindige' },
   { path: '/zaemesetzli', label: 'Zämesetzli' },
   { path: '/schlagziil', label: 'Schlagziil' },
-  { path: '/buchstaebli', label: 'Buchstäbli' },
 ];
 
 function LoginModal({ onClose }: { onClose: () => void }) {
