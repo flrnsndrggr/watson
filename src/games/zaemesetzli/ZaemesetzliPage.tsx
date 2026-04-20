@@ -43,6 +43,7 @@ export function ZaemesetzliPage() {
     score,
     currentRank,
     lastResult,
+    lastResultId,
     status,
     streak,
     isArchive,
@@ -96,7 +97,7 @@ export function ZaemesetzliPage() {
 
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
-  }, [lastResult, clearLastResult]);
+  }, [lastResult, lastResultId, clearLastResult]);
 
   // Confetti + toast on rank milestones
   useEffect(() => {

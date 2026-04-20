@@ -20,6 +20,7 @@ interface ZaemesetzliState {
   currentRank: Rank;
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
+  lastResultId: number;
   status: 'playing' | 'complete';
   streak: StreakData;
   isArchive: boolean;
@@ -50,6 +51,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   currentRank: 'stift',
   hintsUsed: 0,
   lastResult: null,
+  lastResultId: 0,
   status: 'playing',
   streak: getStreak('zaemesetzli'),
   isArchive: false,
@@ -94,7 +96,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
     // Already found?
     if (foundWords.some((fw) => fw.word.toLowerCase() === word)) {
-      set({ lastResult: 'already-found', currentInput: '' });
+      set((s) => ({ lastResult: 'already-found', lastResultId: s.lastResultId + 1, currentInput: '' }));
       return;
     }
 
@@ -102,7 +104,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const compound = puzzle.valid_compounds.find((c) => c.word.toLowerCase() === word);
 
     if (!compound) {
-      set({ lastResult: 'invalid', currentInput: '' });
+      set((s) => ({ lastResult: 'invalid', lastResultId: s.lastResultId + 1, currentInput: '' }));
       return;
     }
 
@@ -112,7 +114,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const emojisMatch = compSet.size === selectedSet.size && [...compSet].every((e) => selectedSet.has(e));
 
     if (!emojisMatch) {
-      set({ lastResult: 'wrong-emojis', currentInput: '' });
+      set((s) => ({ lastResult: 'wrong-emojis', lastResultId: s.lastResultId + 1, currentInput: '' }));
       return;
     }
 
@@ -154,6 +156,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       currentInput: '',
       selectedEmojis: [],
       lastResult: compound.is_mundart ? 'mundart' : 'valid',
+      lastResultId: get().lastResultId + 1,
       status: allFound ? 'complete' : 'playing',
       ...streakUpdate,
     });
