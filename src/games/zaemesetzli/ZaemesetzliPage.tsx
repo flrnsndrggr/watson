@@ -3,6 +3,7 @@ import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
+import { AdSlot } from '@/components/shared/AdSlot';
 import { PuzzleLoading } from '@/components/shared/PuzzleLoading';
 import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { showToast } from '@/components/shared/Toast';
@@ -166,6 +167,10 @@ export function ZaemesetzliPage() {
       {/* Share */}
       <div className="mt-6 text-center">
         <ShareButton text={shareText} />
+      </div>
+
+      <div className="mt-6 flex justify-center">
+        <AdSlot type="mrec" />
       </div>
 
       <PostGameSection currentGame="zaemesetzli" />

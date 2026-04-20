@@ -1,5 +1,6 @@
 import { ShareButton } from '@/components/shared/ShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
+import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
 import { useSchlagziil } from './useSchlagziil';
 
@@ -37,6 +38,10 @@ export function SchlagziilResult() {
       </p>
       <div className="mt-4">
         <ShareButton text={shareText} />
+      </div>
+
+      <div className="mt-6 flex justify-center">
+        <AdSlot type="mrec" />
       </div>
 
       <PostGameSection currentGame="schlagziil" />
