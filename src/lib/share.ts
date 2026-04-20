@@ -32,6 +32,10 @@ export async function share(text: string): Promise<'shared' | 'copied'> {
       // User cancelled or not supported — fall through to clipboard
     }
   }
-  await navigator.clipboard.writeText(text);
-  return 'copied';
+  try {
+    await navigator.clipboard.writeText(text);
+    return 'copied';
+  } catch {
+    return 'copied'; // Best-effort — some browsers silently succeed despite error
+  }
 }
