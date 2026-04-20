@@ -147,8 +147,8 @@ _Items from watson-qa-buchstaebli agent_
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — visual inspection of the game header
    - Problem: The `<h1>` text reads "Buchstäbli#001" with no whitespace between game name and puzzle number badge. The missing space makes the heading look like a concatenation bug and reduces readability at a glance.
-   - Suggested fix: Add a space before the `#001` span: `Buchstäbli <span>#{puzzleNumber}</span>`.
-   - Files: `src/games/buchstaebli/BuchstaebliPage.tsx` or `src/components/shared/GameHeader.tsx`
+   - Suggested fix: Add a literal space or `&nbsp;` text node between `{title}` and the `#{puzzleId}` span in `GameHeader.tsx:12-17`. The current `ml-2` CSS class provides visual spacing but `textContent` concatenates without a space, affecting screen readers and text extraction.
+   - Files: `src/components/shared/GameHeader.tsx` (lines 12-17)
    - Evidence: `document.querySelector('[role="heading"]').textContent === "Buchstäbli#001"` in production. Observed 2026-04-18.
    - Related: Verbindige #3 — both involve GameHeader puzzle number display; may share root cause in `GameHeader.tsx`
 
@@ -185,6 +185,7 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Page text at game-over contained "Kennst du watson?". Observed 2026-04-16.
    - Priority adjusted from P1 to P2: minor wording tweak, not a UX or gameplay issue
    - Related: #4 — both are share-related issues on the Schlagziil result screen; consider fixing together
+   - Triage note (2026-04-20): Code at `SchlagziilResult.tsx:102` now reads `"Ich lese watson, und du?"` — this appears to have been fixed already. Verify in production before marking complete.
 
 4. [x] P1 - Share link appends non-existent watson.ch URL
    - Agent: watson-qa-schlagziil
@@ -306,7 +307,8 @@ _Items from watson-qa-zaemesetzli agent_
     - Scenario: Scoring & Ranks — tracking progress during active play
     - Problem: While playing, the RankBar right-side text always reads "noch X Pkt bis Y" (e.g. "noch 7 Pkt bis Meister"), never showing the actual score (e.g. "13 Pkt"). The raw score only becomes visible once Bundesrat is reached (when `nextRank` is null). Players cannot easily tell where they are on the full scale without mentally summing individual compound scores from the found list. By contrast, Buchstäbli prominently shows the running score (e.g. "5/112 Pkt") at all times.
     - Suggested fix: In `RankBar.tsx:38-40`, change the right-side label to show both: `${score} Pkt (noch ${pointsToNext} bis ${RANK_LABELS[nextRank]})` or add a small score label above/below the bar.
-    - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component used by both games)
+    - Files: `src/games/buchstaebli/RankBar.tsx` (lines 38-41; shared component imported by both Buchstäbli and Zämesetzli)
+    - Related: Buchstäbli #4 — both involve RankBar display improvements; consider fixing together
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
 11. [ ] P0 - Netlify deploy failing — GitHub Actions budget exhausted and CLI not authenticated
