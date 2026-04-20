@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { NotificationSettings } from '@/components/shared/NotificationSettings';
+import { PlayCalendar } from '@/components/shared/PlayCalendar';
 import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
 import { getStreak } from '@/lib/streaks';
@@ -134,6 +135,11 @@ export function ProfilPage() {
         <StatBox label="Aktive Streaks" value={String(gamesActive)} />
         <StatBox label="Streak-Tage total" value={String(totalCurrent)} />
         <StatBox label="Bester Streak" value={`${bestStreak} ${bestStreak === 1 ? 'Tag' : 'Tage'}`} />
+      </div>
+
+      {/* Play history calendar */}
+      <div className="mb-6">
+        <PlayCalendar />
       </div>
 
       {/* Notification settings */}
