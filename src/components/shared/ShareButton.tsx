@@ -7,20 +7,22 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ text, label = 'Teilen' }: ShareButtonProps) {
-  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<'shared' | 'copied' | null>(null);
 
   async function handleShare() {
-    await share(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const result = await share(text);
+    setFeedback(result);
+    setTimeout(() => setFeedback(null), 2000);
   }
+
+  const feedbackLabel = feedback === 'shared' ? 'Geteilt!' : feedback === 'copied' ? 'Kopiert!' : null;
 
   return (
     <button
       onClick={handleShare}
       className="rounded bg-[var(--color-cyan)] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-85 active:scale-[0.97]"
     >
-      {copied ? 'Kopiert!' : label}
+      {feedbackLabel ?? label}
     </button>
   );
 }
