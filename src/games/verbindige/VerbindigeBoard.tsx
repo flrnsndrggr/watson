@@ -1,7 +1,7 @@
 import { useVerbindige } from './useVerbindige';
 import { VerbindigeTile } from './VerbindigeTile';
 import { SolvedGroup } from './SolvedGroup';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 const REVEAL_DELAY_MS = 700;
 const FADE_DELAY_MS = 400;
@@ -69,6 +69,16 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
   const [collapsingItems, setCollapsingItems] = useState<Set<string>>(new Set());
   const revealedCount = useSyncExternalStore(revealSubscribe, revealGetSnapshot);
 
+  // FLIP animation: smooth layout transition for remaining tiles after a group is confirmed
+  const tileRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const firstRects = useRef<Map<string, DOMRect> | null>(null);
+  const flipPending = useRef(false);
+
+  const setTileRef = useCallback((key: string) => (el: HTMLButtonElement | null) => {
+    if (el) tileRefs.current.set(key, el);
+    else tileRefs.current.delete(key);
+  }, []);
+
   // Separate player-solved groups from loss-revealed groups
   const playerSolved = solvedGroups.filter((g) => !g.revealedOnLoss);
   const lossRevealed = solvedGroups.filter((g) => g.revealedOnLoss);
@@ -114,6 +124,7 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
   // Correct guess: two-phase animation
   // Phase 1 (0–400ms): tiles flash difficulty color with bounce
   // Phase 2 (400–700ms): tiles collapse, then confirmCorrectGroup resolves the state
+  // Phase 3 (700ms+): remaining tiles FLIP-animate to new grid positions
   useEffect(() => {
     if (!pendingCorrect) return;
 
@@ -122,8 +133,17 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
       setCollapsingItems(new Set(pendingCorrect.itemTexts));
     }, 400);
 
-    // Phase 3: confirm group after collapse animation finishes
+    // Phase 3: snapshot remaining tile positions, then confirm group
     const confirmTimer = setTimeout(() => {
+      // FLIP "First": capture positions of tiles that will remain
+      const rects = new Map<string, DOMRect>();
+      tileRefs.current.forEach((el, key) => {
+        if (pendingCorrect.itemTexts.has(key)) return;
+        rects.set(key, el.getBoundingClientRect());
+      });
+      firstRects.current = rects;
+      flipPending.current = true;
+
       confirmCorrectGroup();
       clearLastResult();
     }, 700);
@@ -134,6 +154,49 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
       setCollapsingItems(new Set());
     };
   }, [pendingCorrect, confirmCorrectGroup, clearLastResult]);
+
+  // FLIP "Last, Invert, Play": after React re-renders with fewer tiles,
+  // animate them from their old positions to their new ones.
+  useLayoutEffect(() => {
+    if (!flipPending.current || !firstRects.current) return;
+    flipPending.current = false;
+    const first = firstRects.current;
+    firstRects.current = null;
+
+    const toAnimate: Array<{ el: HTMLElement; dx: number; dy: number }> = [];
+
+    tileRefs.current.forEach((el, key) => {
+      const firstRect = first.get(key);
+      if (!firstRect) return;
+      const lastRect = el.getBoundingClientRect();
+      const dx = firstRect.left - lastRect.left;
+      const dy = firstRect.top - lastRect.top;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      toAnimate.push({ el, dx, dy });
+    });
+
+    if (toAnimate.length === 0) return;
+
+    // Invert: place tiles at their old positions
+    for (const { el, dx, dy } of toAnimate) {
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+    }
+
+    // Play: animate to new positions on the next frame
+    requestAnimationFrame(() => {
+      for (const { el } of toAnimate) {
+        el.style.transition = 'transform 300ms ease-out';
+        el.style.transform = '';
+      }
+      // Clean up inline styles after animation completes
+      setTimeout(() => {
+        for (const { el } of toAnimate) {
+          el.style.transition = '';
+          el.style.transform = '';
+        }
+      }, 350);
+    });
+  }, [remainingItems]);
 
   const isPlaying = status === 'playing';
   const visibleLossGroups = lossRevealed.slice(0, revealedCount);
@@ -157,6 +220,7 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
           {remainingItems.map((item, index) => (
             <VerbindigeTile
               key={item.text}
+              ref={setTileRef(item.text)}
               item={item}
               isSelected={selected.some((s) => s.text === item.text)}
               isWrong={wrongItems.has(item.text)}

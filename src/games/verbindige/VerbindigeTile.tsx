@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import type { VerbindigeItem } from '@/types';
 
 type ShufflePhase = 'idle' | 'out' | 'in';
@@ -17,6 +18,7 @@ const DIFFICULTY_BORDER: Record<number, string> = {
 };
 
 interface VerbindigeTileProps {
+  ref?: Ref<HTMLButtonElement>;
   item: VerbindigeItem;
   isSelected: boolean;
   isWrong: boolean;
@@ -31,6 +33,7 @@ interface VerbindigeTileProps {
 }
 
 export function VerbindigeTile({
+  ref,
   item,
   isSelected,
   isWrong,
@@ -61,6 +64,7 @@ export function VerbindigeTile({
 
   return (
     <button
+      ref={ref}
       onClick={onToggle}
       disabled={disabled || shufflePhase !== 'idle' || isCorrectFlash}
       aria-label={`${isSelected ? 'Deselect' : 'Select'} ${item.text}`}
