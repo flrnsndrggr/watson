@@ -103,6 +103,12 @@ export function VerbindigeBoard({ shufflePhase = 'idle', onRevealComplete }: Ver
       }, 500);
       return () => clearTimeout(timer);
     }
+
+    // Clear duplicate result without visual feedback (toast handles it)
+    if (lastGuessResult === 'duplicate') {
+      const timer = setTimeout(clearLastResult, 300);
+      return () => clearTimeout(timer);
+    }
   }, [lastGuessResult, lastWrongItems, clearLastResult, clearWrongItems]);
 
   // Correct guess: two-phase animation

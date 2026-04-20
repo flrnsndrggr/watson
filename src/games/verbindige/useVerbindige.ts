@@ -25,9 +25,10 @@ interface VerbindigeState {
   status: 'loading' | 'playing' | 'won' | 'lost';
   error: string | null;
   remainingItems: VerbindigeItem[];
-  lastGuessResult: 'correct' | 'wrong' | 'one-away' | null;
+  lastGuessResult: 'correct' | 'wrong' | 'one-away' | 'duplicate' | null;
   lastWrongItems: VerbindigeItem[];
   pendingCorrect: PendingCorrectGroup | null;
+  previousGuesses: string[];
   streak: StreakData;
   isArchive: boolean;
   startedAt: number | null;
@@ -64,6 +65,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   lastGuessResult: null,
   lastWrongItems: [],
   pendingCorrect: null,
+  previousGuesses: [],
   streak: getStreak('verbindige'),
   isArchive: false,
   startedAt: null,
@@ -76,7 +78,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       : await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
     const puzzle = fetched ?? SAMPLE_VERBINDIGE;
     const allItems = shuffleArray(puzzle.groups.flatMap((g) => g.items));
-    set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0, startedAt: Date.now(), elapsedSeconds: null });
+    set({ puzzle, remainingItems: allItems, status: 'playing', selected: [], solvedGroups: [], mistakes: 0, previousGuesses: [], startedAt: Date.now(), elapsedSeconds: null });
   },
 
   toggleItem: (item) => {
@@ -126,10 +128,20 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
   },
 
   submitGuess: () => {
-    const { selected, puzzle, solvedGroups, mistakes, maxMistakes } = get();
+    const { selected, puzzle, solvedGroups, mistakes, maxMistakes, previousGuesses } = get();
     if (!puzzle || selected.length !== 4) return;
 
     const selectedTexts = new Set(selected.map((s) => s.text));
+
+    // Create a canonical key for this guess (sorted to be order-independent)
+    const guessKey = [...selectedTexts].sort().join('|');
+
+    // Check for duplicate guess — don't consume a mistake
+    if (previousGuesses.includes(guessKey)) {
+      showToast('Schon probiert!');
+      set({ selected: [], lastGuessResult: 'duplicate' });
+      return;
+    }
 
     // Check against each unsolved group
     const unsolvedGroups = puzzle.groups.filter(
@@ -152,6 +164,9 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         lastGuessResult: 'correct',
       });
     } else {
+      // Record this wrong guess so it can't be repeated
+      const newPreviousGuesses = [...previousGuesses, guessKey];
+
       // Check if "one away" — 3 out of 4 correct in any group
       const isOneAway = unsolvedGroups.some((g) => {
         const overlap = g.items.filter((item) => selectedTexts.has(item.text));
@@ -164,6 +179,8 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
 
       if (result === 'one-away') {
         showToast('Fast! Nur 1 falsch.');
+      } else {
+        showToast('Leider falsch.');
       }
 
       const lostUpdates: Partial<VerbindigeState> = {
@@ -171,6 +188,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         selected: [],
         lastWrongItems: selected,
         lastGuessResult: result,
+        previousGuesses: newPreviousGuesses,
         status: lost ? 'lost' : 'playing',
       };
       if (lost && !get().isArchive) {
