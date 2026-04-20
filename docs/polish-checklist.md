@@ -17,7 +17,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 
 ## Verbindige
 
-- [ ] Tile selection: add scale(1.03) + cyan border on tap, 150ms ease
+- [x] Tile selection: add scale(1.03) + cyan border on tap, 150ms ease (2026-04-20)
 - [ ] Correct group solve: tiles slide up into solved row with color reveal, 400ms ease-out
 - [ ] Wrong guess: translateX shake keyframe animation, 400ms
 - [ ] "One away" toast: show "Fast! Nur 1 falsch." when exactly 3 of 4 items are correct
