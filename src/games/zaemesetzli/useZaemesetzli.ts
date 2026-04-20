@@ -6,6 +6,7 @@ import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
+import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -33,6 +34,23 @@ interface ZaemesetzliState {
   finishGame: () => void;
   useHint: () => string | null;
   clearLastResult: () => void;
+}
+
+interface ZaemesetzliProgress {
+  foundWords: FoundCompound[];
+  score: number;
+  currentRank: Rank;
+  hintsUsed: number;
+}
+
+function persistZaemesetzli(state: ZaemesetzliState): void {
+  if (state.isArchive || !state.puzzle || state.status !== 'playing') return;
+  saveGameProgress<ZaemesetzliProgress>('zaemesetzli', state.puzzle.id, {
+    foundWords: state.foundWords,
+    score: state.score,
+    currentRank: state.currentRank,
+    hintsUsed: state.hintsUsed,
+  });
 }
 
 function getRank(score: number, thresholds: ZaemesetzliPuzzle['rank_thresholds']): Rank {
@@ -63,6 +81,32 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       ? await fetchPuzzleByDate<ZaemesetzliPuzzle>('zaemesetzli', archiveDate)
       : await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
     const puzzle = fetched ?? SAMPLE_ZAEMESETZLI;
+
+    // Restore in-progress state for today's puzzle
+    if (!archiveDate) {
+      const saved = loadGameProgress<ZaemesetzliProgress>('zaemesetzli', puzzle.id);
+      if (saved && saved.foundWords.length > 0 && saved.foundWords.length < puzzle.valid_compounds.length) {
+        set({
+          puzzle,
+          foundWords: saved.foundWords,
+          score: saved.score,
+          currentRank: saved.currentRank,
+          hintsUsed: saved.hintsUsed,
+          selectedEmojis: [],
+          currentInput: '',
+          status: 'playing',
+        });
+        // Re-record streak since it fires on first word found
+        if (!get().isArchive) {
+          const streak = recordGamePlayed('zaemesetzli');
+          set({ streak });
+        }
+        trackGameStarted('zaemesetzli', false);
+        return;
+      }
+    }
+
+    clearGameProgress('zaemesetzli');
     set({
       puzzle,
       selectedEmojis: [],
@@ -148,6 +192,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
           summary: `${newFoundWords.length}/${puzzle.valid_compounds.length} \u00B7 ${rankLabel}`,
         });
       }
+      clearGameProgress('zaemesetzli');
     }
 
     set({
@@ -161,6 +206,11 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       status: allFound ? 'complete' : 'playing',
       ...streakUpdate,
     });
+
+    // Persist after finding a word (if still playing)
+    if (!allFound) {
+      persistZaemesetzli(get());
+    }
   },
 
   finishGame: () => {
@@ -189,6 +239,8 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       });
     }
 
+    clearGameProgress('zaemesetzli');
+
     set({
       status: 'finished',
       selectedEmojis: [],
@@ -212,6 +264,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       selectedEmojis: hint.components,
       currentInput: '',
     });
+    persistZaemesetzli(get());
     return `${hint.components.join(' + ')} = ?`;
   },
 }));

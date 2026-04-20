@@ -6,6 +6,7 @@ import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
+import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
@@ -34,6 +35,27 @@ interface SchlagziilState {
   advanceToNext: () => void;
   useHint: (index: number) => void;
   clearLastResult: () => void;
+}
+
+interface SchlagziilProgress {
+  currentIndex: number;
+  totalErrors: number;
+  results: ('correct' | 'wrong' | null)[];
+  revealedAnswers: (string | null)[];
+  hintsUsed: boolean[];
+  startedAt: number | null;
+}
+
+function persistSchlagziil(state: SchlagziilState): void {
+  if (state.isArchive || !state.puzzle || state.status !== 'playing') return;
+  saveGameProgress<SchlagziilProgress>('schlagziil', state.puzzle.id, {
+    currentIndex: state.currentIndex,
+    totalErrors: state.totalErrors,
+    results: state.results,
+    revealedAnswers: state.revealedAnswers,
+    hintsUsed: state.hintsUsed,
+    startedAt: state.startedAt,
+  });
 }
 
 function normalize(s: string): string {
@@ -90,6 +112,31 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     const puzzle: SchlagziilPuzzle = fetched ?? SAMPLE_SCHLAGZIIL;
     const answers = fetched?.answers ?? DEMO_ANSWERS;
     const displayAnswers = fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS;
+
+    // Restore in-progress state for today's puzzle
+    if (!archiveDate) {
+      const saved = loadGameProgress<SchlagziilProgress>('schlagziil', puzzle.id);
+      if (saved && saved.results.some((r) => r === null)) {
+        set({
+          puzzle,
+          answers,
+          displayAnswers,
+          currentIndex: saved.currentIndex,
+          totalErrors: saved.totalErrors,
+          results: saved.results,
+          revealedAnswers: saved.revealedAnswers,
+          hintsUsed: saved.hintsUsed,
+          startedAt: saved.startedAt,
+          status: 'playing',
+          lastGuessResult: null,
+          elapsedSeconds: null,
+        });
+        trackGameStarted('schlagziil', false);
+        return;
+      }
+    }
+
+    clearGameProgress('schlagziil');
     set({
       puzzle,
       answers,
@@ -134,6 +181,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       newResults[currentIndex] = 'correct';
       newRevealed[currentIndex] = displayAnswers[currentIndex] ?? answers[0];
       set({ results: newResults, revealedAnswers: newRevealed, lastGuessResult: 'correct' });
+      persistSchlagziil(get());
     } else {
       const newErrors = totalErrors + 1;
       if (newErrors >= maxErrors) {
@@ -163,6 +211,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
             timeSeconds: elapsed,
           });
         }
+        clearGameProgress('schlagziil');
         set({
           totalErrors: newErrors,
           results: newResults,
@@ -174,6 +223,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         });
       } else {
         set({ totalErrors: newErrors, lastGuessResult: 'wrong' });
+        persistSchlagziil(get());
       }
     }
   },
@@ -203,9 +253,11 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           timeSeconds: elapsed,
         });
       }
+      clearGameProgress('schlagziil');
       set({ status: 'finished', elapsedSeconds: elapsed, ...streakUpdate2 });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
+      persistSchlagziil(get());
     }
   },
 
