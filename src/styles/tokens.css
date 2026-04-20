@@ -170,6 +170,27 @@
   to { transform: translateX(0); opacity: 1; }
 }
 
+/* Zämesetzli: emoji slot fills when selected */
+@keyframes slotFill {
+  0% { transform: scale(0.7); opacity: 0.3; }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Zämesetzli: celebration — emoji slots pulse green */
+@keyframes celebrateSlot {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Zämesetzli: celebration — word reveal pop */
+@keyframes wordReveal {
+  0% { transform: scale(0.5) translateX(-8px); opacity: 0; }
+  60% { transform: scale(1.06) translateX(0); opacity: 1; }
+  100% { transform: scale(1) translateX(0); opacity: 1; }
+}
+
 /* ===== BASE STYLES ===== */
 
 body {

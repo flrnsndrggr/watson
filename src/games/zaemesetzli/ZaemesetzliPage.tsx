@@ -41,6 +41,7 @@ export function ZaemesetzliPage() {
     currentRank,
     lastResult,
     lastResultId,
+    lastFoundCompound,
     status,
     isArchive,
     selectEmoji,
@@ -208,6 +209,7 @@ export function ZaemesetzliPage() {
           <CombineSlots
             selectedEmojis={selectedEmojis}
             onClear={clearEmojiSelection}
+            celebration={lastFoundCompound}
           />
 
           {/* Word input */}

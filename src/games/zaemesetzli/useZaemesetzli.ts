@@ -12,6 +12,13 @@ interface FoundCompound extends CompoundWord {
   foundAt: number;
 }
 
+interface CelebrationData {
+  components: string[];
+  word: string;
+  points: number;
+  is_mundart: boolean;
+}
+
 interface ZaemesetzliState {
   puzzle: ZaemesetzliPuzzle | null;
   selectedEmojis: string[];
@@ -22,6 +29,7 @@ interface ZaemesetzliState {
   hintsUsed: number;
   lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
   lastResultId: number;
+  lastFoundCompound: CelebrationData | null;
   status: 'playing' | 'complete' | 'finished';
   streak: StreakData;
   isArchive: boolean;
@@ -71,6 +79,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   hintsUsed: 0,
   lastResult: null,
   lastResultId: 0,
+  lastFoundCompound: null,
   status: 'playing',
   streak: getStreak('zaemesetzli'),
   isArchive: false,
@@ -115,6 +124,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       score: 0,
       currentRank: 'stift',
       hintsUsed: 0,
+      lastFoundCompound: null,
       status: 'playing',
     });
     trackGameStarted('zaemesetzli', !!archiveDate);
@@ -131,7 +141,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
   setInput: (input) => set({ currentInput: input }),
 
-  clearLastResult: () => set({ lastResult: null }),
+  clearLastResult: () => set({ lastResult: null, lastFoundCompound: null }),
 
   submitWord: () => {
     const { currentInput, selectedEmojis, foundWords, score, puzzle } = get();
@@ -205,6 +215,12 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       selectedEmojis: [],
       lastResult: compound.is_mundart ? 'mundart' : 'valid',
       lastResultId: get().lastResultId + 1,
+      lastFoundCompound: {
+        components: compound.components,
+        word: compound.word,
+        points: compound.points,
+        is_mundart: compound.is_mundart,
+      },
       status: allFound ? 'complete' : 'playing',
       ...streakUpdate,
     });
