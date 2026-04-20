@@ -20,7 +20,7 @@ interface GameCompletedEvent {
 interface GameSharedEvent {
   event: 'game_shared';
   game: GameType;
-  method: 'share_api' | 'clipboard' | 'share_image' | 'download_image';
+  method: 'share_api' | 'clipboard' | 'share_image' | 'download_image' | 'share_story' | 'download_story';
 }
 
 interface StreakMilestoneEvent {
@@ -137,7 +137,7 @@ export function trackGameCompleted(
   });
 }
 
-export function trackGameShared(game: GameType, method: 'share_api' | 'clipboard' | 'share_image' | 'download_image'): void {
+export function trackGameShared(game: GameType, method: 'share_api' | 'clipboard' | 'share_image' | 'download_image' | 'share_story' | 'download_story'): void {
   emit({ event: 'game_shared', game, method });
 }
 

@@ -369,3 +369,279 @@ function hexAlpha(hex: string, alpha: number): string {
     .padStart(2, '0');
   return `${hex}${a}`;
 }
+
+// ============================================================
+// Instagram Story card — 1080×1920 (9:16 portrait)
+// ============================================================
+
+const STORY_W = 1080;
+const STORY_H = 1920;
+const STORY_PAD = 80;
+
+export async function generateStoryCard(data: ShareCardData): Promise<Blob> {
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = STORY_W * DPR;
+  canvas.height = STORY_H * DPR;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas 2D context unavailable');
+  ctx.scale(DPR, DPR);
+
+  storyDrawBackground(ctx, data.accentColor);
+  storyDrawContent(ctx, data);
+
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error('toBlob failed'))),
+      'image/png',
+    );
+  });
+}
+
+function storyDrawBackground(ctx: CanvasRenderingContext2D, accent: string) {
+  // Solid dark background
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+  // Subtle radial tint for depth — centered
+  const tint = ctx.createRadialGradient(
+    STORY_W / 2, STORY_H * 0.4, 0,
+    STORY_W / 2, STORY_H * 0.4, STORY_W,
+  );
+  tint.addColorStop(0, hexAlpha(accent, 0.06));
+  tint.addColorStop(1, 'transparent');
+  ctx.fillStyle = tint;
+  ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+  // Top accent stripe (cyan → pink gradient)
+  const stripe = ctx.createLinearGradient(0, 0, STORY_W, 0);
+  stripe.addColorStop(0, C.cyan);
+  stripe.addColorStop(1, C.pink);
+  ctx.fillStyle = stripe;
+  ctx.fillRect(0, 0, STORY_W, 6);
+
+  // Bottom accent stripe
+  ctx.fillStyle = stripe;
+  ctx.fillRect(0, STORY_H - 6, STORY_W, 6);
+}
+
+function storyDrawContent(ctx: CanvasRenderingContext2D, data: ShareCardData) {
+  const cx = STORY_W / 2;
+
+  // -- Top section: branding --
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  // "watson Spiele"
+  ctx.fillStyle = C.gray;
+  ctx.font = `600 28px ${FONT_H}`;
+  ctx.fillText('watson Spiele', cx, 120);
+
+  // Game name — large
+  ctx.fillStyle = C.white;
+  ctx.font = `bold 72px ${FONT_H}`;
+  ctx.fillText(data.gameName, cx, 210);
+
+  // Puzzle number
+  ctx.fillStyle = C.grayDark;
+  ctx.font = `600 30px ${FONT_H}`;
+  ctx.fillText(`#${data.puzzleId}`, cx, 260);
+
+  // -- Center section: result grid --
+  const gridCy = 720;
+  storyDrawGrid(ctx, data.grid, cx, gridCy);
+
+  // -- Performance heading --
+  const textY = 1080;
+  ctx.fillStyle = data.accentColor;
+  ctx.font = `bold 64px ${FONT_H}`;
+  ctx.fillText(data.heading, cx, textY);
+
+  // Subheading
+  ctx.fillStyle = C.gray;
+  ctx.font = `400 28px ${FONT_B}`;
+  wrapTextCentered(ctx, data.subheading, cx, textY + 52, STORY_W - STORY_PAD * 2, 38);
+
+  // Stats
+  ctx.fillStyle = C.white;
+  ctx.font = `600 30px ${FONT_B}`;
+  ctx.fillText(data.stats, cx, textY + 160);
+
+  // -- Bottom section: branding --
+  // Tagline
+  ctx.fillStyle = C.grayDark;
+  ctx.font = `italic 24px ${FONT_B}`;
+  ctx.fillText('Spiel, aber deep.', cx, STORY_H - 180);
+
+  // URL
+  ctx.fillStyle = C.cyan;
+  ctx.font = `600 26px ${FONT_B}`;
+  ctx.fillText(`games-watson.netlify.app/${data.gamePath}`, cx, STORY_H - 130);
+
+  ctx.textAlign = 'left';
+}
+
+function storyDrawGrid(
+  ctx: CanvasRenderingContext2D,
+  grid: ShareCardGrid,
+  cx: number,
+  cy: number,
+) {
+  if (grid.type === 'verbindige') {
+    storyDrawVerbindigeGrid(ctx, grid, cx, cy);
+  } else if (grid.type === 'schlagziil') {
+    storyDrawSchlagziilGrid(ctx, grid, cx, cy);
+  } else {
+    storyDrawZaemesetzliGrid(ctx, grid, cx, cy);
+  }
+}
+
+function storyDrawVerbindigeGrid(
+  ctx: CanvasRenderingContext2D,
+  grid: { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4 }[] },
+  cx: number,
+  cy: number,
+) {
+  const size = 100;
+  const gap = 16;
+  const cols = 4;
+  const rows = grid.rows.length;
+  const totalW = cols * size + (cols - 1) * gap;
+  const totalH = rows * size + (rows - 1) * gap;
+  const x0 = cx - totalW / 2;
+  const y0 = cy - totalH / 2;
+
+  for (let ri = 0; ri < rows; ri++) {
+    const color = C.diff[grid.rows[ri].difficulty] ?? C.cyan;
+    for (let ci = 0; ci < cols; ci++) {
+      ctx.fillStyle = color;
+      roundRect(ctx, x0 + ci * (size + gap), y0 + ri * (size + gap), size, size, 12);
+    }
+  }
+}
+
+function storyDrawSchlagziilGrid(
+  ctx: CanvasRenderingContext2D,
+  grid: { type: 'schlagziil'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] },
+  cx: number,
+  cy: number,
+) {
+  const size = 100;
+  const gap = 18;
+  const count = grid.results.length;
+  const totalW = count * size + (count - 1) * gap;
+  const x0 = cx - totalW / 2;
+  const y0 = cy - size / 2 - 30;
+
+  grid.results.forEach((result, i) => {
+    const x = x0 + i * (size + gap);
+
+    ctx.fillStyle = result === 'correct' ? C.green : C.pink;
+    roundRect(ctx, x, y0, size, size, 12);
+
+    ctx.fillStyle = C.white;
+    ctx.font = 'bold 40px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(result === 'correct' ? '\u2713' : '\u2717', x + size / 2, y0 + size / 2);
+
+    if (grid.hints[i]) {
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.arc(x + size / 2, y0 + size + 20, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  // Score label
+  const correctCount = grid.results.filter((r) => r === 'correct').length;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = C.white;
+  ctx.font = `bold 48px ${FONT_H}`;
+  ctx.fillText(`${correctCount}/${count}`, cx, y0 + size + 80);
+  ctx.fillStyle = C.gray;
+  ctx.font = `400 24px ${FONT_B}`;
+  ctx.fillText('richtig', cx, y0 + size + 112);
+}
+
+function storyDrawZaemesetzliGrid(
+  ctx: CanvasRenderingContext2D,
+  grid: {
+    type: 'zaemesetzli';
+    found: number;
+    total: number;
+    rank: string;
+    score: number;
+    maxScore: number;
+  },
+  cx: number,
+  cy: number,
+) {
+  const barW = 600;
+  const barH = 36;
+  const x0 = cx - barW / 2;
+  const y0 = cy - 100;
+
+  // Background bar
+  ctx.fillStyle = '#333333';
+  roundRect(ctx, x0, y0, barW, barH, barH / 2);
+
+  // Filled bar
+  const ratio = grid.maxScore > 0 ? grid.score / grid.maxScore : 0;
+  const fillW = Math.max(barH, ratio * barW);
+  const grad = ctx.createLinearGradient(x0, 0, x0 + barW, 0);
+  grad.addColorStop(0, C.cyan);
+  grad.addColorStop(1, C.green);
+  ctx.fillStyle = grad;
+  roundRect(ctx, x0, y0, fillW, barH, barH / 2);
+
+  // Found count
+  ctx.textAlign = 'center';
+  ctx.fillStyle = C.white;
+  ctx.font = `bold 56px ${FONT_H}`;
+  ctx.fillText(`${grid.found}/${grid.total}`, cx, y0 + barH + 72);
+
+  // "Wörter" label
+  ctx.fillStyle = C.gray;
+  ctx.font = `400 24px ${FONT_B}`;
+  ctx.fillText('Wörter gefunden', cx, y0 + barH + 106);
+
+  // Score
+  ctx.fillStyle = C.white;
+  ctx.font = `600 30px ${FONT_B}`;
+  ctx.fillText(`${grid.score} Punkte`, cx, y0 + barH + 155);
+
+  // Rank badge
+  ctx.fillStyle = C.cyan;
+  ctx.font = `bold 44px ${FONT_H}`;
+  ctx.fillText(grid.rank, cx, y0 + barH + 210);
+}
+
+function wrapTextCentered(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  cx: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+) {
+  const words = text.split(' ');
+  let line = '';
+  let currentY = y;
+
+  for (const word of words) {
+    const testLine = line ? `${line} ${word}` : word;
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      ctx.fillText(line, cx, currentY);
+      line = word;
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, cx, currentY);
+}

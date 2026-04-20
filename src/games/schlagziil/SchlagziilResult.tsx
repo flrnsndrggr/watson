@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ShareImageButton } from '@/components/shared/ShareImageButton';
+import { StoryShareButton } from '@/components/shared/StoryShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
@@ -309,6 +310,7 @@ export function SchlagziilResult() {
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">
         <ShareButton text={shareText} label="Ergebnis teilen" game="schlagziil" />
         <ShareImageButton cardData={cardData} game="schlagziil" />
+        <StoryShareButton cardData={cardData} game="schlagziil" />
       </div>
 
       {/* Puzzle date */}
