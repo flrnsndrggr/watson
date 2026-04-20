@@ -15,18 +15,18 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 ## Priority: Medium (User Engagement)
 
 - [x] User accounts: Supabase Auth with email magic link — basic sign-up/sign-in flow — done 2026-04-19
-- [ ] Streak tracking: calculate and display current streak per game (consecutive days played)
-- [ ] Streak prompt: show "Willst du deinen Streak behalten? Konto erstellen." after Day 3
-- [ ] Profile page: `/profil` route showing streaks, stats, games played per game
-- [ ] Archive mode: `/archiv` route with calendar view of past puzzles (no streak credit)
-- [ ] Leaderboard: basic daily leaderboard per game (score-based for Zämesetzli, speed for Verbindige/Schlagziil)
+- [x] Streak tracking: calculate and display current streak per game (consecutive days played) — done 2026-04-20
+- [x] Streak prompt: show "Willst du deinen Streak behalten? Konto erstellen." after Day 3 — done 2026-04-20
+- [x] Profile page: `/profil` route showing streaks, stats, games played per game — done 2026-04-20
+- [x] Archive mode: `/archiv` route with calendar view of past puzzles (no streak credit) — done 2026-04-20
+- [x] Leaderboard: basic daily leaderboard per game (score-based for Zämesetzli, speed for Verbindige/Schlagziil) — done 2026-04-20
 
 ## Priority: Lower (Monetization & Integration)
 
-- [ ] Sponsor bar: "Presented by [Brand]" banner above game area (728x90 leaderboard slot)
+- [x] Sponsor bar: "Presented by [Brand]" banner above game area (728x90 leaderboard slot) — done 2026-04-20
 - [ ] Post-game ad slot: MREC 300x250 ad unit in results screen
 - [ ] Pre-game interstitial: 5-second ad shown once per session on mobile
-- [ ] Analytics events: implement core tracking (game_started, game_completed, game_shared, streak_milestone)
+- [x] Analytics events: implement core tracking (game_started, game_completed, game_shared, streak_milestone) — done 2026-04-20
 - [ ] Analytics: game-specific events (verbindige_guess, schlagziil_headline_solved)
 - [ ] Push notification opt-in: daily reminder prompt with configurable time
 - [ ] Instagram story share: generate 1080x1920 canvas image with watson branding + result grid
