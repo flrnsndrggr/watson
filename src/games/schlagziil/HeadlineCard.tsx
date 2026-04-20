@@ -79,7 +79,7 @@ export function HeadlineCard({
         <span className="inline-block rounded bg-[var(--color-nav-bg)] px-2 py-0.5 text-xs font-bold text-white">
           🕐 {articleYear}
         </span>
-        <span className="inline-block rounded bg-[var(--color-gray-bg)] px-2 py-0.5 text-xs font-semibold text-[var(--color-gray-text)]">
+        <span className="inline-block rounded bg-[var(--color-green)] px-2 py-0.5 text-xs font-semibold text-white">
           {category}
         </span>
         {isCorrect === true && (

@@ -18,23 +18,23 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 ## Verbindige
 
 - [x] Tile selection: add scale(1.03) + cyan border on tap, 150ms ease (2026-04-20)
-- [ ] Correct group solve: tiles slide up into solved row with color reveal, 400ms ease-out
-- [ ] Wrong guess: translateX shake keyframe animation, 400ms
-- [ ] "One away" toast: show "Fast! Nur 1 falsch." when exactly 3 of 4 items are correct
-- [ ] Game complete: confetti burst using canvas-confetti library
-- [ ] Solved groups: show category label with difficulty color background
-- [ ] Tile grid: ensure 44x44px minimum touch targets on mobile (WCAG AA)
-- [ ] Deselect all: add "Auswahl löschen" button that clears all selected tiles
+- [x] Correct group solve: tiles slide up into solved row with color reveal, 400ms ease-out (2026-04-20)
+- [x] Wrong guess: translateX shake keyframe animation, 400ms (2026-04-20)
+- [x] "One away" toast: show "Fast! Nur 1 falsch." when exactly 3 of 4 items are correct (2026-04-20)
+- [x] Game complete: confetti burst using canvas-confetti library (2026-04-20)
+- [x] Solved groups: show category label with difficulty color background (2026-04-20)
+- [x] Tile grid: ensure 44x44px minimum touch targets on mobile (WCAG AA) (2026-04-20)
+- [x] Deselect all: add "Auswahl löschen" button that clears all selected tiles (2026-04-20)
 
 ## Schlagziil
 
-- [ ] Headline card: category label (Schweiz, Sport, etc.) styled with watson green
-- [ ] Correct answer: green flash on headline card, auto-advance after 2s
-- [ ] Wrong answer: red flash, error counter increments visually
-- [ ] Article link: "watson-Artikel lesen" button appears after solving each headline
-- [ ] Results screen: show all 5 headlines with correct answers + article links
-- [ ] Input: auto-focus on the text input when headline appears
-- [ ] Input: submit on Enter key press
+- [x] Headline card: category label (Schweiz, Sport, etc.) styled with watson green (2026-04-20)
+- [x] Correct answer: green flash on headline card, auto-advance after 2s (2026-04-20)
+- [x] Wrong answer: red flash, error counter increments visually (2026-04-20)
+- [x] Article link: "watson-Artikel lesen" button appears after solving each headline (2026-04-20)
+- [x] Results screen: show all 5 headlines with correct answers + article links (2026-04-20)
+- [x] Input: auto-focus on the text input when headline appears (2026-04-20)
+- [x] Input: submit on Enter key press (2026-04-20)
 
 ## Zämesetzli
 
