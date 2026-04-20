@@ -43,7 +43,7 @@ _Items from watson-qa-verbindige agent_
    - Files: `src/games/verbindige/VerbindigeBoard.tsx`, `src/games/verbindige/VerbindigePage.tsx`, `src/games/verbindige/useVerbindige.ts`
    - Evidence: Guess 1 Tschumpel/Tubel/Güxi/Löli → 3/4 Dummkopf. Guess 2 Töffli/Velo/Trottinett/Tscholi → 3/4 Fortbewegung. Guess 3 same+Sürmel → 3/4 Fortbewegung. No toast visible in any post-guess screenshot. Observed 2026-04-16.
 
-3. [ ] P2 - Puzzle identifier inconsistent: header shows #001, result shows #2026-04-16
+3. [x] P2 - Puzzle identifier inconsistent: header shows #001, result shows #2026-04-16
    - Agent: watson-qa-verbindige
    - Scenario: Full Game Flow — result screen after winning
    - Problem: Game header displays "Verbindige #001" (hardcoded `puzzleNumber={1}` in `VerbindigePage.tsx:46`). Result footer displays "Verbindige #2026-04-16" (using `puzzle.date` in `VerbindigeResult.tsx:38`). A user comparing their shared result to the header would see two different identifiers.
@@ -70,7 +70,7 @@ _Items from watson-qa-verbindige agent_
    - Related: #3 — same puzzle identifier inconsistency; this item extends the fix to the share text surface
    - Related: Schlagziil #4 — share text also appends wrong base URL (watson.ch instead of production domain)
 
-6. [ ] P2 - Share error propagates uncaught — silent failure when clipboard is denied
+6. [x] P2 - Share error propagates uncaught — silent failure when clipboard is denied
    - Agent: watson-qa-verbindige
    - Scenario: Share Flow — Teilen click when clipboard permission denied or document unfocused
    - Problem: `share.ts:32` calls `navigator.clipboard.writeText(text)` with no try/catch. If it throws (e.g. `NotAllowedError: Document is not focused`, or clipboard permission denied), the rejection propagates to `ShareButton.handleShare()` which also has no catch. `setCopied(true)` (line 14) is never reached — the button label stays "Teilen" forever and no error toast appears. The user has zero indication that the share failed. Note: under normal usage the clipboard succeeds, but on permission-denied or after a cancelled `navigator.share` dialog, this path is reachable.
@@ -143,7 +143,7 @@ _Items from watson-qa-buchstaebli agent_
    - Files: `src/pages/Layout.tsx` (or whichever component renders the persistent nav)
    - Evidence: Production nav links: Spiele, Verbindige, Zämesetzli, Schlagziil — Buchstäbli absent. Observed 2026-04-18.
 
-8. [ ] P2 - Heading renders "Buchstäbli#001" without a space before the puzzle number
+8. [x] P2 - Heading renders "Buchstäbli#001" without a space before the puzzle number
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — visual inspection of the game header
    - Problem: The `<h1>` text reads "Buchstäbli#001" with no whitespace between game name and puzzle number badge. The missing space makes the heading look like a concatenation bug and reduces readability at a glance.
@@ -176,7 +176,7 @@ _Items from watson-qa-schlagziil agent_
    - Evidence: Submitted two wrong guesses — input cleared each time with no card colour change, no toast, only error dots updated. Confirmed via Zustand state: `totalErrors: 2, results: [null,null,null,null,null], lastGuessResult: 'wrong'`. Observed 2026-04-16.
    - Related: #1 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
 
-3. [ ] P2 - Share CTA text differs from brand spec ("Kennst du watson?" vs "Ich lese watson, und du?")
+3. [x] P2 - Share CTA text differs from brand spec ("Kennst du watson?" vs "Ich lese watson, und du?")
    - Agent: watson-qa-schlagziil
    - Scenario: Results Screen — share button
    - Problem: `SchlagziilResult.tsx` passes `"Kennst du watson?"` as the CTA line in the share text. The expected brand CTA is "Ich lese watson, und du?".

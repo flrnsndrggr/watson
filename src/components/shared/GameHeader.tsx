@@ -12,7 +12,7 @@ export function GameHeader({ title, puzzleId, subtitle, onInfoClick }: GameHeade
         {title}
         {puzzleId && (
           <span className="ml-2 text-[var(--color-gray-text)] text-base font-normal">
-            #{puzzleId}
+            {' '}#{puzzleId}
           </span>
         )}
       </h1>
