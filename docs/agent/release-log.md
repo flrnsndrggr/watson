@@ -1,5 +1,36 @@
 # Release Log
 
+## Release — 2026-04-20 21:00
+
+- Commits: 17c2af7..49f6fe5 (39 commits)
+- Netlify deploy: skipped (MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP not available)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
+
+### Notable commits
+- 49f6fe5 feat: add duplicate guess prevention and toast feedback to Verbindige
+- 77b21d5 fix: add ARIA labels to interactive game elements across all games
+- 72ed260 fix: add keyboard navigation to Verbindige and Zämesetzli
+- a00c0ee feat: add sponsor bar above game area and create missing StreakBadge component
+- 60a06ac polish: add custom 404 page with link back to landing
+- 36403f6 feat: transform landing page into personalized daily dashboard
+- 457785e feat: daily leaderboard per game with score submission and top-10 display
+- 691fd16 feat: add Buchstäbli game completion flow with results screen, streak tracking, and archive support
+- adac8e5 feat: archive mode with calendar view of past puzzles
+- d72136e feat: profile page with streak stats per game
+
+---
+
+## Last Verified
+- Commit: 49f6fe5
+- Date: 2026-04-20
+
+---
+
 ## Release — 2026-04-20 15:30
 
 - Commits: 70cfbcf..17c2af7 (10 commits)
@@ -20,7 +51,7 @@
 
 ---
 
-## Last Verified
+## Previous Last Verified
 - Commit: 17c2af7
 - Date: 2026-04-20
 
