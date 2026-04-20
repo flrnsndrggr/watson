@@ -4,6 +4,7 @@ import { ShareImageButton } from '@/components/shared/ShareImageButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
+import { NotificationPrompt } from '@/components/shared/NotificationPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
@@ -297,6 +298,9 @@ export function SchlagziilResult() {
 
       {/* Streak account prompt */}
       <StreakPrompt streak={streak} />
+
+      {/* Notification opt-in */}
+      <NotificationPrompt />
 
       {/* Leaderboard */}
       <LeaderboardPanel gameType="schlagziil" puzzleDate={puzzle.date} showTime />

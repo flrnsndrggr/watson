@@ -61,6 +61,11 @@ interface ZaemesetzliHintUsedEvent {
   hints_used: number;
 }
 
+interface NotificationOptInEvent {
+  event: 'notification_opt_in';
+  source: 'game_result' | 'profile';
+}
+
 type AnalyticsEvent =
   | GameStartedEvent
   | GameCompletedEvent
@@ -69,7 +74,8 @@ type AnalyticsEvent =
   | VerbindigeGuessEvent
   | SchlagziilHeadlineGuessEvent
   | ZaemesetzliWordFoundEvent
-  | ZaemesetzliHintUsedEvent;
+  | ZaemesetzliHintUsedEvent
+  | NotificationOptInEvent;
 
 // ---- Listener registry ----
 
@@ -185,4 +191,10 @@ export function trackZaemesetzliWordFound(
 
 export function trackZaemesetzliHintUsed(hintsUsed: number): void {
   emit({ event: 'zaemesetzli_hint_used', hints_used: hintsUsed });
+}
+
+// ---- Notification opt-in ----
+
+export function trackNotificationOptIn(source: 'game_result' | 'profile'): void {
+  emit({ event: 'notification_opt_in', source });
 }
