@@ -84,16 +84,18 @@ _Items from watson-qa-verbindige agent_
    - Scenario: Mobile UX — viewport constrained to 390px width
    - Problem: At 390px viewport width, the header allocates ~165px to the watson logo+badge and ~54px to the Login button, leaving only ~171px for the `<nav>` element. The 4 nav links (Spiele, Verbindige, Zämesetzli, Schlagziil) need ~335px total, so `scrollWidth` (347px) exceeds `clientWidth` (165px). `overflow-x-auto` on the nav handles the overflow silently — no gradient fade, clipping hint, or arrow signals that more items exist. A user landing on Verbindige via a shared link sees only "Spiele" and "Verbindige"; "Zämesetzli" and "Schlagziil" are invisible without scrolling.
    - Suggested fix: Add a right-side gradient fade overlay on the nav when overflowing (CSS `::after` with `background: linear-gradient(to right, transparent, var(--color-nav-bg))`). Alternatively switch to a hamburger/drawer menu at the `sm` breakpoint (≤640px).
-   - Files: `src/pages/Layout.tsx:88` (`<nav className="flex gap-1 overflow-x-auto">`)
+   - Files: `src/pages/Layout.tsx:95` (`<nav className="flex gap-1 overflow-x-auto">`)
    - Evidence: JS at 390px max-width confirmed `nav.scrollWidth=347, nav.clientWidth=165, isOverflowing=true`. Screenshot showed only "Spiele" + "Verbindige" + "Login" visible in nav bar with no visual hint of additional items. Observed 2026-04-20.
+   - Related: #8 — both affect `Layout.tsx` nav on mobile; consider fixing together
 
 8. [ ] P2 - Action buttons and nav links below 44px touch target minimum
    - Agent: watson-qa-verbindige
    - Scenario: Mobile UX — measuring interactive element heights at 390px viewport
    - Problem: "Prüfen" and "Löschen" render at 38px tall (`py-2` = 8px padding each side + `text-sm` 20px line height). Nav links render at 32px tall (`py-1.5` = 6px each side). WCAG 2.5.5 recommends 44×44px minimum touch targets. Action buttons fall short by 6px, nav links by 12px. On a phone, tapping "Prüfen" right after tile selection is error-prone given the button's narrow vertical hit area.
    - Suggested fix: Change action buttons from `py-2` to `py-3` (raises height to 44px). Change nav links from `py-1.5` to `py-2.5` (raises height to 44px). The header's `h-[56px]` has room for 44px nav links. Alternatively add `min-h-[44px]` to both.
-   - Files: `src/games/verbindige/VerbindigePage.tsx:92,99` (action buttons `py-2`), `src/pages/Layout.tsx:93` (nav links `py-1.5`)
-   - Evidence: JS measurement: Prüfen=82×38px, Löschen=87×38px, nav links ~85×32px. Confirmed via source: VerbindigePage.tsx:92,99 uses `py-2`; Layout.tsx:93 uses `py-1.5`. Observed 2026-04-20.
+   - Files: `src/games/verbindige/VerbindigePage.tsx:92,99` (action buttons `py-2`), `src/pages/Layout.tsx:100` (nav links `py-1.5`)
+   - Evidence: JS measurement: Prüfen=82×38px, Löschen=87×38px, nav links ~85×32px. Confirmed via source: VerbindigePage.tsx:92,99 uses `py-2`; Layout.tsx:100 uses `py-1.5`. Observed 2026-04-20.
+   - Related: #7 — both affect `Layout.tsx` nav on mobile; consider fixing together
 
 ---
 
@@ -166,6 +168,7 @@ _Items from watson-qa-schlagziil agent_
    - Suggested fix: Remove `autoFocus` from the input. On desktop it can be re-added via a `useEffect` with `inputRef.focus()` guarded by `window.innerWidth > 768` or a media-query check.
    - Files: `src/games/schlagziil/HeadlineCard.tsx` (line 122)
    - Evidence: `autoFocus` attribute confirmed in source. Standard browser behaviour on iOS/Android: `autoFocus` on an `<input>` opens the soft keyboard on mount. Observed 2026-04-18.
+   - Priority adjusted from P2 to P1: on mobile (primary platform), the keyboard covering the headline before the player reads it actively hurts gameplay — this is confusing UX blocking real gameplay, not minor polish
 
 8. [ ] P2 - Year line in results/share uses puzzle order, not chronological order
    - Agent: watson-qa-schlagziil
@@ -328,46 +331,52 @@ _Weekly architecture review findings from watson-architect_
 
 _Items from watson-qa-buchstaebli agent_
 
-1. [ ] P1 - No toast for "not in word list" — silent rejection on invalid words
+1. [!] P1 - No toast for "not in word list" — silent rejection on invalid words
    - Agent: watson-qa-buchstaebli
    - Scenario: Validation Responses — submitting valid German words not in puzzle list
    - Problem: When a word passes all pre-checks (4+ letters, contains center letter A, uses available letters) but is not in the puzzle's valid word list, the input clears silently with no feedback toast. LASTERN, LASTEN, and RASTEN were all rejected this way. Players have no indication whether their word was wrong, misspelled, or simply not in this puzzle's set.
    - Suggested fix: Show a "Kein gültiges Wort" toast (mirroring the center-letter toast that already fires) when submission fails the word-list validation step.
    - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler), `src/components/shared/Toast.tsx`
    - Evidence: LASTERN (all 7 letters, pangram attempt), LASTEN (6 letters), RASTEN (6 letters) all silently rejected — input cleared, score unchanged, MutationObserver captured zero toast DOM insertions. Center-letter toast ("Der Buchstabe A muss dabei sein") fires correctly via same observer confirming toast infrastructure works. Observed 2026-04-19.
+   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** No `src/games/buchstaebli/` directory, no `/buchstaebli` route in `App.tsx`, no Buchstäbli references in source. All 5 Buchstäbli findings (#1–#5) reference non-existent files. Needs human review: is this a planned game, or were these findings generated against a different deployment?
+   - Related: #2, #3 — all three validation-toast gaps would be fixed in one pass if/when the game exists
 
-2. [ ] P1 - No "already found" toast on duplicate word submission
+2. [!] P1 - No "already found" toast on duplicate word submission
    - Agent: watson-qa-buchstaebli
    - Scenario: Validation Responses — re-submitting an already-found word (RATEN twice)
    - Problem: After RATEN was accepted (score 22→17 Pkt), submitting RATEN again produced no "Schon gefunden!" toast, did not clear the input (word stayed visible), and silently blocked the re-add. Player has zero feedback about why Enter had no effect.
    - Suggested fix: Show "Schon gefunden! ✓" toast and clear the input when a duplicate is detected.
    - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler)
    - Evidence: Second RATEN: found count stayed at 1, score stayed "noch 17 Pkt bis Lehrling", MutationObserver captured no DOM insertions, input ref still showed "RATEN". Observed 2026-04-19.
+   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** See #1 triage note.
 
-3. [ ] P2 - No "too short" toast for sub-4-letter submissions
+3. [!] P2 - No "too short" toast for sub-4-letter submissions
    - Agent: watson-qa-buchstaebli
    - Scenario: Validation Responses — submitting TAN (3 letters, contains center letter A)
    - Problem: Submitting TAN (T, A, N) causes the input to clear silently with no "Zu kurz!" toast. The center-letter check fires a toast but the minimum-length check does not. A player who types a short word gets no feedback about the 4-letter minimum.
    - Suggested fix: Show "Zu kurz! (mind. 4 Buchstaben)" toast for words under 4 letters, consistent with the center-letter toast pattern.
    - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler)
    - Evidence: TAN submitted, MutationObserver empty, input cleared to placeholder. Observed 2026-04-19.
+   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** See #1 triage note.
    - Related: #1 — all three validation-toast gaps can be fixed in one pass through the submit handler
 
-4. [ ] P2 - Center letter button missing aria-label indicating it is required
+4. [!] P2 - Center letter button missing aria-label indicating it is required
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — reviewing ARIA labels on hex grid
    - Problem: All 7 hex letter buttons have no `aria-label`. The center letter A is visually distinct (cyan background) but has no accessible label indicating it must appear in every word. Screen reader users hear only "A" with no hint it is mandatory.
    - Suggested fix: Add `aria-label="A – Pflichtbuchstabe"` to the center button and `aria-label="R"` etc. to outer buttons. Add `role="group" aria-label="Buchstaben"` to the hex container.
    - Files: `src/games/buchstaebli/BuchstaebliGrid.tsx` (or equivalent hex letter component)
    - Evidence: All 7 buttons returned `null` for `getAttribute('aria-label')`. Computed bg confirmed A is `rgb(0,198,255)` (cyan), others `rgb(236,236,236)`. Observed 2026-04-19.
+   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** See #1 triage note.
 
-5. [ ] P2 - Buchstäbli is an orphaned route — live but not linked from navigation
+5. [!] P2 - Buchstäbli is an orphaned route — live but not linked from navigation
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — navigating to game from landing page
    - Problem: The main nav shows only Verbindige, Zämesetzli, Schlagziil. The game is fully playable at `/buchstaebli` but a user starting at the homepage cannot discover it. The game appears to have been removed from the nav while the route and game logic remain deployed, leaving it in a half-removed state.
    - Suggested fix: Either restore the nav link (if the game is meant to stay live) or remove the route from the production deploy to avoid confusion.
-   - Files: Nav component, React router config
+   - Files: `src/pages/Layout.tsx` (nav links), `src/App.tsx` (router config)
    - Evidence: Nav links on production: [Spiele, Verbindige, Zämesetzli, Schlagziil]. Direct navigation to `/buchstaebli` loads a fully functional game. Observed 2026-04-19.
+   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** No `/buchstaebli` route in `App.tsx`. No `src/games/buchstaebli/` directory. If the game was live on production, it may have been deployed from a different branch or removed since. See #1 triage note.
 
 ---
 
