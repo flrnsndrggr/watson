@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface CelebrationData {
   components: string[];
   word: string;
@@ -8,11 +10,32 @@ interface CelebrationData {
 interface CombineSlotsProps {
   selectedEmojis: string[];
   onClear: () => void;
+  onDrop?: (emoji: string) => void;
   celebration: CelebrationData | null;
 }
 
-export function CombineSlots({ selectedEmojis, onClear, celebration }: CombineSlotsProps) {
+export function CombineSlots({ selectedEmojis, onClear, onDrop, celebration }: CombineSlotsProps) {
+  const [dragOver, setDragOver] = useState(false);
   const slots = [0, 1, 2];
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    setDragOver(true);
+  }
+
+  function handleDragLeave() {
+    setDragOver(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const emoji = e.dataTransfer.getData('text/plain');
+    if (emoji && onDrop) {
+      onDrop(emoji);
+    }
+  }
 
   // During celebration, show the found compound with animations
   if (celebration) {
@@ -53,7 +76,16 @@ export function CombineSlots({ selectedEmojis, onClear, celebration }: CombineSl
 
   // Default: empty/filling slots
   return (
-    <div className="flex items-center justify-center gap-2 py-3">
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={`flex items-center justify-center gap-2 rounded-lg py-3 transition-all duration-150 ${
+        dragOver
+          ? 'bg-[var(--color-cyan)]/10 ring-2 ring-dashed ring-[var(--color-cyan)]'
+          : ''
+      }`}
+    >
       <span className="text-sm text-[var(--color-gray-text)]">Kombiniere:</span>
       {slots.map((i) => (
         <div key={i} className="flex items-center gap-1">

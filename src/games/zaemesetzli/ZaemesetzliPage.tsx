@@ -209,6 +209,7 @@ export function ZaemesetzliPage() {
           <CombineSlots
             selectedEmojis={selectedEmojis}
             onClear={clearEmojiSelection}
+            onDrop={selectEmoji}
             celebration={lastFoundCompound}
           />
 

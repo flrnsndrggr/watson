@@ -10,8 +10,21 @@ interface EmojiPoolProps {
 function EmojiButton({ item, isSelected, onSelect }: { item: EmojiItem; isSelected: boolean; onSelect: () => void }) {
   const [showNoun, setShowNoun] = useState(false);
 
+  function handleDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('text/plain', item.emoji);
+    e.dataTransfer.effectAllowed = 'copy';
+    (e.currentTarget as HTMLElement).style.opacity = '0.5';
+  }
+
+  function handleDragEnd(e: React.DragEvent) {
+    (e.currentTarget as HTMLElement).style.opacity = '';
+  }
+
   return (
     <button
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onClick={onSelect}
       onMouseEnter={() => setShowNoun(true)}
       onMouseLeave={() => setShowNoun(false)}
@@ -21,7 +34,7 @@ function EmojiButton({ item, isSelected, onSelect }: { item: EmojiItem; isSelect
       }}
       className={`
         relative flex h-14 w-14 items-center justify-center rounded-lg text-2xl
-        transition-all duration-[var(--transition-fast)] select-none
+        transition-all duration-[var(--transition-fast)] select-none cursor-grab active:cursor-grabbing
         ${isSelected
           ? 'scale-110 bg-[var(--color-cyan)] shadow-md ring-2 ring-[var(--color-cyan)]'
           : 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80'

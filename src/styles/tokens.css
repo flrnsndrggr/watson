@@ -170,6 +170,13 @@
   to { transform: translateX(0); opacity: 1; }
 }
 
+/* Zämesetzli: emoji dropped into slot */
+@keyframes slotDrop {
+  0% { transform: scale(1.2); opacity: 0.6; }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* Zämesetzli: emoji slot fills when selected */
 @keyframes slotFill {
   0% { transform: scale(0.7); opacity: 0.3; }
