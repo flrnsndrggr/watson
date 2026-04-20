@@ -225,7 +225,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (line 33: `is_mundart: false`)
    - Evidence: `{ word: 'Bergsonntag', components: ['⛰️','☀️'], difficulty: 3, points: 3, is_mundart: false }` in data file. ☀️ alt_nouns only contains `'Licht'`, not `'Sonntag'`. Observed 2026-04-18.
 
-9. [x] P1 - max_score: 28 is incorrect — actual compound point sum is 29
+9. [x] P1 - max_score: 28 is incorrect — actual compound point sum is 29 _(fixed in e862f18)_
    - Agent: watson-qa-zaemesetzli
    - Scenario: Scoring & Ranks — summing all compound points
    - Problem: `zaemesetzli.data.ts` sets `max_score: 28`, but summing all 16 compound `points` values gives 29 (7×1pt + 5×2pt + 4×3pt = 7+10+12 = 29). `RankBar.tsx:21` uses `maxScore` to compute the bar fill percentage and at Bundesrat (nextRank=null) renders `${score}/${maxScore} Pkt`. A player who finds all 16 compounds scores 29pt and sees "29/28 Pkt" — an impossible-looking score. The progress bar caps correctly at 100% due to `Math.min(100, …)`, but the label is misleading.
