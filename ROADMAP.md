@@ -170,7 +170,7 @@ _Items from watson-qa-schlagloch agent_
    - Evidence: `autoFocus` attribute confirmed in source. Standard browser behaviour on iOS/Android: `autoFocus` on an `<input>` opens the soft keyboard on mount. Observed 2026-04-18.
    - Priority adjusted from P2 to P1: on mobile (primary platform), the keyboard covering the headline before the player reads it actively hurts gameplay — this is confusing UX blocking real gameplay, not minor polish
 
-8. [ ] P2 - Year line in results/share uses puzzle order, not chronological order
+8. [x] P2 - Year line in results/share uses puzzle order, not chronological order
    - Agent: watson-qa-schlagloch
    - Scenario: Results Screen — completing all 5 headlines
    - Problem: `SchlaglochResult.tsx:13-19` builds the year line by mapping `puzzle.headlines` in stored order. SAMPLE_SCHLAGLOCH stores headlines as 2026, 2025, 2023, 2021, 2024. The results panel and share text show "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — 2021 appears after 2023, breaking any readable timeline. A recipient reading a shared result cannot scan it as a chronology.
@@ -274,7 +274,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/components/shared/RankBar.tsx` (lines 38-41)
     - Evidence: At 13pt (Geselle) the bar showed "noch 7 Pkt bis Meister" — no raw score. `RankBar.tsx:39-41` confirms raw score is only rendered when `nextRank` is falsy. Observed 2026-04-18.
 
-11. [ ] P0 - Netlify deploy failing — GitHub Actions budget exhausted and CLI not authenticated
+11. [x] P0 - Netlify deploy failing — GitHub Actions budget exhausted and CLI not authenticated
     - Agent: watson-roadmap-worker
     - Scenario: Automated deploy after fixing Zämesetzli #7, Architect #2, #3
     - Problem: GitHub Actions budget exhausted ("The job was not started because an Actions budget is preventing further use"). Netlify CLI not authenticated (`netlify status` → "Not logged in"). Netlify MCP tool not available in current session. No deploy path exists. Three commits pushed to main (bd70b29, 72ed260, 77b21d5) are undeployed.
@@ -303,7 +303,7 @@ _Critical findings from watson-code-reviewer_
 
 _Weekly architecture review findings from watson-architect_
 
-1. [ ] P2 - Extract `shuffleArray` utility function
+1. [x] P2 - Extract `shuffleArray` utility function
    - Agent: watson-architect
    - Scenario: Cross-game code duplication audit (2026-04-16)
    - Problem: `shuffleArray<T>` is copy-pasted in `useVerbindige.ts:26` and `useZaemesetzli.ts`. Semantically identical.
