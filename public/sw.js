@@ -9,8 +9,11 @@
 //   Google Fonts / static     → cache-first (long-lived)
 // -------------------------------------------------------
 
-const CACHE_VERSION = 'watson-v1';
-const API_CACHE = 'watson-api-v1';
+// Bump both versions on every deploy that changes behaviour — the activate
+// handler nukes any cache whose name doesn't match and returning players
+// immediately pull the fresh shell. v2 = Schlagziil -> Schlagloch rename.
+const CACHE_VERSION = 'watson-v2-schlagloch';
+const API_CACHE = 'watson-api-v2-schlagloch';
 
 // Minimal app-shell URLs cached on install.
 // Vite hashed assets are cached at runtime via fetch handler.
