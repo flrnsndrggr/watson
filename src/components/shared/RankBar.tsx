@@ -37,7 +37,7 @@ export function RankBar({ currentRank, score, maxScore, thresholds }: RankBarPro
         <span className="font-semibold">{RANK_LABELS[currentRank]}</span>
         <span className="text-[var(--color-gray-text)]">
           {nextRank && pointsToNext > 0
-            ? `noch ${pointsToNext} Pkt bis ${RANK_LABELS[nextRank]}`
+            ? `${score} Pkt · noch ${pointsToNext} bis ${RANK_LABELS[nextRank]}`
             : `${score}/${maxScore} Pkt`}
         </span>
       </div>

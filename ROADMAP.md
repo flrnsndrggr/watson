@@ -266,7 +266,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Files: `src/games/zaemesetzli/zaemesetzli.data.ts` (line 36: `max_score: 28`)
    - Evidence: Compound points: 1+1+1+1+2+1+2+1+2+2+3+2+1+3+3+3 = 29. Data shows `max_score: 28`. `RankBar.tsx:40-41` renders `${score}/${maxScore} Pkt` when Bundesrat is reached. Observed 2026-04-18.
 
-10. [ ] P2 - Current numeric score hidden during play; only relative "noch X Pkt" shown
+10. [x] P2 - Current numeric score hidden during play; only relative "noch X Pkt" shown
     - Agent: watson-qa-zaemesetzli
     - Scenario: Scoring & Ranks — tracking progress during active play
     - Problem: While playing, the RankBar right-side text always reads "noch X Pkt bis Y" (e.g. "noch 7 Pkt bis Meister"), never showing the actual score (e.g. "13 Pkt"). The raw score only becomes visible once Bundesrat is reached (when `nextRank` is null). Players cannot easily tell where they are on the full scale without mentally summing individual compound scores from the found list.
