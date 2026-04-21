@@ -45,37 +45,39 @@ function getPerformanceTier(
   status: 'won' | 'lost',
   mistakes: number,
 ): PerformanceTier {
+
+  // watson voice, not NYT-translated. Mundart first, Hochdeutsch for the sub.
   if (status === 'lost') {
     return {
-      heading: 'Nächstes Mal!',
-      sub: 'Jede Runde macht dich besser.',
+      heading: 'Knapp däbä.',
+      sub: 'Kei Angscht — morn gits es nöis.',
       accentClass: 'text-[var(--color-gray-text)]',
     };
   }
   if (mistakes === 0) {
     return {
-      heading: 'Perfekt!',
-      sub: 'Kein einziger Fehler — chapeau!',
+      heading: 'Eismeister!',
+      sub: 'Kein einziger Fehler — Chapeau.',
       accentClass: 'text-[var(--color-pink)]',
     };
   }
   if (mistakes === 1) {
     return {
-      heading: 'Super gmacht!',
-      sub: 'Nur ein Fehler — starke Leistung.',
+      heading: 'Sauglatt!',
+      sub: 'Nur ein Patzer — stark.',
       accentClass: 'text-[var(--color-green)]',
     };
   }
   if (mistakes === 2) {
     return {
-      heading: 'Guet gspilt!',
+      heading: 'Guet gspilt.',
       sub: 'Solide durchgekämpft.',
       accentClass: 'text-[var(--color-cyan)]',
     };
   }
   return {
-    heading: 'Knapp!',
-    sub: 'Gerade noch geschafft — Nervenstärke!',
+    heading: 'Huere knapp.',
+    sub: 'Ganz zletscht no gschafft — Nervä wie Seili.',
     accentClass: 'text-[var(--color-blue)]',
   };
 }

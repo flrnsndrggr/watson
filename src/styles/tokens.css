@@ -20,11 +20,13 @@
   --color-black: #000000;
   --color-gray-text: #777777;
 
-  /* Game-specific (Verbindige difficulty colors) */
-  --color-difficulty-1: #FFD700;
-  --color-difficulty-2: #7BD400;
-  --color-difficulty-3: #0F6CF5;
-  --color-difficulty-4: #9B59B6;
+  /* Verbindige difficulty — watson palette, not NYT Connections clone.
+     cyan → green → blue → pink, from easy to trickiest. Pink is hottest
+     so it reads as "this is the nasty one". */
+  --color-difficulty-1: #00C6FF;  /* watson cyan — easy */
+  --color-difficulty-2: #7BD400;  /* watson green — medium */
+  --color-difficulty-3: #0F6CF5;  /* watson blue — hard */
+  --color-difficulty-4: #F40F97;  /* watson pink — trickiest */
 
   /* Spacing */
   --space-xs: 4px;

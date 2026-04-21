@@ -161,6 +161,11 @@ Generate a puzzle with 4 groups of 4 items. Theme categories around:
 - Current events (general Swiss news topics)
 - watson-related pop culture (Picdump, Spass, etc.)
 - Food: Swiss dishes, cheeses, chocolate brands
+- **watson-internet-culture flavour** — things only a watson reader would
+  land instantly: stock sentences from watson-Kommentaren ("Typisch X",
+  "bin Weg", "Ratschlag dä Woche"), Picdump-Favoriten, recurring jokes.
+  Use this sparingly (at most one such group per puzzle, ideally the
+  purple / tricky slot) — it's watson signature, not watson gimmick.
 
 Difficulty: Yellow (1) = obvious grouping, Green (2) = requires some knowledge, Blue (3) = tricky overlaps, Purple (4) = unexpected connection.
 

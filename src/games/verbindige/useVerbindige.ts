@@ -206,7 +206,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
 
     // Check for duplicate guess — don't consume a mistake
     if (previousGuesses.includes(guessKey)) {
-      showToast('Schon probiert!');
+      showToast('Hesch scho probiert!');
       trackVerbindigeGuess('duplicate', previousGuesses.length + 1, mistakes);
       set({ selected: [], lastGuessResult: 'duplicate' });
       return;
@@ -249,9 +249,12 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       trackVerbindigeGuess(result, newPreviousGuesses.length, newMistakes);
 
       if (result === 'one-away') {
-        showToast('Fast! Nur 1 falsch.');
+        // Swiss-German microcopy — watson voice, not translated NYT.
+        showToast('Knapp näbä — nur 1 falsch!');
       } else {
-        showToast('Leider falsch.');
+        // Rotate through playful fails so it never feels like the same game.
+        const fails = ['Leider nöd.', 'Sackelement!', 'Gopfertori!', 'Nope.'];
+        showToast(fails[newPreviousGuesses.length % fails.length]);
       }
 
       const lostUpdates: Partial<VerbindigeState> = {
