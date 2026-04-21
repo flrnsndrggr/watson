@@ -14,11 +14,28 @@ You are the games-watson puzzle content agent. You ensure there are always enoug
    - `src/games/zaemesetzli/zaemesetzli.data.ts`
 3. Read `src/types/index.ts` for shared types.
 
+## Database access
+
+Stdio MCP servers do not finish connecting before `claude -p` sends the
+first prompt, so the Supabase MCP tools (`mcp__supabase__*`,
+`mcp__193c4c85-…__*`) are NOT available to you. Do not waste turns
+searching for them. Use the Bash wrapper instead — it posts to the
+Supabase Management API with full admin rights:
+
+```bash
+/Users/fs/Code/game-watson/scripts/watson-sql.sh "SELECT … ;"          # inline SQL
+/Users/fs/Code/game-watson/scripts/watson-sql.sh -f /tmp/insert.sql    # from file (best for big multi-line inserts)
+echo "INSERT INTO …" | /Users/fs/Code/game-watson/scripts/watson-sql.sh -   # from stdin
+```
+
+Output is JSON (an array of rows for SELECT, or `{"code":...,"message":...}` on
+error). Pipe to `jq` for inspection. Multi-statement transactions work:
+`BEGIN; … ; COMMIT;` runs atomically.
+
 ## Step 1: Audit current puzzle inventory
 
-Query Supabase (project `fosnshalcgwvatejpdok`) for puzzle counts:
-
-```sql
+```bash
+/Users/fs/Code/game-watson/scripts/watson-sql.sh "
 SELECT game_type, COUNT(*) as total,
   COUNT(*) FILTER (WHERE publish_date > CURRENT_DATE) as upcoming,
   COUNT(*) FILTER (WHERE publish_date = CURRENT_DATE) as today,
@@ -26,9 +43,8 @@ SELECT game_type, COUNT(*) as total,
   MAX(publish_date) as latest_date
 FROM puzzles
 GROUP BY game_type;
+"
 ```
-
-Use `mcp__193c4c85-ef5f-4fb7-987d-79872f7a09e1__execute_sql` with project_id `fosnshalcgwvatejpdok`.
 
 ## Step 2: Validate existing puzzles
 
@@ -71,9 +87,22 @@ Difficulty: Yellow (1) = obvious grouping, Green (2) = requires some knowledge, 
 
 Ensure items could plausibly appear in multiple groups (that's what makes it fun).
 
-Insert via:
-1. Insert into `puzzles` (game_type='verbindige', publish_date=CURRENT_DATE + 1)
-2. Insert into `verbindige_puzzles` (id=puzzle id, groups=JSONB)
+Insert via the wrapper, in a single transaction:
+
+```bash
+cat > /tmp/insert-verbindige.sql <<'SQL'
+BEGIN;
+INSERT INTO puzzles (id, game_type, publish_date)
+  VALUES (gen_random_uuid(), 'verbindige', CURRENT_DATE + 1)
+  RETURNING id \gset
+INSERT INTO verbindige_puzzles (id, groups)
+  VALUES (:'id', '<jsonb groups payload>'::jsonb);
+COMMIT;
+SQL
+/Users/fs/Code/game-watson/scripts/watson-sql.sh -f /tmp/insert-verbindige.sql
+```
+
+(Or do the two inserts in one CTE with `WITH ins AS (INSERT INTO puzzles … RETURNING id) INSERT INTO verbindige_puzzles SELECT id, '...'::jsonb FROM ins;` — single round-trip, no `\gset` needed.)
 
 ### Schlagziil — Headlines
 Generate 5 headline-style entries. Since we don't have access to watson.ch's API, create plausible Swiss news headlines covering:

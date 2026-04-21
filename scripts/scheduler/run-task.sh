@@ -25,9 +25,22 @@ export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 export PYTHONIOENCODING="utf-8"
 
+# Per-machine secrets (Supabase PAT, etc) live outside the repo so they
+# never get committed. File is created by hand once, mode 600.
+# Stdio MCP servers do not connect in time inside `claude -p`, so agents
+# call the Supabase Management API directly via watson-sql.sh which reads
+# SUPABASE_ACCESS_TOKEN from this file.
+if [[ -r "${HOME}/.claude/external-scheduler/secrets.env" ]]; then
+  source "${HOME}/.claude/external-scheduler/secrets.env"
+fi
+
 # Fleet-wide allowlist: broad Bash, file tools, web, and MCP servers the fleet uses
 # (Chrome for QA dogfooding, computer-use for macOS UI, scheduled-tasks for self-introspection).
 # MCP hashes are user-local IDs: a95af… = Netlify, 193c4… = Supabase.
+# The same Supabase/Netlify servers also register under their connector slug
+# names in the `claude -p` runtime — both forms must be allowed because the
+# CLI session may surface either, and skill files reference the hashed IDs
+# while the ToolSearch results use the slug names.
 ALLOWED_TOOLS=(
   "Bash"
   "Edit" "Write" "Read" "Glob" "Grep"
@@ -39,6 +52,11 @@ ALLOWED_TOOLS=(
   "mcp__Claude_Preview__*"
   "mcp__a95af696-7dd0-4a65-b9d5-96537d1bf632__*"
   "mcp__193c4c85-ef5f-4fb7-987d-79872f7a09e1__*"
+  "mcp__claude_ai_Supabase__*"
+  "mcp__claude_ai_Netlify__*"
+  "mcp__Supabase__*"
+  "mcp__Netlify__*"
+  "mcp__supabase__*"
 )
 
 LOCKDIR="${HOME}/.claude/external-scheduler/watson-main.lock"
