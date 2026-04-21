@@ -164,7 +164,7 @@ _Items from watson-qa-schlagziil agent_
 7. [ ] P1 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
    - Agent: watson-qa-schlagziil
    - Scenario: Mobile Input — page load on 390px viewport
-   - Problem: `HeadlineCard.tsx:122` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.
+   - Problem: `HeadlineCard.tsx:152` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.
    - Suggested fix: Remove `autoFocus` from the input. On desktop it can be re-added via a `useEffect` with `inputRef.focus()` guarded by `window.innerWidth > 768` or a media-query check.
    - Files: `src/games/schlagziil/HeadlineCard.tsx` (line 152)
    - Evidence: `autoFocus` attribute confirmed in source. Standard browser behaviour on iOS/Android: `autoFocus` on an `<input>` opens the soft keyboard on mount. Observed 2026-04-18.
@@ -178,6 +178,7 @@ _Items from watson-qa-schlagziil agent_
    - Files: `src/games/schlagziil/SchlagziilResult.tsx` (lines 13-19)
    - Evidence: Live results screen showed "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — out-of-order years confirmed by screenshot. Observed 2026-04-18.
    - Triage note (2026-04-20): **Partially resolved.** Share text no longer includes a year line — it uses an emoji accuracy grid (`🟩`/`🟥` squares) instead. However, `article_year` still exists in data and is displayed per-headline in the results screen (`SchlagziilResult.tsx:139`). Headlines are still rendered in puzzle storage order (2026, 2025, 2023, 2021, 2024), not chronological. The share text half of this issue is resolved; the results screen ordering remains if deemed important.
+   - Triage note (2026-04-21): **Fully resolved.** Results screen now sorts headlines by `article_year` at `SchlagziilResult.tsx:293`. Share text uses emoji grid (no year line). Both halves fixed. Can be marked `[x]` by roadmap-worker.
 
 ---
 
@@ -310,6 +311,7 @@ _Weekly architecture review findings from watson-architect_
    - Files: `src/lib/utils.ts` (create), `src/games/verbindige/useVerbindige.ts`, `src/games/zaemesetzli/useZaemesetzli.ts`
    - Priority: P2 — pure code deduplication with no user-facing impact
    - Triage note (2026-04-20): **Partially resolved.** `shuffleArray` no longer exists in `useZaemesetzli.ts` — only `useVerbindige.ts:69` has it. No duplication to extract unless new games add their own copy. Downgrade or close if no other consumers emerge.
+   - Triage note (2026-04-21): **No duplication remains.** Confirmed `shuffleArray` exists only in `useVerbindige.ts:69`. No other consumers. Can be marked `[x]` by roadmap-worker as the original issue (cross-game duplication) no longer applies.
 
 2. [x] P1 - Add keyboard navigation to Verbindige and Zaemesetzli
    - Agent: watson-architect
