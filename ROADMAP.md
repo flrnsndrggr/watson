@@ -161,7 +161,7 @@ _Items from watson-qa-schlagloch agent_
    - Files: `src/games/schlagloch/HeadlineCard.tsx`, `src/games/schlagloch/SchlaglochPage.tsx`
    - Evidence: Clicked "Tipp anzeigen" on headline 1 (2026/Solarenergie). Screenshots of headlines 2 (2025), 3 (2023), 4 (2021), 5 (2024) all showed hint text immediately without any click. `hintsUsed` Zustand state tracked only the intentional click correctly (💡 shown only for 2026 in final score), confirming the bug is isolated to local component state. Observed 2026-04-18.
 
-7. [ ] P1 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
+7. [x] P1 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
    - Agent: watson-qa-schlagloch
    - Scenario: Mobile Input — page load on 390px viewport
    - Problem: `HeadlineCard.tsx:152` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.

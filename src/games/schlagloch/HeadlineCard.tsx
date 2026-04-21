@@ -41,9 +41,16 @@ export function HeadlineCard({
   const [showHint, setShowHint] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Re-focus input after a wrong guess so the player can immediately retry
+  // Focus input on desktop only (avoid triggering mobile keyboard on mount)
   useEffect(() => {
-    if (shaking === false && !disabled && !revealedAnswer) {
+    if (!disabled && !revealedAnswer && window.matchMedia('(min-width: 768px)').matches) {
+      inputRef.current?.focus();
+    }
+  }, [display, disabled, revealedAnswer]);
+
+  // Re-focus input after a wrong guess so the player can immediately retry (desktop only)
+  useEffect(() => {
+    if (shaking === false && !disabled && !revealedAnswer && window.matchMedia('(min-width: 768px)').matches) {
       inputRef.current?.focus();
     }
   }, [shaking, disabled, revealedAnswer]);
@@ -162,7 +169,6 @@ export function HeadlineCard({
             onChange={(e) => setInput(e.target.value)}
             disabled={disabled}
             placeholder="Dein Tipp..."
-            autoFocus
             aria-label="Dein Tipp für das fehlende Wort"
             className="flex-1 rounded border-2 border-[var(--color-gray-bg)] px-3 py-2 text-sm font-semibold outline-none transition-colors focus:border-[var(--color-cyan)] disabled:opacity-50"
           />
