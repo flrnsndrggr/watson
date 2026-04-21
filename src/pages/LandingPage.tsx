@@ -236,7 +236,7 @@ export function LandingPage() {
                     </span>
                   ) : (
                     <span className="rounded bg-[var(--color-cyan)] px-1.5 py-0.5 text-[10px] font-bold text-white">
-                      T\u00C4GLICH
+                      TÄGLICH
                     </span>
                   )}
                   {status.streak.current >= 2 && (
