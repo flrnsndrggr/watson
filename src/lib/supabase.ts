@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { GameType } from '@/types';
+import type { GameType, VerbindigeEdition } from '@/types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
@@ -122,5 +122,71 @@ export async function fetchTodaysPuzzle<T>(gameType: GameType): Promise<T | null
     return { ...gameObj, id: row.id, date: row.publish_date } as T;
   } catch {
     return null;
+  }
+}
+
+// ----- Branded Verbindige Editions -----
+
+/** Fetch a published branded edition by slug. */
+export async function fetchEditionBySlug(slug: string): Promise<VerbindigeEdition | null> {
+  try {
+    const { data, error } = await supabase
+      .from('verbindige_editions')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return data as VerbindigeEdition;
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch all branded editions (admin — includes drafts). */
+export async function fetchAllEditions(): Promise<VerbindigeEdition[]> {
+  try {
+    const { data, error } = await supabase
+      .from('verbindige_editions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+    return data as VerbindigeEdition[];
+  } catch {
+    return [];
+  }
+}
+
+/** Create or update a branded edition. */
+export async function upsertEdition(
+  edition: Omit<VerbindigeEdition, 'created_at' | 'updated_at'>,
+): Promise<VerbindigeEdition | null> {
+  try {
+    const { data, error } = await supabase
+      .from('verbindige_editions')
+      .upsert({ ...edition, updated_at: new Date().toISOString() })
+      .select()
+      .single();
+
+    if (error || !data) return null;
+    return data as VerbindigeEdition;
+  } catch {
+    return null;
+  }
+}
+
+/** Delete a branded edition by ID. */
+export async function deleteEdition(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('verbindige_editions')
+      .delete()
+      .eq('id', id);
+
+    return !error;
+  } catch {
+    return false;
   }
 }

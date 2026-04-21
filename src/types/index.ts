@@ -103,6 +103,22 @@ export interface StreakData {
   last_played: string;
 }
 
+// ===== Branded Verbindige Editions =====
+
+export interface VerbindigeEdition {
+  id: string;
+  slug: string;
+  title: string;
+  sponsor_name: string;
+  sponsor_logo_url: string | null;
+  sponsor_click_url: string | null;
+  groups: VerbindigeGroup[];
+  status: 'draft' | 'published';
+  publish_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // ===== Game State =====
 
 export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil';

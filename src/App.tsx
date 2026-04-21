@@ -30,6 +30,8 @@ const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m 
 const AdminVerbindige = lazy(() => import('@/pages/admin/AdminVerbindige').then(m => ({ default: m.AdminVerbindige })));
 const AdminZaemesetzli = lazy(() => import('@/pages/admin/AdminZaemesetzli').then(m => ({ default: m.AdminZaemesetzli })));
 const AdminSchlagziil = lazy(() => import('@/pages/admin/AdminSchlagziil').then(m => ({ default: m.AdminSchlagziil })));
+const AdminVerbindigeEditions = lazy(() => import('@/pages/admin/AdminVerbindigeEditions').then(m => ({ default: m.AdminVerbindigeEditions })));
+const VerbindigeEditionPage = lazy(() => import('@/games/verbindige/VerbindigeEditionPage').then(m => ({ default: m.VerbindigeEditionPage })));
 
 export default function App() {
   return (
@@ -41,6 +43,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route index element={<LandingPage />} />
               <Route path="verbindige" element={<VerbindigePage />} />
+              <Route path="verbindige/edition/:slug" element={<VerbindigeEditionPage />} />
               <Route path="zaemesetzli" element={<ZaemesetzliPage />} />
               <Route path="schlagziil" element={<SchlagziilPage />} />
               <Route path="profil" element={<ProfilPage />} />
@@ -51,6 +54,7 @@ export default function App() {
               <Route path="verbindige" element={<AdminVerbindige />} />
               <Route path="zaemesetzli" element={<AdminZaemesetzli />} />
               <Route path="schlagziil" element={<AdminSchlagziil />} />
+              <Route path="verbindige-editions" element={<AdminVerbindigeEditions />} />
             </Route>
             <Route element={<Layout />}>
               <Route path="*" element={<NotFoundPage />} />

@@ -34,6 +34,6 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 ## Priority: Future (Post-Launch)
 
 - [x] Sunday Schlagziil "Rückblick": 10 headlines, harder difficulty, separate leaderboard — done 2026-04-21
-- [ ] Branded Verbindige editions: CMS tool for creating sponsor-themed puzzles
+- [x] Branded Verbindige editions: CMS tool for creating sponsor-themed puzzles — done 2026-04-21
 - [x] PWA: add service worker for offline play after initial puzzle load — done 2026-04-21
 - [ ] Performance: code-split per game (lazy-load game bundles)
