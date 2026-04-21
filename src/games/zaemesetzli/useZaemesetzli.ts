@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { ZaemesetzliPuzzle, Rank, CompoundWord, StreakData } from '@/types';
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
-import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate, getTodayDateCET } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackZaemesetzliWordFound, trackZaemesetzliHintUsed } from '@/lib/analytics';
@@ -22,13 +22,19 @@ interface CelebrationData {
 interface ZaemesetzliState {
   puzzle: ZaemesetzliPuzzle | null;
   selectedEmojis: string[];
-  currentInput: string;
   foundWords: FoundCompound[];
   score: number;
   currentRank: Rank;
   hintsUsed: number;
-  lastResult: 'valid' | 'mundart' | 'not-in-puzzle' | 'invalid' | 'already-found' | 'wrong-emojis' | null;
+  /**
+   * `valid` / `mundart`: at least one new compound matched the selected emoji set.
+   * `already-found`: every compound for this emoji set was already found.
+   * `invalid`: no compound exists for this emoji set.
+   */
+  lastResult: 'valid' | 'mundart' | 'invalid' | 'already-found' | null;
   lastResultId: number;
+  /** Extra compounds awarded on the same submit, beyond the celebrated one. */
+  lastExtraFound: FoundCompound[];
   lastFoundCompound: CelebrationData | null;
   status: 'playing' | 'complete' | 'finished';
   streak: StreakData;
@@ -37,8 +43,7 @@ interface ZaemesetzliState {
   loadPuzzle: (archiveDate?: string) => Promise<void>;
   selectEmoji: (emoji: string) => void;
   clearEmojiSelection: () => void;
-  setInput: (input: string) => void;
-  submitWord: () => void;
+  submitCombination: () => void;
   finishGame: () => void;
   useHint: () => string | null;
   clearLastResult: () => void;
@@ -49,6 +54,11 @@ interface ZaemesetzliProgress {
   score: number;
   currentRank: Rank;
   hintsUsed: number;
+}
+
+/** Stable string key for an unordered emoji multiset. */
+function emojiSetKey(emojis: readonly string[]): string {
+  return [...emojis].sort().join('|');
 }
 
 function persistZaemesetzli(state: ZaemesetzliState): void {
@@ -72,13 +82,13 @@ function getRank(score: number, thresholds: ZaemesetzliPuzzle['rank_thresholds']
 export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
   puzzle: null,
   selectedEmojis: [],
-  currentInput: '',
   foundWords: [],
   score: 0,
   currentRank: 'stift',
   hintsUsed: 0,
   lastResult: null,
   lastResultId: 0,
+  lastExtraFound: [],
   lastFoundCompound: null,
   status: 'playing',
   streak: getStreak('zaemesetzli'),
@@ -89,7 +99,8 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const fetched = archiveDate
       ? await fetchPuzzleByDate<ZaemesetzliPuzzle>('zaemesetzli', archiveDate)
       : await fetchTodaysPuzzle<ZaemesetzliPuzzle>('zaemesetzli');
-    const puzzle = fetched ?? SAMPLE_ZAEMESETZLI;
+    const fallbackDate = archiveDate ?? getTodayDateCET();
+    const puzzle = fetched ?? { ...SAMPLE_ZAEMESETZLI, date: fallbackDate };
 
     // Restore in-progress state for today's puzzle
     if (!archiveDate) {
@@ -102,7 +113,6 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
           currentRank: saved.currentRank,
           hintsUsed: saved.hintsUsed,
           selectedEmojis: [],
-          currentInput: '',
           status: 'playing',
         });
         // Re-record streak since it fires on first word found
@@ -119,12 +129,12 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     set({
       puzzle,
       selectedEmojis: [],
-      currentInput: '',
       foundWords: [],
       score: 0,
       currentRank: 'stift',
       hintsUsed: 0,
       lastFoundCompound: null,
+      lastExtraFound: [],
       status: 'playing',
     });
     trackGameStarted('zaemesetzli', !!archiveDate);
@@ -137,52 +147,60 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     }
   },
 
-  clearEmojiSelection: () => set({ selectedEmojis: [], currentInput: '' }),
+  clearEmojiSelection: () => set({ selectedEmojis: [] }),
 
-  setInput: (input) => set({ currentInput: input }),
+  clearLastResult: () => set({ lastResult: null, lastFoundCompound: null, lastExtraFound: [] }),
 
-  clearLastResult: () => set({ lastResult: null, lastFoundCompound: null }),
+  submitCombination: () => {
+    const { selectedEmojis, foundWords, score, puzzle } = get();
+    if (!puzzle || selectedEmojis.length < 2) return;
 
-  submitWord: () => {
-    const { currentInput, selectedEmojis, foundWords, score, puzzle } = get();
-    if (!puzzle || !currentInput.trim()) return;
+    const targetKey = emojiSetKey(selectedEmojis);
 
-    const word = currentInput.trim().toLowerCase();
+    // Find every compound that matches the selected emoji set (order-insensitive,
+    // duplicates not allowed — selectEmoji already prevents duplicate selection).
+    const allMatches = puzzle.valid_compounds.filter(
+      (c) => emojiSetKey(c.components) === targetKey,
+    );
 
-    // Already found?
-    if (foundWords.some((fw) => fw.word.toLowerCase() === word)) {
-      set((s) => ({ lastResult: 'already-found', lastResultId: s.lastResultId + 1, currentInput: '' }));
+    if (allMatches.length === 0) {
+      set((s) => ({ lastResult: 'invalid', lastResultId: s.lastResultId + 1, selectedEmojis: [] }));
       return;
     }
 
-    // Check against puzzle compounds
-    const compound = puzzle.valid_compounds.find((c) => c.word.toLowerCase() === word);
+    const foundWordSet = new Set(foundWords.map((fw) => fw.word.toLowerCase()));
+    const newMatches = allMatches.filter((c) => !foundWordSet.has(c.word.toLowerCase()));
 
-    if (!compound) {
-      set((s) => ({ lastResult: 'invalid', lastResultId: s.lastResultId + 1, currentInput: '' }));
+    if (newMatches.length === 0) {
+      set((s) => ({ lastResult: 'already-found', lastResultId: s.lastResultId + 1, selectedEmojis: [] }));
       return;
     }
 
-    // Check if emojis match
-    const selectedSet = new Set(selectedEmojis);
-    const compSet = new Set(compound.components);
-    const emojisMatch = compSet.size === selectedSet.size && [...compSet].every((e) => selectedSet.has(e));
+    // Celebrate the highest-scoring new match (mundart bonus tends to win);
+    // toast the rest via lastExtraFound.
+    const sorted = [...newMatches].sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      return Number(b.is_mundart) - Number(a.is_mundart);
+    });
+    const [primary, ...extras] = sorted;
 
-    if (!emojisMatch) {
-      set((s) => ({ lastResult: 'wrong-emojis', lastResultId: s.lastResultId + 1, currentInput: '' }));
-      return;
-    }
-
-    const newFound: FoundCompound = { ...compound, foundAt: Date.now() };
-    const newScore = score + compound.points;
+    const now = Date.now();
+    const newFound: FoundCompound[] = sorted.map((c) => ({ ...c, foundAt: now }));
+    const newFoundWords = [...foundWords, ...newFound];
+    const gainedPoints = newFound.reduce((sum, c) => sum + c.points, 0);
+    const newScore = score + gainedPoints;
     const newRank = getRank(newScore, puzzle.rank_thresholds);
-    const newFoundWords = [...foundWords, newFound];
     const allFound = newFoundWords.length === puzzle.valid_compounds.length;
+    const isArchiveSession = get().isArchive;
 
-    trackZaemesetzliWordFound(compound.difficulty, compound.is_mundart, compound.points, newScore, newFoundWords.length);
+    // Track each found compound as an individual word-found event so analytics
+    // stay comparable to the old per-word flow.
+    for (const c of newFound) {
+      trackZaemesetzliWordFound(c.difficulty, c.is_mundart, c.points, newScore, newFoundWords.length);
+    }
 
     // Record streak on first word found (skip for archive)
-    const streakUpdate = foundWords.length === 0 && !get().isArchive
+    const streakUpdate = foundWords.length === 0 && !isArchiveSession
       ? (() => {
           const streak = recordGamePlayed('zaemesetzli');
           checkStreakMilestone('zaemesetzli', streak.current);
@@ -190,14 +208,13 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
         })()
       : {};
 
-    // Submit to leaderboard on each word found (upsert keeps latest score)
-    if (!get().isArchive) {
+    if (!isArchiveSession) {
       void submitLeaderboardEntry('zaemesetzli', newScore, null);
     }
 
     if (allFound) {
-      trackGameCompleted('zaemesetzli', 'complete', get().isArchive, newScore);
-      if (!get().isArchive) {
+      trackGameCompleted('zaemesetzli', 'complete', isArchiveSession, newScore);
+      if (!isArchiveSession) {
         const rankLabel = newRank.charAt(0).toUpperCase() + newRank.slice(1);
         saveDailyResult('zaemesetzli', {
           outcome: 'complete',
@@ -207,20 +224,22 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       clearGameProgress('zaemesetzli');
     }
 
+    const newFoundExtras: FoundCompound[] = extras.map((c) => ({ ...c, foundAt: now }));
+
     set({
       foundWords: newFoundWords,
       score: newScore,
       currentRank: newRank,
-      currentInput: '',
       selectedEmojis: [],
-      lastResult: compound.is_mundart ? 'mundart' : 'valid',
+      lastResult: primary.is_mundart ? 'mundart' : 'valid',
       lastResultId: get().lastResultId + 1,
       lastFoundCompound: {
-        components: compound.components,
-        word: compound.word,
-        points: compound.points,
-        is_mundart: compound.is_mundart,
+        components: primary.components,
+        word: primary.word,
+        points: primary.points,
+        is_mundart: primary.is_mundart,
       },
+      lastExtraFound: newFoundExtras,
       status: allFound ? 'complete' : 'playing',
       ...streakUpdate,
     });
@@ -262,7 +281,6 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     set({
       status: 'finished',
       selectedEmojis: [],
-      currentInput: '',
       ...streakUpdate,
     });
   },
@@ -282,7 +300,6 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       hintsUsed: newHintsUsed,
       score: Math.max(0, score - 1),
       selectedEmojis: hint.components,
-      currentInput: '',
     });
     persistZaemesetzli(get());
     return `${hint.components.join(' + ')} = ?`;

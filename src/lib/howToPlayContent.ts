@@ -16,7 +16,7 @@ export const SCHLAGZIIL_STEPS: HowToPlayStep[] = [
 
 export const ZAEMESETZLI_STEPS: HowToPlayStep[] = [
   { icon: '🧩', text: 'Kombiniere 2–3 Emojis zu zusammengesetzten Wörtern.' },
-  { icon: '👆', text: 'Wähle Emojis aus, tippe das Wort ein und drücke Enter.' },
+  { icon: '👆', text: 'Wähle Emojis aus und drücke «Prüfen» — wenn deine Kombination einem Wort entspricht, zählt sie.' },
   { icon: '🇨🇭', text: 'Mundart-Wörter geben extra Punkte!' },
   { icon: '🏔️', text: 'Steige auf: Stift → Lehrling → Geselle → Meister → Bundesrat.' },
 ];

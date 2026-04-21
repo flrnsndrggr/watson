@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
@@ -17,65 +17,7 @@ import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
 import { ZaemesetzliResult } from './ZaemesetzliResult';
 import { useZaemesetzli } from './useZaemesetzli';
-import type { Rank, CompoundWord } from '@/types';
-
-const DIFFICULTY_COLORS: Record<1 | 2 | 3, string> = {
-  1: 'var(--color-difficulty-1)',
-  2: 'var(--color-difficulty-2)',
-  3: 'var(--color-difficulty-3)',
-};
-
-const DIFFICULTY_LABELS: Record<1 | 2 | 3, string> = {
-  1: 'Einfach',
-  2: 'Mittel',
-  3: 'Schwer',
-};
-
-function DifficultyProgress({
-  foundWords,
-  validCompounds,
-}: {
-  foundWords: { difficulty: 1 | 2 | 3 }[];
-  validCompounds: CompoundWord[];
-}) {
-  const tiers = [1, 2, 3] as const;
-
-  return (
-    <div className="flex gap-2 px-1 pb-2" role="group" aria-label="Fortschritt nach Schwierigkeit">
-      {tiers.map((d) => {
-        const total = validCompounds.filter((c) => c.difficulty === d).length;
-        if (total === 0) return null;
-        const found = foundWords.filter((fw) => fw.difficulty === d).length;
-        const pct = Math.round((found / total) * 100);
-        return (
-          <div key={d} className="min-w-0 flex-1">
-            <div className="mb-0.5 flex items-center justify-between">
-              <span className="flex items-center gap-0.5 text-[10px] font-semibold">
-                <span style={{ color: DIFFICULTY_COLORS[d] }} aria-hidden="true">
-                  {'●'.repeat(d)}
-                </span>
-                <span className="text-[var(--color-gray-text)]">{DIFFICULTY_LABELS[d]}</span>
-              </span>
-              <span className="text-[10px] font-semibold text-[var(--color-gray-text)]">
-                {found}/{total}
-              </span>
-            </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-gray-bg)]">
-              <div
-                className="h-full rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${pct}%`, backgroundColor: DIFFICULTY_COLORS[d] }}
-                role="progressbar"
-                aria-valuenow={found}
-                aria-valuemax={total}
-                aria-label={`${DIFFICULTY_LABELS[d]}: ${found} von ${total}`}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+import type { Rank } from '@/types';
 
 const RANK_LABELS: Record<Rank, string> = {
   stift: 'Stift',
@@ -93,19 +35,18 @@ export function ZaemesetzliPage() {
     loadPuzzle,
     puzzle,
     selectedEmojis,
-    currentInput,
     foundWords,
     score,
     currentRank,
     lastResult,
     lastResultId,
     lastFoundCompound,
+    lastExtraFound,
     status,
     isArchive,
     selectEmoji,
     clearEmojiSelection,
-    setInput,
-    submitWord,
+    submitCombination,
     finishGame,
     useHint,
     clearLastResult,
@@ -116,19 +57,6 @@ export function ZaemesetzliPage() {
   const [shaking, setShaking] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevRank = useRef<Rank>(currentRank);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Emojis that appear in at least one unfound compound
-  const hintableEmojis = useMemo(() => {
-    if (!puzzle) return undefined;
-    const foundWordSet = new Set(foundWords.map((fw) => fw.word.toLowerCase()));
-    const unfound = puzzle.valid_compounds.filter((c) => !foundWordSet.has(c.word.toLowerCase()));
-    const set = new Set<string>();
-    for (const c of unfound) {
-      for (const emoji of c.components) set.add(emoji);
-    }
-    return set;
-  }, [puzzle, foundWords]);
 
   useEffect(() => {
     loadPuzzle(archiveDate ?? undefined);
@@ -147,32 +75,32 @@ export function ZaemesetzliPage() {
   useEffect(() => {
     if (!lastResult) return;
 
-    const isError = lastResult === 'invalid' || lastResult === 'already-found'
-      || lastResult === 'wrong-emojis' || lastResult === 'not-in-puzzle';
+    const isError = lastResult === 'invalid' || lastResult === 'already-found';
 
     if (isError) {
       setShaking(true);
       const shakeTimer = setTimeout(() => setShaking(false), 400);
 
-      if (lastResult === 'invalid') showToast('Kein gültiges Wort');
+      if (lastResult === 'invalid') showToast('Keine Kombination gefunden');
       else if (lastResult === 'already-found') showToast('Schon gefunden!');
-      else if (lastResult === 'wrong-emojis') showToast('Stimmt, aber andere Emojis!');
-      else if (lastResult === 'not-in-puzzle') showToast('Gutes Wort, aber nicht in der heutigen Lösung!');
-
-      // Re-focus input for quick retry
-      inputRef.current?.focus();
 
       const clearTimer = setTimeout(clearLastResult, 2000);
       return () => { clearTimeout(shakeTimer); clearTimeout(clearTimer); };
     }
 
     if (lastResult === 'mundart') {
-      showToast('Mundart-Bonus! 🇨🇭 +1');
+      showToast('Mundart-Bonus! 🇨🇭');
+    }
+
+    // Toast extra compounds awarded on the same submission (e.g. ⛰️+🧀 yields
+    // both Bergkäse and Alpkäse). The primary one runs the celebrate animation.
+    for (const extra of lastExtraFound) {
+      showToast(`Auch: ${extra.word}${extra.is_mundart ? ' 🇨🇭' : ''} +${extra.points}`);
     }
 
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
-  }, [lastResult, lastResultId, clearLastResult]);
+  }, [lastResult, lastResultId, lastExtraFound, clearLastResult]);
 
   // Confetti + toast on rank milestones
   useEffect(() => {
@@ -199,13 +127,22 @@ export function ZaemesetzliPage() {
     }
   }, [currentRank]);
 
-  // Keyboard support: Backspace clears emoji selection when input is empty
+  // Keyboard support: Enter submits, Backspace clears the emoji selection.
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (status !== 'playing') return;
-    if (e.key === 'Backspace' && !currentInput && selectedEmojis.length > 0) {
+    const isFormField = e.target instanceof HTMLInputElement
+      || e.target instanceof HTMLTextAreaElement
+      || (e.target instanceof HTMLElement && e.target.isContentEditable);
+    if (isFormField) return;
+
+    if (e.key === 'Enter' && selectedEmojis.length >= 2) {
+      e.preventDefault();
+      submitCombination();
+    } else if (e.key === 'Backspace' && selectedEmojis.length > 0) {
+      e.preventDefault();
       clearEmojiSelection();
     }
-  }, [status, currentInput, selectedEmojis.length, clearEmojiSelection]);
+  }, [status, selectedEmojis.length, clearEmojiSelection, submitCombination]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -224,11 +161,6 @@ export function ZaemesetzliPage() {
       });
     }
   }, [status, currentRank]);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    submitWord();
-  }
 
   function handleHint() {
     const hint = useHint();
@@ -268,19 +200,10 @@ export function ZaemesetzliPage() {
 
       {status === 'playing' ? (
         <>
-          {/* Difficulty progress bars */}
-          {puzzle && (
-            <DifficultyProgress
-              foundWords={foundWords}
-              validCompounds={puzzle.valid_compounds}
-            />
-          )}
-
           {/* Emoji pool */}
           <EmojiPool
             emojis={puzzle.emojis}
             selectedEmojis={selectedEmojis}
-            hintableEmojis={hintableEmojis}
             onSelect={selectEmoji}
           />
 
@@ -292,39 +215,32 @@ export function ZaemesetzliPage() {
             celebration={lastFoundCompound}
           />
 
-          {/* Word input */}
-          <form
-            onSubmit={handleSubmit}
-            className={`mx-auto mt-2 flex max-w-[360px] gap-2 transition-colors ${
+          {/* Submit + hint */}
+          <div
+            className={`mx-auto mt-2 flex max-w-[360px] flex-col items-center gap-3 transition-colors ${
               shaking ? 'animate-[shake_400ms_ease]' : ''
-            } ${
-              lastResult === 'valid' || lastResult === 'mundart'
-                ? 'rounded ring-2 ring-[var(--color-green)]'
-                : ''
             }`}
           >
-            <input
-              ref={inputRef}
-              type="text"
-              value={currentInput}
-              onChange={(e) => setInput(e.target.value)}
+            <button
+              type="button"
+              onClick={submitCombination}
               disabled={selectedEmojis.length < 2}
-              placeholder={selectedEmojis.length < 2 ? 'Wähle 2-3 Emojis...' : 'Zusammengesetztes Wort...'}
-              className="flex-1 rounded border-2 border-[var(--color-gray-bg)] px-3 py-2 text-sm font-semibold outline-none transition-colors focus:border-[var(--color-cyan)] disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={selectedEmojis.length < 2 || !currentInput.trim()}
-              aria-label="Wort absenden"
-              className="rounded bg-[var(--color-cyan)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
+              aria-label={
+                selectedEmojis.length < 2
+                  ? 'Wähle zuerst 2–3 Emojis'
+                  : 'Kombination prüfen'
+              }
+              className={`min-h-[44px] w-full rounded px-5 py-3 text-sm font-semibold text-white transition-all disabled:cursor-not-allowed disabled:bg-[var(--color-gray-bg)] disabled:text-[var(--color-gray-text)] ${
+                lastResult === 'valid' || lastResult === 'mundart'
+                  ? 'bg-[var(--color-green)] ring-2 ring-[var(--color-green)]'
+                  : 'bg-[var(--color-cyan)] hover:opacity-85'
+              }`}
             >
-              &rarr;
+              {selectedEmojis.length < 2 ? 'Wähle 2–3 Emojis' : 'Prüfen'}
             </button>
-          </form>
 
-          {/* Hint button */}
-          <div className="mt-3 text-center">
             <button
+              type="button"
               onClick={handleHint}
               className="text-xs text-[var(--color-gray-text)] underline hover:text-[var(--color-cyan)]"
             >
@@ -350,15 +266,10 @@ export function ZaemesetzliPage() {
                           : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
                       } ${isNewest ? 'animate-[popIn_300ms_ease]' : ''}`}
                     >
-                      <span className="flex items-center gap-1.5">
-                        <span
-                          className="inline-block h-2 w-2 flex-shrink-0 rounded-full"
-                          style={{ backgroundColor: DIFFICULTY_COLORS[fw.difficulty] }}
-                          aria-label={DIFFICULTY_LABELS[fw.difficulty]}
-                        />
+                      <span>
                         {fw.components.join('')}{' '}
                         <span className="font-semibold">{fw.word}</span>
-                        {fw.is_mundart && <span className="ml-0.5">🇨🇭</span>}
+                        {fw.is_mundart && <span className="ml-1">🇨🇭</span>}
                       </span>
                       <span className="text-xs text-[var(--color-gray-text)]">
                         {fw.is_mundart && isNewest ? '🇨🇭 ' : ''}{fw.points}pt
