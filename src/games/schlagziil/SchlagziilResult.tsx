@@ -1,16 +1,13 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ShareImageButton } from '@/components/shared/ShareImageButton';
-import { StoryShareButton } from '@/components/shared/StoryShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { NotificationPrompt } from '@/components/shared/NotificationPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
-import { StatsPanel } from '@/components/shared/StatsPanel';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
-import { computeGameStats } from '@/lib/gameStats';
 import type { ShareCardData } from '@/lib/shareImage';
 import type { SchlagziilHeadline } from '@/types';
 import { useSchlagziil } from './useSchlagziil';
@@ -21,29 +18,30 @@ interface PerformanceTier {
   accentClass: string;
 }
 
-function getPerformanceTier(correctCount: number): PerformanceTier {
-  if (correctCount === 5) {
+function getPerformanceTier(correctCount: number, total: number): PerformanceTier {
+  const ratio = correctCount / total;
+  if (ratio === 1) {
     return {
       heading: 'Perfekt!',
-      sub: 'Alle 5 Schlagzeilen — du bist à jour!',
+      sub: `Alle ${total} Schlagzeilen — du bist à jour!`,
       accentClass: 'text-[var(--color-pink)]',
     };
   }
-  if (correctCount === 4) {
+  if (ratio >= 0.8) {
     return {
       heading: 'Stark!',
       sub: 'Fast alles gewusst — starke Leistung.',
       accentClass: 'text-[var(--color-green)]',
     };
   }
-  if (correctCount === 3) {
+  if (ratio >= 0.6) {
     return {
       heading: 'Guet!',
       sub: 'Mehr als die Hälfte — solide.',
       accentClass: 'text-[var(--color-cyan)]',
     };
   }
-  if (correctCount === 2) {
+  if (ratio >= 0.4) {
     return {
       heading: 'Nicht schlecht!',
       sub: 'watson lesen hilft — morgen klappts besser.',
@@ -193,18 +191,16 @@ function HeadlineReviewItem({
 }
 
 export function SchlagziilResult() {
-  const { results, revealedAnswers, hintsUsed, puzzle, status, streak } = useSchlagziil();
+  const { results, revealedAnswers, hintsUsed, puzzle, status, streak, isRueckblick } = useSchlagziil();
   const countdown = useNextPuzzleCountdown();
 
-  const correctCount = results.filter((r) => r === 'correct').length;
-  const todayBucket = status === 'finished' ? String(correctCount) : undefined;
-  const stats = useMemo(
-    () => computeGameStats('schlagziil', todayBucket),
-    [todayBucket],
-  );
-
   if (status !== 'finished' || !puzzle) return null;
-  const tier = getPerformanceTier(correctCount);
+
+  const total = puzzle.headlines.length;
+  const correctCount = results.filter((r) => r === 'correct').length;
+  const tier = getPerformanceTier(correctCount, total);
+  const gameLabel = isRueckblick ? 'Schlagziil Rückblick' : 'Schlagziil';
+  const shareGameKey = isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil';
 
   // Build accuracy squares
   const accuracySquares = results.map((r, i) => {
@@ -215,13 +211,13 @@ export function SchlagziilResult() {
   const accuracyGrid = accuracySquares.join('');
 
   const shareText = generateShareText(
-    'schlagziil',
+    shareGameKey,
     puzzle.date,
-    `${correctCount}/5\n${accuracyGrid}\nIch lese watson, und du?`,
+    `${correctCount}/${total}\n${accuracyGrid}\nIch lese watson, und du?`,
   );
 
   const cardData: ShareCardData = {
-    gameName: 'Schlagziil',
+    gameName: gameLabel,
     gamePath: 'schlagziil',
     puzzleId: puzzle.date,
     heading: tier.heading,
@@ -232,14 +228,14 @@ export function SchlagziilResult() {
       results: results.map((r) => (r === 'correct' ? 'correct' : 'wrong')),
       hints: [...hintsUsed],
     },
-    stats: `${correctCount}/5 richtig`,
+    stats: `${correctCount}/${total} richtig`,
   };
 
   return (
     <div
       className="mt-6 animate-[resultSlideUp_400ms_ease-out]"
       role="region"
-      aria-label={`Ergebnis: ${correctCount} von 5 richtig`}
+      aria-label={`Ergebnis: ${correctCount} von ${total} richtig`}
     >
       {/* Divider */}
       <div className="mx-auto mb-5 h-px w-16 bg-[var(--color-gray-bg)]" />
@@ -259,7 +255,7 @@ export function SchlagziilResult() {
         <span className="font-[family-name:var(--font-heading)] text-4xl font-bold text-[var(--color-black)]">
           {correctCount}
         </span>
-        <span className="text-lg text-[var(--color-gray-text)]">/5</span>
+        <span className="text-lg text-[var(--color-gray-text)]">/{total}</span>
       </div>
 
       {/* Accuracy grid — staggered square reveal */}
@@ -284,14 +280,16 @@ export function SchlagziilResult() {
           Alle Schlagzeilen
         </h3>
         <div className="flex flex-col gap-2">
-          {puzzle.headlines.map((headline, i) => (
+          {[...puzzle.headlines.keys()]
+            .sort((a, b) => puzzle.headlines[a].article_year - puzzle.headlines[b].article_year)
+            .map((i, pos) => (
             <HeadlineReviewItem
               key={i}
-              headline={headline}
+              headline={puzzle.headlines[i]}
               result={results[i]}
               revealedAnswer={revealedAnswers[i]}
               hintUsed={hintsUsed[i]}
-              index={i}
+              index={pos}
             />
           ))}
         </div>
@@ -311,27 +309,23 @@ export function SchlagziilResult() {
       <NotificationPrompt />
 
       {/* Leaderboard */}
-      <LeaderboardPanel gameType="schlagziil" puzzleDate={puzzle.date} showTime />
-
-      {/* Personal statistics */}
-      <StatsPanel stats={stats} distributionLabel="Treffer-Verteilung" />
+      <LeaderboardPanel gameType={isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil'} puzzleDate={puzzle.date} showTime />
 
       {/* Share buttons */}
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">
         <ShareButton text={shareText} label="Ergebnis teilen" game="schlagziil" />
         <ShareImageButton cardData={cardData} game="schlagziil" />
-        <StoryShareButton cardData={cardData} game="schlagziil" />
       </div>
 
       {/* Puzzle date */}
       <p className="mt-2 text-center text-xs text-[var(--color-gray-text)]">
-        Schlagziil #{puzzle.date}
+        {gameLabel} #{puzzle.date}
       </p>
 
       {/* Next puzzle countdown */}
       <div className="mt-4 text-center animate-[resultSlideUp_400ms_ease-out_900ms_both]">
         <p className="text-xs text-[var(--color-gray-text)]">
-          Nächsts Schlagziil in{' '}
+          Nächsts {isRueckblick ? 'Rückblick' : 'Schlagziil'} in{' '}
           <span className="font-semibold text-[var(--color-black)]">
             {countdown}
           </span>

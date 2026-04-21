@@ -1,12 +1,17 @@
 import { create } from 'zustand';
-import type { SchlagziilPuzzle, StreakData } from '@/types';
+import type { SchlagziilPuzzle, StreakData, LeaderboardGameType } from '@/types';
 import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagziil.data';
-import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate, getTodayDateCET } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlagziilHeadlineGuess } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
+
+/** Standard Schlagziil has 5 headlines; Rückblick (Sunday) has more. */
+const STANDARD_HEADLINE_COUNT = 5;
+const STANDARD_MAX_ERRORS = 3;
+const RUECKBLICK_MAX_ERRORS = 5;
 
 interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
   answers?: string[][];
@@ -27,6 +32,7 @@ interface SchlagziilState {
   lastGuessResult: 'correct' | 'wrong' | null;
   streak: StreakData;
   isArchive: boolean;
+  isRueckblick: boolean;
   startedAt: number | null;
   elapsedSeconds: number | null;
 
@@ -44,6 +50,10 @@ interface SchlagziilProgress {
   revealedAnswers: (string | null)[];
   hintsUsed: boolean[];
   startedAt: number | null;
+}
+
+function getLeaderboardType(state: SchlagziilState): LeaderboardGameType {
+  return state.isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil';
 }
 
 function persistSchlagziil(state: SchlagziilState): void {
@@ -101,6 +111,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   lastGuessResult: null,
   streak: getStreak('schlagziil'),
   isArchive: false,
+  isRueckblick: false,
   startedAt: null,
   elapsedSeconds: null,
 
@@ -109,9 +120,12 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
     const fetched = archiveDate
       ? await fetchPuzzleByDate<SchlagziilPuzzleWithAnswers>('schlagziil', archiveDate)
       : await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
-    const puzzle: SchlagziilPuzzle = fetched ?? SAMPLE_SCHLAGZIIL;
+    const fallbackDate = archiveDate ?? getTodayDateCET();
+    const puzzle: SchlagziilPuzzle = fetched ?? { ...SAMPLE_SCHLAGZIIL, date: fallbackDate };
     const answers = fetched?.answers ?? DEMO_ANSWERS;
     const displayAnswers = fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS;
+    const isRueckblick = puzzle.headlines.length > STANDARD_HEADLINE_COUNT;
+    const maxErrors = isRueckblick ? RUECKBLICK_MAX_ERRORS : STANDARD_MAX_ERRORS;
 
     // Restore in-progress state for today's puzzle
     if (!archiveDate) {
@@ -123,6 +137,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           displayAnswers,
           currentIndex: saved.currentIndex,
           totalErrors: saved.totalErrors,
+          maxErrors,
           results: saved.results,
           revealedAnswers: saved.revealedAnswers,
           hintsUsed: saved.hintsUsed,
@@ -130,6 +145,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           status: 'playing',
           lastGuessResult: null,
           elapsedSeconds: null,
+          isRueckblick,
         });
         trackGameStarted('schlagziil', false);
         return;
@@ -143,12 +159,14 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       displayAnswers,
       currentIndex: 0,
       totalErrors: 0,
+      maxErrors,
       results: Array(puzzle.headlines.length).fill(null),
       revealedAnswers: Array(puzzle.headlines.length).fill(null),
       hintsUsed: Array(puzzle.headlines.length).fill(false),
       status: 'playing',
       startedAt: Date.now(),
       elapsedSeconds: null,
+      isRueckblick,
     });
     trackGameStarted('schlagziil', !!archiveDate);
   },
@@ -202,7 +220,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         const correctCount = newResults.filter((r) => r === 'correct').length;
         const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
         if (!get().isArchive) {
-          void submitLeaderboardEntry('schlagziil', correctCount, elapsed);
+          void submitLeaderboardEntry(getLeaderboardType(get()), correctCount, elapsed);
         }
         const streakUpdate = get().isArchive ? {} : (() => {
           const streak = recordGamePlayed('schlagziil');
@@ -244,7 +262,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       const correctCount = results.filter((r) => r === 'correct').length;
       const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
       if (!get().isArchive) {
-        void submitLeaderboardEntry('schlagziil', correctCount, elapsed);
+        void submitLeaderboardEntry(getLeaderboardType(get()), correctCount, elapsed);
       }
       const streakUpdate2 = get().isArchive ? {} : (() => {
           const streak = recordGamePlayed('schlagziil');

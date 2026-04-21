@@ -2,12 +2,18 @@ const GAME_LABELS: Record<string, string> = {
   verbindige: 'Verbindige',
   zaemesetzli: 'Zämesetzli',
   schlagziil: 'Schlagziil',
+  schlagziil_rueckblick: 'Schlagziil Rückblick',
 };
 
 const GAME_EMOJIS: Record<string, string> = {
   verbindige: '🇨🇭',
   zaemesetzli: '🧩',
   schlagziil: '📰',
+  schlagziil_rueckblick: '📰',
+};
+
+const GAME_PATHS: Record<string, string> = {
+  schlagziil_rueckblick: 'schlagziil',
 };
 
 export function generateShareText(
@@ -17,7 +23,8 @@ export function generateShareText(
 ): string {
   const label = GAME_LABELS[game] ?? game;
   const emoji = GAME_EMOJIS[game] ?? '';
-  return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\ngames-watson.netlify.app/${game}`;
+  const path = GAME_PATHS[game] ?? game;
+  return `${label} #${puzzleNumber} ${emoji}\n${resultLines}\ngames-watson.netlify.app/${path}`;
 }
 
 /** Returns 'shared' if Web Share API was used, 'copied' if clipboard fallback. */

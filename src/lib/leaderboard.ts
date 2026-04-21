@@ -1,5 +1,5 @@
 import { supabase, getTodayDateCET } from './supabase';
-import type { GameType } from '@/types';
+import type { LeaderboardGameType } from '@/types';
 
 export interface LeaderboardEntry {
   display_name: string;
@@ -20,7 +20,7 @@ export function maskEmail(email: string): string {
  * Uses upsert — safe to call multiple times per day.
  */
 export async function submitLeaderboardEntry(
-  gameType: GameType,
+  gameType: LeaderboardGameType,
   score: number,
   timeSeconds: number | null,
 ): Promise<void> {
@@ -54,7 +54,7 @@ export async function submitLeaderboardEntry(
  * Returns top 10 entries + the current user's entry/rank if outside top 10.
  */
 export async function fetchLeaderboard(
-  gameType: GameType,
+  gameType: LeaderboardGameType,
   puzzleDate?: string,
 ): Promise<{ entries: LeaderboardEntry[]; userRank: number | null }> {
   try {

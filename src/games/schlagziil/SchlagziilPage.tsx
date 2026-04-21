@@ -32,6 +32,7 @@ export function SchlagziilPage() {
     status,
     lastGuessResult,
     isArchive,
+    isRueckblick,
     submitGuess,
     advanceToNext,
     useHint,
@@ -92,7 +93,8 @@ export function SchlagziilPage() {
   useEffect(() => {
     if (status === 'finished' && prevStatus.current !== 'finished') {
       const correctCount = results.filter((r) => r === 'correct').length;
-      if (correctCount >= 4) {
+      const confettiThreshold = results.length > 5 ? 8 : 4;
+      if (correctCount >= confettiThreshold) {
         import('canvas-confetti').then(({ default: confetti }) => {
           confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
         });
@@ -111,9 +113,9 @@ export function SchlagziilPage() {
       {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
       {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
-        title="Schlagziil"
+        title={isRueckblick ? 'Schlagziil Rückblick' : 'Schlagziil'}
         puzzleId={puzzle?.date ?? ''}
-        subtitle="Errate das fehlende Wort"
+        subtitle={isRueckblick ? '10 Schlagzeilen aus der Woche' : 'Errate das fehlende Wort'}
         onInfoClick={() => setShowHowToPlay(true)}
         streak={streak}
       />
@@ -146,7 +148,7 @@ export function SchlagziilPage() {
                 />
               ))}
               <span className="ml-2 text-xs text-[var(--color-gray-text)]">
-                Headline {currentIndex + 1}/5
+                Headline {currentIndex + 1}/{puzzle.headlines.length}
               </span>
             </div>
             <ErrorDots total={maxErrors} used={totalErrors} />

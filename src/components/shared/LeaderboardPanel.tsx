@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { fetchLeaderboard, type LeaderboardEntry } from '@/lib/leaderboard';
-import type { GameType } from '@/types';
+import type { LeaderboardGameType } from '@/types';
 
 const RANK_MEDALS = ['🥇', '🥈', '🥉'];
 
 interface LeaderboardPanelProps {
-  gameType: GameType;
+  gameType: LeaderboardGameType;
   puzzleDate?: string;
   /** Whether this game uses time as a ranking factor */
   showTime?: boolean;

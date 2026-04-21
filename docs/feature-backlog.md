@@ -29,11 +29,11 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Analytics events: implement core tracking (game_started, game_completed, game_shared, streak_milestone) — done 2026-04-20
 - [x] Analytics: game-specific events (verbindige_guess, schlagziil_headline_guess, zaemesetzli_word_found, zaemesetzli_hint_used) — done 2026-04-20
 - [x] Push notification opt-in: daily reminder prompt with configurable time — done 2026-04-20
-- [ ] Instagram story share: generate 1080x1920 canvas image with watson branding + result grid
+- [x] Instagram story share: generate 1080x1920 canvas image with watson branding + result grid — done 2026-04-21
 
 ## Priority: Future (Post-Launch)
 
-- [ ] Sunday Schlagziil "Rückblick": 10 headlines, harder difficulty, separate leaderboard
+- [x] Sunday Schlagziil "Rückblick": 10 headlines, harder difficulty, separate leaderboard — done 2026-04-21
 - [ ] Branded Verbindige editions: CMS tool for creating sponsor-themed puzzles
 - [ ] PWA: add service worker for offline play after initial puzzle load
 - [ ] Performance: code-split per game (lazy-load game bundles)

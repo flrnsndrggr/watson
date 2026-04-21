@@ -107,4 +107,7 @@ export interface StreakData {
 
 export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil';
 
+/** Extended type that includes game variants used for separate leaderboards. */
+export type LeaderboardGameType = GameType | 'schlagziil_rueckblick';
+
 export type GameStatus = 'loading' | 'playing' | 'won' | 'lost';
