@@ -55,6 +55,7 @@ export function ZaemesetzliPage() {
   const { current: streakCount, recordPlay } = useStreak('zaemesetzli');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
+  const [rejected, setRejected] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevRank = useRef<Rank>(currentRank);
 
@@ -79,13 +80,18 @@ export function ZaemesetzliPage() {
 
     if (isError) {
       setShaking(true);
+      setRejected(true);
       const shakeTimer = setTimeout(() => setShaking(false), 400);
+      const bounceTimer = setTimeout(() => {
+        setRejected(false);
+        clearEmojiSelection();
+      }, 400);
 
       if (lastResult === 'invalid') showToast('Keine Kombination gefunden');
       else if (lastResult === 'already-found') showToast('Schon gefunden!');
 
       const clearTimer = setTimeout(clearLastResult, 2000);
-      return () => { clearTimeout(shakeTimer); clearTimeout(clearTimer); };
+      return () => { clearTimeout(shakeTimer); clearTimeout(bounceTimer); clearTimeout(clearTimer); };
     }
 
     if (lastResult === 'mundart') {
@@ -100,7 +106,7 @@ export function ZaemesetzliPage() {
 
     const timer = setTimeout(clearLastResult, 2000);
     return () => clearTimeout(timer);
-  }, [lastResult, lastResultId, lastExtraFound, clearLastResult]);
+  }, [lastResult, lastResultId, lastExtraFound, clearLastResult, clearEmojiSelection]);
 
   // Confetti + toast on rank milestones
   useEffect(() => {
@@ -213,6 +219,7 @@ export function ZaemesetzliPage() {
             onClear={clearEmojiSelection}
             onDrop={selectEmoji}
             celebration={lastFoundCompound}
+            rejected={rejected}
           />
 
           {/* Submit + hint */}

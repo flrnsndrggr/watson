@@ -12,9 +12,10 @@ interface CombineSlotsProps {
   onClear: () => void;
   onDrop?: (emoji: string) => void;
   celebration: CelebrationData | null;
+  rejected?: boolean;
 }
 
-export function CombineSlots({ selectedEmojis, onClear, onDrop, celebration }: CombineSlotsProps) {
+export function CombineSlots({ selectedEmojis, onClear, onDrop, celebration, rejected }: CombineSlotsProps) {
   const [dragOver, setDragOver] = useState(false);
   const slots = [0, 1, 2];
 
@@ -97,9 +98,11 @@ export function CombineSlots({ selectedEmojis, onClear, onDrop, celebration }: C
             {i > 0 && <span className="text-[var(--color-gray-text)]">+</span>}
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-lg border-2 text-xl transition-all duration-150 ${
-                isFilled
-                  ? 'border-[var(--color-cyan)] bg-[var(--color-cyan)]/10 animate-[slotFill_200ms_ease-out]'
-                  : 'border-dashed border-[var(--color-gray-bg)]'
+                isFilled && rejected
+                  ? 'border-[var(--color-pink)] bg-[var(--color-pink)]/10 animate-[bounceBack_400ms_ease-out_both]'
+                  : isFilled
+                    ? 'border-[var(--color-cyan)] bg-[var(--color-cyan)]/10 animate-[slotFill_200ms_ease-out]'
+                    : 'border-dashed border-[var(--color-gray-bg)]'
               }`}
             >
               {selectedEmojis[i] ?? '?'}

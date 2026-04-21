@@ -164,7 +164,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     );
 
     if (allMatches.length === 0) {
-      set((s) => ({ lastResult: 'invalid', lastResultId: s.lastResultId + 1, selectedEmojis: [] }));
+      set((s) => ({ lastResult: 'invalid', lastResultId: s.lastResultId + 1 }));
       return;
     }
 
@@ -172,7 +172,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const newMatches = allMatches.filter((c) => !foundWordSet.has(c.word.toLowerCase()));
 
     if (newMatches.length === 0) {
-      set((s) => ({ lastResult: 'already-found', lastResultId: s.lastResultId + 1, selectedEmojis: [] }));
+      set((s) => ({ lastResult: 'already-found', lastResultId: s.lastResultId + 1 }));
       return;
     }
 
