@@ -39,7 +39,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 ## Zämesetzli
 
 - [x] Emoji pool: drag-and-drop interaction for combining emojis (2026-04-21)
-- [ ] Valid compound: satisfying combine animation with score popup
+- [x] Valid compound: satisfying combine animation with score popup (2026-04-21)
 - [ ] Invalid compound: gentle bounce-back animation
 - [ ] Score display: running total with rank progression bar
 - [ ] Hint system: subtle glow on emojis that can be combined
