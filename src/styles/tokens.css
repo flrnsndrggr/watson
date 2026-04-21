@@ -215,6 +215,12 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Zämesetzli: hint glow on combinable emojis */
+@keyframes hintGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 198, 255, 0); }
+  50% { box-shadow: 0 0 8px 2px rgba(0, 198, 255, 0.35); }
+}
+
 /* Stats panel: bar chart grow animation */
 @keyframes statsBarGrow {
   from { transform: scaleX(0); transform-origin: left; }

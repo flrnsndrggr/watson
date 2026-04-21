@@ -4,10 +4,11 @@ import type { EmojiItem } from '@/types';
 interface EmojiPoolProps {
   emojis: EmojiItem[];
   selectedEmojis: string[];
+  hintableEmojis?: Set<string>;
   onSelect: (emoji: string) => void;
 }
 
-function EmojiButton({ item, isSelected, onSelect }: { item: EmojiItem; isSelected: boolean; onSelect: () => void }) {
+function EmojiButton({ item, isSelected, isHintable, onSelect }: { item: EmojiItem; isSelected: boolean; isHintable: boolean; onSelect: () => void }) {
   const [showNoun, setShowNoun] = useState(false);
 
   function handleDragStart(e: React.DragEvent) {
@@ -37,7 +38,9 @@ function EmojiButton({ item, isSelected, onSelect }: { item: EmojiItem; isSelect
         transition-all duration-[var(--transition-fast)] select-none cursor-grab active:cursor-grabbing
         ${isSelected
           ? 'scale-110 bg-[var(--color-cyan)] shadow-md ring-2 ring-[var(--color-cyan)]'
-          : 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80'
+          : isHintable
+            ? 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80 animate-[hintGlow_2s_ease-in-out_infinite]'
+            : 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80 opacity-50'
         }
       `}
       aria-label={item.canonical_noun}
@@ -52,7 +55,7 @@ function EmojiButton({ item, isSelected, onSelect }: { item: EmojiItem; isSelect
   );
 }
 
-export function EmojiPool({ emojis, selectedEmojis, onSelect }: EmojiPoolProps) {
+export function EmojiPool({ emojis, selectedEmojis, hintableEmojis, onSelect }: EmojiPoolProps) {
   return (
     <div className="flex flex-wrap justify-center gap-3 py-4">
       {emojis.map((item) => (
@@ -60,6 +63,7 @@ export function EmojiPool({ emojis, selectedEmojis, onSelect }: EmojiPoolProps) 
           key={item.emoji}
           item={item}
           isSelected={selectedEmojis.includes(item.emoji)}
+          isHintable={!hintableEmojis || hintableEmojis.has(item.emoji)}
           onSelect={() => onSelect(item.emoji)}
         />
       ))}

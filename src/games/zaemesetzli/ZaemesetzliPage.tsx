@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
@@ -117,6 +117,18 @@ export function ZaemesetzliPage() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevRank = useRef<Rank>(currentRank);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Emojis that appear in at least one unfound compound
+  const hintableEmojis = useMemo(() => {
+    if (!puzzle) return undefined;
+    const foundWordSet = new Set(foundWords.map((fw) => fw.word.toLowerCase()));
+    const unfound = puzzle.valid_compounds.filter((c) => !foundWordSet.has(c.word.toLowerCase()));
+    const set = new Set<string>();
+    for (const c of unfound) {
+      for (const emoji of c.components) set.add(emoji);
+    }
+    return set;
+  }, [puzzle, foundWords]);
 
   useEffect(() => {
     loadPuzzle(archiveDate ?? undefined);
@@ -268,6 +280,7 @@ export function ZaemesetzliPage() {
           <EmojiPool
             emojis={puzzle.emojis}
             selectedEmojis={selectedEmojis}
+            hintableEmojis={hintableEmojis}
             onSelect={selectEmoji}
           />
 
