@@ -17,7 +17,65 @@ import { EmojiPool } from './EmojiPool';
 import { CombineSlots } from './CombineSlots';
 import { ZaemesetzliResult } from './ZaemesetzliResult';
 import { useZaemesetzli } from './useZaemesetzli';
-import type { Rank } from '@/types';
+import type { Rank, CompoundWord } from '@/types';
+
+const DIFFICULTY_COLORS: Record<1 | 2 | 3, string> = {
+  1: 'var(--color-difficulty-1)',
+  2: 'var(--color-difficulty-2)',
+  3: 'var(--color-difficulty-3)',
+};
+
+const DIFFICULTY_LABELS: Record<1 | 2 | 3, string> = {
+  1: 'Einfach',
+  2: 'Mittel',
+  3: 'Schwer',
+};
+
+function DifficultyProgress({
+  foundWords,
+  validCompounds,
+}: {
+  foundWords: { difficulty: 1 | 2 | 3 }[];
+  validCompounds: CompoundWord[];
+}) {
+  const tiers = [1, 2, 3] as const;
+
+  return (
+    <div className="flex gap-2 px-1 pb-2" role="group" aria-label="Fortschritt nach Schwierigkeit">
+      {tiers.map((d) => {
+        const total = validCompounds.filter((c) => c.difficulty === d).length;
+        if (total === 0) return null;
+        const found = foundWords.filter((fw) => fw.difficulty === d).length;
+        const pct = Math.round((found / total) * 100);
+        return (
+          <div key={d} className="min-w-0 flex-1">
+            <div className="mb-0.5 flex items-center justify-between">
+              <span className="flex items-center gap-0.5 text-[10px] font-semibold">
+                <span style={{ color: DIFFICULTY_COLORS[d] }} aria-hidden="true">
+                  {'●'.repeat(d)}
+                </span>
+                <span className="text-[var(--color-gray-text)]">{DIFFICULTY_LABELS[d]}</span>
+              </span>
+              <span className="text-[10px] font-semibold text-[var(--color-gray-text)]">
+                {found}/{total}
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-gray-bg)]">
+              <div
+                className="h-full rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${pct}%`, backgroundColor: DIFFICULTY_COLORS[d] }}
+                role="progressbar"
+                aria-valuenow={found}
+                aria-valuemax={total}
+                aria-label={`${DIFFICULTY_LABELS[d]}: ${found} von ${total}`}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 const RANK_LABELS: Record<Rank, string> = {
   stift: 'Stift',
@@ -198,6 +256,14 @@ export function ZaemesetzliPage() {
 
       {status === 'playing' ? (
         <>
+          {/* Difficulty progress bars */}
+          {puzzle && (
+            <DifficultyProgress
+              foundWords={foundWords}
+              validCompounds={puzzle.valid_compounds}
+            />
+          )}
+
           {/* Emoji pool */}
           <EmojiPool
             emojis={puzzle.emojis}
@@ -271,10 +337,15 @@ export function ZaemesetzliPage() {
                           : 'bg-[var(--color-gray-bg)] text-[var(--color-black)]'
                       } ${isNewest ? 'animate-[popIn_300ms_ease]' : ''}`}
                     >
-                      <span>
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="inline-block h-2 w-2 flex-shrink-0 rounded-full"
+                          style={{ backgroundColor: DIFFICULTY_COLORS[fw.difficulty] }}
+                          aria-label={DIFFICULTY_LABELS[fw.difficulty]}
+                        />
                         {fw.components.join('')}{' '}
                         <span className="font-semibold">{fw.word}</span>
-                        {fw.is_mundart && <span className="ml-1">🇨🇭</span>}
+                        {fw.is_mundart && <span className="ml-0.5">🇨🇭</span>}
                       </span>
                       <span className="text-xs text-[var(--color-gray-text)]">
                         {fw.is_mundart && isNewest ? '🇨🇭 ' : ''}{fw.points}pt

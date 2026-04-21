@@ -87,24 +87,26 @@ export function CombineSlots({ selectedEmojis, onClear, onDrop, celebration }: C
       }`}
     >
       <span className="text-sm text-[var(--color-gray-text)]">Kombiniere:</span>
-      {slots.map((i) => (
-        <div key={i} className="flex items-center gap-1">
-          {i > 0 && i < (selectedEmojis.length > 2 ? 3 : 2) && (
-            <span className="text-[var(--color-gray-text)]">+</span>
-          )}
-          {i < (selectedEmojis.length > 2 ? 3 : 2) && (
+      {slots.map((i) => {
+        const isFilled = !!selectedEmojis[i];
+        const isGhost = i === 2 && selectedEmojis.length === 2;
+        const isVisible = i < 2 || selectedEmojis.length >= 2;
+        if (!isVisible) return null;
+        return (
+          <div key={i} className={`flex items-center gap-1 transition-opacity duration-150 ${isGhost ? 'opacity-40' : ''}`}>
+            {i > 0 && <span className="text-[var(--color-gray-text)]">+</span>}
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-lg border-2 text-xl transition-all duration-150 ${
-                selectedEmojis[i]
+                isFilled
                   ? 'border-[var(--color-cyan)] bg-[var(--color-cyan)]/10 animate-[slotFill_200ms_ease-out]'
                   : 'border-dashed border-[var(--color-gray-bg)]'
               }`}
             >
               {selectedEmojis[i] ?? '?'}
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
       <span className="mx-1 text-[var(--color-gray-text)]">=</span>
       <span className="text-lg">?</span>
       {selectedEmojis.length > 0 && (
