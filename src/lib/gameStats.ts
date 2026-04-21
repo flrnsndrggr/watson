@@ -34,10 +34,10 @@ function parseVerbindigeBucket(result: DailyResult): string {
 }
 
 /**
- * Schlagziil summary: "4/5"
+ * Schlagloch summary: "4/5"
  * Returns correct count as string.
  */
-function parseSchlagziilBucket(result: DailyResult): string {
+function parseSchlaglochBucket(result: DailyResult): string {
   const match = result.summary.match(/^(\d)\/5/);
   if (match) return match[1];
   return result.outcome === 'lost' ? '0' : '5';
@@ -65,7 +65,7 @@ const VERBINDIGE_BUCKETS = [
   { key: 'lost', label: 'Verloren' },
 ];
 
-const SCHLAGZIIL_BUCKETS = [
+const SCHLAGLOCH_BUCKETS = [
   { key: '5', label: '5/5' },
   { key: '4', label: '4/5' },
   { key: '3', label: '3/5' },
@@ -89,13 +89,13 @@ type BucketTemplate = { key: string; label: string }[];
 
 const PARSERS: Record<GameType, BucketParser> = {
   verbindige: parseVerbindigeBucket,
-  schlagziil: parseSchlagziilBucket,
+  schlagloch: parseSchlaglochBucket,
   zaemesetzli: parseZaemesetzliBucket,
 };
 
 const TEMPLATES: Record<GameType, BucketTemplate> = {
   verbindige: VERBINDIGE_BUCKETS,
-  schlagziil: SCHLAGZIIL_BUCKETS,
+  schlagloch: SCHLAGLOCH_BUCKETS,
   zaemesetzli: ZAEMESETZLI_BUCKETS,
 };
 

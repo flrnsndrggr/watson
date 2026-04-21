@@ -30,7 +30,7 @@ Compare what exists in code against what the dev brief specifies. Look for:
 
 **Missing game mechanics:**
 - Verbindige: "one away" hint, confetti on completion, difficulty-colored solved groups, 4-error limit with visual dots
-- Schlagziil: article links after solve, typo tolerance (Levenshtein ≤1), category labels, 3-error limit across all headlines
+- Schlagloch: article links after solve, typo tolerance (Levenshtein ≤1), category labels, 3-error limit across all headlines
 - Zämesetzli: drag-and-drop or tap-to-combine, compound validation feedback, hint system
 
 **Missing polish that the dev brief calls for:**

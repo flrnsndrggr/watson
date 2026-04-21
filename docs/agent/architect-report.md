@@ -6,9 +6,9 @@
 - All games follow the required file structure: `<Game>Page.tsx`, `use<Game>.ts`, `<game>.data.ts`.
 - `GameShell` wraps all game pages correctly.
 - `GameHeader` used consistently across all games.
-- `ShareButton` used in all games (VerbindigeResult, SchlagziilResult, ZaemesetzliPage).
-- `showToast` used in Verbindige, Zaemesetzli; Schlagziil appropriately omits it (inline card feedback).
-- `ErrorDots` used only where applicable (Verbindige, Schlagziil) — not forced on rank-based games.
+- `ShareButton` used in all games (VerbindigeResult, SchlaglochResult, ZaemesetzliPage).
+- `showToast` used in Verbindige, Zaemesetzli; Schlagloch appropriately omits it (inline card feedback).
+- `ErrorDots` used only where applicable (Verbindige, Schlagloch) — not forced on rank-based games.
 
 **Gaps:**
 
@@ -40,8 +40,8 @@
 - Extract a shared `getRank(score: number, thresholds: RankThresholds): Rank` to `src/lib/utils.ts` with a `RankThresholds` type in `src/types/index.ts`.
 
 **P2 — `normalize()` + `levenshtein()` inline in game hook:**
-- `src/games/schlagziil/useSchlagziil.ts:23-50` — 30 lines of utility code inside a game-specific file.
-- Move to `src/lib/utils.ts`; schlagziil imports them from there.
+- `src/games/schlagloch/useSchlagloch.ts:23-50` — 30 lines of utility code inside a game-specific file.
+- Move to `src/lib/utils.ts`; schlagloch imports them from there.
 
 **P2 — No Supabase integration in any game hook yet:**
 - All 4 hooks load from static `SAMPLE_*` / `DEMO_*` fixtures. Supabase client exists at `src/lib/supabase.ts` but is unused from game code.
@@ -55,17 +55,17 @@
 - `prefers-reduced-motion` handled globally in `src/styles/tokens.css:90-95` — all animations and transitions disabled at OS level. No component-level handling needed.
 
 **Gaps:**
-- **[P1] No keyboard navigation in Verbindige, Schlagziil, or Zaemesetzli.**
+- **[P1] No keyboard navigation in Verbindige, Schlagloch, or Zaemesetzli.**
   - Verbindige tiles (`src/games/verbindige/VerbindigeTile.tsx`) suppress tap highlight but have no `onKeyDown` or `role="button"` — keyboard users cannot select tiles.
-  - Schlagziil's guess input (`src/games/schlagziil/HeadlineCard.tsx`) likely relies on native `<input>` Enter — confirm Enter submits; the hint button needs keyboard support.
+  - Schlagloch's guess input (`src/games/schlagloch/HeadlineCard.tsx`) likely relies on native `<input>` Enter — confirm Enter submits; the hint button needs keyboard support.
   - Zaemesetzli emoji pool buttons (`src/games/zaemesetzli/EmojiPool.tsx`) need `onKeyDown` for Space/Enter activation.
 
 - **[P1] Insufficient ARIA labels on interactive elements:**
   - Only 1 `aria-label` found across all game directories (`EmojiPool.tsx:30` — emoji item).
-  - Verbindige tiles, Schlagziil hint buttons, Zaemesetzli combine slots all lack `aria-label`.
+  - Verbindige tiles, Schlagloch hint buttons, Zaemesetzli combine slots all lack `aria-label`.
 
-- **[P2] Schlagziil progress dots are color-only indicators.**
-  - `src/games/schlagziil/SchlagziilPage.tsx:54-66`: 5 colored dots (green=correct, pink=wrong, cyan=current, gray=pending) convey state through color alone.
+- **[P2] Schlagloch progress dots are color-only indicators.**
+  - `src/games/schlagloch/SchlaglochPage.tsx:54-66`: 5 colored dots (green=correct, pink=wrong, cyan=current, gray=pending) convey state through color alone.
   - Add `aria-label` per dot, e.g. `aria-label="Headline 1: richtig"`.
 
 - **[P2] Touch target audit partially passing:**
@@ -95,4 +95,4 @@
 
 5. **[P2] Plan `src/lib/puzzles.ts`** — before any Supabase integration lands in game hooks, define typed fetch functions per game table here. Prevents each hook from writing its own query pattern.
 
-6. **[P2] Schlagziil progress dot ARIA labels** — `src/games/schlagziil/SchlagziilPage.tsx:54-66`, add `aria-label` to each dot describing its state.
+6. **[P2] Schlagloch progress dot ARIA labels** — `src/games/schlagloch/SchlaglochPage.tsx:54-66`, add `aria-label` to each dot describing its state.

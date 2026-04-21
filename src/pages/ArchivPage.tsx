@@ -7,7 +7,7 @@ import type { GameType } from '@/types';
 const GAME_INFO: Record<string, { name: string; emoji: string; path: string; color: string }> = {
   verbindige: { name: 'Verbindige', emoji: '🇨🇭', path: '/verbindige', color: 'var(--color-cyan)' },
   zaemesetzli: { name: 'Zämesetzli', emoji: '🧩', path: '/zaemesetzli', color: 'var(--color-green)' },
-  schlagziil: { name: 'Schlagziil', emoji: '📰', path: '/schlagziil', color: 'var(--color-cyan)' },
+  schlagloch: { name: 'Schlagloch', emoji: '📰', path: '/schlagloch', color: 'var(--color-cyan)' },
 };
 
 const WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];

@@ -68,7 +68,7 @@ _Items from watson-qa-verbindige agent_
    - Files: `src/games/verbindige/VerbindigeResult.tsx` (line 23), `src/lib/share.ts`
    - Evidence: Captured share text via clipboard interceptor: "Verbindige #1 🇨🇭\n🟨🟨🟨🟨\n🟩🟩🟩🟩\n🟦🟦🟦🟦\n🟪🟪🟪🟪\nwatson.ch/spiele/verbindige". Header on same page rendered "Verbindige #001". Result footer rendered "Verbindige #2026-04-16". Observed 2026-04-18.
    - Related: #3 — same puzzle identifier inconsistency; this item extends the fix to the share text surface
-   - Related: Schlagziil #4 — share text also appends wrong base URL (watson.ch instead of production domain)
+   - Related: Schlagloch #4 — share text also appends wrong base URL (watson.ch instead of production domain)
 
 6. [x] P2 - Share error propagates uncaught — silent failure when clipboard is denied
    - Agent: watson-qa-verbindige
@@ -82,7 +82,7 @@ _Items from watson-qa-verbindige agent_
 7. [x] P1 - Nav game links hidden off-screen on mobile — no scroll affordance
    - Agent: watson-qa-verbindige
    - Scenario: Mobile UX — viewport constrained to 390px width
-   - Problem: At 390px viewport width, the header allocates ~165px to the watson logo+badge and ~54px to the Login button, leaving only ~171px for the `<nav>` element. The 4 nav links (Spiele, Verbindige, Zämesetzli, Schlagziil) need ~335px total, so `scrollWidth` (347px) exceeds `clientWidth` (165px). `overflow-x-auto` on the nav handles the overflow silently — no gradient fade, clipping hint, or arrow signals that more items exist. A user landing on Verbindige via a shared link sees only "Spiele" and "Verbindige"; "Zämesetzli" and "Schlagziil" are invisible without scrolling.
+   - Problem: At 390px viewport width, the header allocates ~165px to the watson logo+badge and ~54px to the Login button, leaving only ~171px for the `<nav>` element. The 4 nav links (Spiele, Verbindige, Zämesetzli, Schlagloch) need ~335px total, so `scrollWidth` (347px) exceeds `clientWidth` (165px). `overflow-x-auto` on the nav handles the overflow silently — no gradient fade, clipping hint, or arrow signals that more items exist. A user landing on Verbindige via a shared link sees only "Spiele" and "Verbindige"; "Zämesetzli" and "Schlagloch" are invisible without scrolling.
    - Suggested fix: Add a right-side gradient fade overlay on the nav when overflowing (CSS `::after` with `background: linear-gradient(to right, transparent, var(--color-nav-bg))`). Alternatively switch to a hamburger/drawer menu at the `sm` breakpoint (≤640px).
    - Files: `src/pages/Layout.tsx:95` (`<nav className="flex gap-1 overflow-x-auto">`)
    - Evidence: JS at 390px max-width confirmed `nav.scrollWidth=347, nav.clientWidth=165, isOverflowing=true`. Screenshot showed only "Spiele" + "Verbindige" + "Login" visible in nav bar with no visual hint of additional items. Observed 2026-04-20.
@@ -99,86 +99,86 @@ _Items from watson-qa-verbindige agent_
 
 ---
 
-## Schlagziil QA Findings
+## Schlagloch QA Findings
 
-_Items from watson-qa-schlagziil agent_
+_Items from watson-qa-schlagloch agent_
 
 1. [x] P1 - Revealed answers show normalized non-German strings
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Error Counting — game-over after 3 total errors on headline 1
    - Problem: When an answer is revealed (game-over), `revealedAnswers[i]` is set to `DEMO_ANSWERS[i][0]` which is the lowercase normalized form. `HeadlineCard` only uppercases the first character. Result: "Missstaende" instead of "Missstände", "Ubs" instead of "UBS", "Co2-gesetz" instead of "CO2-Gesetz".
    - Suggested fix: Add a `display_answer` field alongside `DEMO_ANSWERS` for each headline holding the canonical display-ready string. Use that in `revealedAnswers` instead of the normalized key.
-   - Files: `src/games/schlagziil/schlagziil.data.ts`, `src/games/schlagziil/useSchlagziil.ts`
+   - Files: `src/games/schlagloch/schlagloch.data.ts`, `src/games/schlagloch/useSchlagloch.ts`
    - Evidence: Results screen showed "Missstaende", "Ubs", "Co2-gesetz" live in production. Observed 2026-04-16.
-   - Related: #2 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
+   - Related: #2 — both affect the wrong-guess / game-over flow in Schlagloch; consider fixing together
 
 2. [x] P1 - No visual feedback for wrong guesses below error limit
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Answer Validation — submitting wrong answers with totalErrors < 3
-   - Problem: After a wrong guess, `results[currentIndex]` stays `null` so the HeadlineCard border stays neutral. `lastGuessResult: 'wrong'` is set in the store but `SchlagziilPage` only reads `lastGuessResult` for the correct-answer auto-advance timer — it never triggers a red flash, shake, or toast. The user sees the input clear with no feedback beyond the error dot filling.
-   - Suggested fix: In `SchlagziilPage`, add a `useEffect` on `lastGuessResult === 'wrong'` to show a toast ("Falsch!") or pass a `wrongFlash` prop to `HeadlineCard` for a brief red-border animation.
-   - Files: `src/games/schlagziil/SchlagziilPage.tsx`, `src/games/schlagziil/HeadlineCard.tsx`
+   - Problem: After a wrong guess, `results[currentIndex]` stays `null` so the HeadlineCard border stays neutral. `lastGuessResult: 'wrong'` is set in the store but `SchlaglochPage` only reads `lastGuessResult` for the correct-answer auto-advance timer — it never triggers a red flash, shake, or toast. The user sees the input clear with no feedback beyond the error dot filling.
+   - Suggested fix: In `SchlaglochPage`, add a `useEffect` on `lastGuessResult === 'wrong'` to show a toast ("Falsch!") or pass a `wrongFlash` prop to `HeadlineCard` for a brief red-border animation.
+   - Files: `src/games/schlagloch/SchlaglochPage.tsx`, `src/games/schlagloch/HeadlineCard.tsx`
    - Evidence: Submitted two wrong guesses — input cleared each time with no card colour change, no toast, only error dots updated. Confirmed via Zustand state: `totalErrors: 2, results: [null,null,null,null,null], lastGuessResult: 'wrong'`. Observed 2026-04-16.
-   - Related: #1 — both affect the wrong-guess / game-over flow in Schlagziil; consider fixing together
+   - Related: #1 — both affect the wrong-guess / game-over flow in Schlagloch; consider fixing together
 
 3. [x] P2 - Share CTA text differs from brand spec ("Kennst du watson?" vs "Ich lese watson, und du?")
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Results Screen — share button
-   - Problem: `SchlagziilResult.tsx` passes `"Kennst du watson?"` as the CTA line in the share text. The expected brand CTA is "Ich lese watson, und du?".
+   - Problem: `SchlaglochResult.tsx` passes `"Kennst du watson?"` as the CTA line in the share text. The expected brand CTA is "Ich lese watson, und du?".
    - Suggested fix: Change the resultLines string from `"Kennst du watson?"` to `"Ich lese watson, und du?"`.
-   - Files: `src/games/schlagziil/SchlagziilResult.tsx`
+   - Files: `src/games/schlagloch/SchlaglochResult.tsx`
    - Evidence: Page text at game-over contained "Kennst du watson?". Observed 2026-04-16.
    - Priority adjusted from P1 to P2: minor wording tweak, not a UX or gameplay issue
-   - Related: #4 — both are share-related issues on the Schlagziil result screen; consider fixing together
-   - Triage note (2026-04-20): Code at `SchlagziilResult.tsx:102` now reads `"Ich lese watson, und du?"` — this appears to have been fixed already. Verify in production before marking complete.
+   - Related: #4 — both are share-related issues on the Schlagloch result screen; consider fixing together
+   - Triage note (2026-04-20): Code at `SchlaglochResult.tsx:102` now reads `"Ich lese watson, und du?"` — this appears to have been fixed already. Verify in production before marking complete.
 
 4. [x] P1 - Share link appends non-existent watson.ch URL
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Results Screen — share button
-   - Problem: `generateShareText` appends `watson.ch/spiele/schlagziil` to every share text. That URL does not exist — the game lives at `games-watson.netlify.app/schlagziil`. Anyone who taps the link in a shared message hits a 404.
+   - Problem: `generateShareText` appends `watson.ch/spiele/schlagloch` to every share text. That URL does not exist — the game lives at `games-watson.netlify.app/schlagloch`. Anyone who taps the link in a shared message hits a 404.
    - Suggested fix: Update `share.ts` to use the real base URL (env variable `VITE_SITE_URL` or hardcoded production domain).
    - Files: `src/lib/share.ts`
-   - Evidence: Share text footer reads `watson.ch/spiele/schlagziil`. Same bug affects all games sharing via this util. Observed 2026-04-16.
-   - Related: #3 — both are share-related issues on the Schlagziil result screen; consider fixing together
+   - Evidence: Share text footer reads `watson.ch/spiele/schlagloch`. Same bug affects all games sharing via this util. Observed 2026-04-16.
+   - Related: #3 — both are share-related issues on the Schlagloch result screen; consider fixing together
    - Related: Cross-game — share.ts URL affects all 4 games; fixing here resolves it everywhere
 
 5. [!] P1 - All article URLs are placeholder paths — "watson-Artikel lesen" links 404
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Article Links — results screen after game-over
-   - Problem: All 5 headlines in `SAMPLE_SCHLAGZIIL` have stub `article_url` values (`/energie/123`, `/migration/456`, etc.). Clicking "watson-Artikel lesen →" leads to a 404, breaking the core value prop of reading the real article after guessing.
+   - Problem: All 5 headlines in `SAMPLE_SCHLAGLOCH` have stub `article_url` values (`/energie/123`, `/migration/456`, etc.). Clicking "watson-Artikel lesen →" leads to a 404, breaking the core value prop of reading the real article after guessing.
    - Suggested fix: Replace stub URLs with real watson.ch article URLs for each headline before launch.
-   - Files: `src/games/schlagziil/schlagziil.data.ts`, `src/games/schlagziil/HeadlineCard.tsx`
+   - Files: `src/games/schlagloch/schlagloch.data.ts`, `src/games/schlagloch/HeadlineCard.tsx`
    - Evidence: Interactive tree confirmed all 5 links use numeric stub paths (`/123`, `/456`, `/789`, `/101`, `/102`). Observed 2026-04-16.
    - Priority adjusted from P2 to P1: article links are the core post-game value prop; all 5 returning 404 blocks real user engagement flow
-   - Related: Schlagziil #4 — share URL also wrong; both need the correct production base URL
+   - Related: Schlagloch #4 — share URL also wrong; both need the correct production base URL
    - Note: Requires manual review — editorial content curation needed; real watson.ch article URLs must be sourced by a human editor. One headline (CO2-Gesetz "sagt Ja") is factually incorrect (Switzerland voted No in June 2021).
 
 6. [x] P1 - Hint state leaks between headlines — subsequent tips auto-reveal without user click
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Answer Validation — clicked "Tipp anzeigen" on headline 1, then advanced through all 5 headlines
    - Problem: `HeadlineCard.tsx:33` uses `const [showHint, setShowHint] = useState(false)` for hint visibility. React reuses the same component instance when `currentIndex` advances (same JSX position, only props change), so `showHint` stays `true` from the previous headline. After clicking the hint once on headline 1, the hint text for headlines 2–5 is displayed automatically without any user action.
-   - Suggested fix: Add `key={currentIndex}` to the `HeadlineCard` in `SchlagziilPage.tsx` (line 76) so React force-remounts the component on each headline advance, resetting all local state. Alternatively add `useEffect(() => { setShowHint(false); }, [display])` inside `HeadlineCard.tsx`.
-   - Files: `src/games/schlagziil/HeadlineCard.tsx`, `src/games/schlagziil/SchlagziilPage.tsx`
+   - Suggested fix: Add `key={currentIndex}` to the `HeadlineCard` in `SchlaglochPage.tsx` (line 76) so React force-remounts the component on each headline advance, resetting all local state. Alternatively add `useEffect(() => { setShowHint(false); }, [display])` inside `HeadlineCard.tsx`.
+   - Files: `src/games/schlagloch/HeadlineCard.tsx`, `src/games/schlagloch/SchlaglochPage.tsx`
    - Evidence: Clicked "Tipp anzeigen" on headline 1 (2026/Solarenergie). Screenshots of headlines 2 (2025), 3 (2023), 4 (2021), 5 (2024) all showed hint text immediately without any click. `hintsUsed` Zustand state tracked only the intentional click correctly (💡 shown only for 2026 in final score), confirming the bug is isolated to local component state. Observed 2026-04-18.
 
 7. [ ] P1 - `autoFocus` on HeadlineCard input triggers mobile keyboard before player reads headline
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Mobile Input — page load on 390px viewport
    - Problem: `HeadlineCard.tsx:152` has `autoFocus` on the text input. On mobile devices this causes the virtual keyboard to pop up immediately on page load, covering the lower portion of the screen before the player has read the full headline. The user must dismiss the keyboard manually just to see what they need to guess. On headline advance the same auto-focus fires again, re-triggering the keyboard. This is a known mobile UX anti-pattern for quiz/reading games.
    - Suggested fix: Remove `autoFocus` from the input. On desktop it can be re-added via a `useEffect` with `inputRef.focus()` guarded by `window.innerWidth > 768` or a media-query check.
-   - Files: `src/games/schlagziil/HeadlineCard.tsx` (line 152)
+   - Files: `src/games/schlagloch/HeadlineCard.tsx` (line 152)
    - Evidence: `autoFocus` attribute confirmed in source. Standard browser behaviour on iOS/Android: `autoFocus` on an `<input>` opens the soft keyboard on mount. Observed 2026-04-18.
    - Priority adjusted from P2 to P1: on mobile (primary platform), the keyboard covering the headline before the player reads it actively hurts gameplay — this is confusing UX blocking real gameplay, not minor polish
 
 8. [ ] P2 - Year line in results/share uses puzzle order, not chronological order
-   - Agent: watson-qa-schlagziil
+   - Agent: watson-qa-schlagloch
    - Scenario: Results Screen — completing all 5 headlines
-   - Problem: `SchlagziilResult.tsx:13-19` builds the year line by mapping `puzzle.headlines` in stored order. SAMPLE_SCHLAGZIIL stores headlines as 2026, 2025, 2023, 2021, 2024. The results panel and share text show "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — 2021 appears after 2023, breaking any readable timeline. A recipient reading a shared result cannot scan it as a chronology.
+   - Problem: `SchlaglochResult.tsx:13-19` builds the year line by mapping `puzzle.headlines` in stored order. SAMPLE_SCHLAGLOCH stores headlines as 2026, 2025, 2023, 2021, 2024. The results panel and share text show "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — 2021 appears after 2023, breaking any readable timeline. A recipient reading a shared result cannot scan it as a chronology.
    - Suggested fix: Sort entries by `article_year` before joining: map headlines+results to objects, sort ascending by year, then join. This decouples puzzle storage order from the user-facing output.
-   - Files: `src/games/schlagziil/SchlagziilResult.tsx` (lines 13-19)
+   - Files: `src/games/schlagloch/SchlaglochResult.tsx` (lines 13-19)
    - Evidence: Live results screen showed "2026 ✓ | 2025 ✓ | 2023 ✓ | 2021 ✓ | 2024 ✓" — out-of-order years confirmed by screenshot. Observed 2026-04-18.
-   - Triage note (2026-04-20): **Partially resolved.** Share text no longer includes a year line — it uses an emoji accuracy grid (`🟩`/`🟥` squares) instead. However, `article_year` still exists in data and is displayed per-headline in the results screen (`SchlagziilResult.tsx:139`). Headlines are still rendered in puzzle storage order (2026, 2025, 2023, 2021, 2024), not chronological. The share text half of this issue is resolved; the results screen ordering remains if deemed important.
-   - Triage note (2026-04-21): **Fully resolved.** Results screen now sorts headlines by `article_year` at `SchlagziilResult.tsx:293`. Share text uses emoji grid (no year line). Both halves fixed. Can be marked `[x]` by roadmap-worker.
+   - Triage note (2026-04-20): **Partially resolved.** Share text no longer includes a year line — it uses an emoji accuracy grid (`🟩`/`🟥` squares) instead. However, `article_year` still exists in data and is displayed per-headline in the results screen (`SchlaglochResult.tsx:139`). Headlines are still rendered in puzzle storage order (2026, 2025, 2023, 2021, 2024), not chronological. The share text half of this issue is resolved; the results screen ordering remains if deemed important.
+   - Triage note (2026-04-21): **Fully resolved.** Results screen now sorts headlines by `article_year` at `SchlaglochResult.tsx:293`. Share text uses emoji grid (no year line). Both halves fixed. Can be marked `[x]` by roadmap-worker.
 
 ---
 
@@ -203,7 +203,7 @@ _Items from watson-qa-zaemesetzli agent_
    - Files: `src/games/zaemesetzli/ZaemesetzliPage.tsx`, `src/components/shared/ShareButton.tsx`
    - Evidence: Clicked "Teilen" at 2/16 found, 1/28 Pkt. Page state unchanged, no console output, no toast or modal. Observed 2026-04-16.
    - Related: Verbindige #6 — same share error handling gap in share.ts; fixing share.ts centrally would benefit both games
-   - Related: Schlagziil #4 — share.ts is the common fix surface for share URL, error handling, and feedback across all games
+   - Related: Schlagloch #4 — share.ts is the common fix surface for share URL, error handling, and feedback across all games
 
 3. [x] P1 - Hint deducts a point but does not auto-select the hinted emojis
    - Agent: watson-qa-zaemesetzli
@@ -376,10 +376,10 @@ _Items from watson-qa-buchstaebli agent_
 5. [!] P2 - Buchstäbli is an orphaned route — live but not linked from navigation
    - Agent: watson-qa-buchstaebli
    - Scenario: First Play — navigating to game from landing page
-   - Problem: The main nav shows only Verbindige, Zämesetzli, Schlagziil. The game is fully playable at `/buchstaebli` but a user starting at the homepage cannot discover it. The game appears to have been removed from the nav while the route and game logic remain deployed, leaving it in a half-removed state.
+   - Problem: The main nav shows only Verbindige, Zämesetzli, Schlagloch. The game is fully playable at `/buchstaebli` but a user starting at the homepage cannot discover it. The game appears to have been removed from the nav while the route and game logic remain deployed, leaving it in a half-removed state.
    - Suggested fix: Either restore the nav link (if the game is meant to stay live) or remove the route from the production deploy to avoid confusion.
    - Files: `src/pages/Layout.tsx` (nav links), `src/App.tsx` (router config)
-   - Evidence: Nav links on production: [Spiele, Verbindige, Zämesetzli, Schlagziil]. Direct navigation to `/buchstaebli` loads a fully functional game. Observed 2026-04-19.
+   - Evidence: Nav links on production: [Spiele, Verbindige, Zämesetzli, Schlagloch]. Direct navigation to `/buchstaebli` loads a fully functional game. Observed 2026-04-19.
    - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** No `/buchstaebli` route in `App.tsx`. No `src/games/buchstaebli/` directory. If the game was live on production, it may have been deployed from a different branch or removed since. See #1 triage note.
 
 ---

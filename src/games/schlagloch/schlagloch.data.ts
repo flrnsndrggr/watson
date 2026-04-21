@@ -1,6 +1,6 @@
-import type { SchlagziilPuzzle } from '@/types';
+import type { SchlaglochPuzzle } from '@/types';
 
-export const SAMPLE_SCHLAGZIIL: SchlagziilPuzzle = {
+export const SAMPLE_SCHLAGLOCH: SchlaglochPuzzle = {
   id: 's-001',
   date: '2026-04-16',
   headlines: [

@@ -20,7 +20,7 @@ interface GameInfo {
 const GAMES: GameInfo[] = [
   { type: 'verbindige', name: 'Verbindige', emoji: '🇨🇭', path: '/verbindige', color: 'var(--color-cyan)' },
   { type: 'zaemesetzli', name: 'Zämesetzli', emoji: '🧩', path: '/zaemesetzli', color: 'var(--color-green)' },
-  { type: 'schlagziil', name: 'Schlagziil', emoji: '📰', path: '/schlagziil', color: 'var(--color-cyan)' },
+  { type: 'schlagloch', name: 'Schlagloch', emoji: '📰', path: '/schlagloch', color: 'var(--color-cyan)' },
 ];
 
 function StreakCard({ game, streak }: { game: GameInfo; streak: StreakData }) {

@@ -4,7 +4,7 @@
 
 ### Branch: temp-holder (commits 29f7061..31bc00d)
 
-15 commits covering: Buchstäbli removal, Supabase SDK swap to postgrest-js, localStorage game state persistence, streak tracking, reduced-motion support, ShareButton Web Share API, puzzle ID standardization, Schlagziil display answers, HeadlineCard key fix, Zämesetzli max_score correction.
+15 commits covering: Buchstäbli removal, Supabase SDK swap to postgrest-js, localStorage game state persistence, streak tracking, reduced-motion support, ShareButton Web Share API, puzzle ID standardization, Schlagloch display answers, HeadlineCard key fix, Zämesetzli max_score correction.
 
 **CRITICAL** (must fix before merge):
 
@@ -22,7 +22,7 @@
 
 2. Zämesetzli streak triggers on first found word, not game completion.
    - File: `src/games/zaemesetzli/ZaemesetzliPage.tsx:49-52`
-   - Problem: `recordPlay` fires when `foundWords.length > 0`, meaning finding a single word records the streak. Verbindige and Schlagziil record on game completion (`status === 'won' || 'lost'` / `status === 'finished'`). This inconsistency means a Zämesetzli player who finds one word and abandons gets streak credit, while a Verbindige player who solves 3/4 groups and quits does not.
+   - Problem: `recordPlay` fires when `foundWords.length > 0`, meaning finding a single word records the streak. Verbindige and Schlagloch record on game completion (`status === 'won' || 'lost'` / `status === 'finished'`). This inconsistency means a Zämesetzli player who finds one word and abandons gets streak credit, while a Verbindige player who solves 3/4 groups and quits does not.
    - Suggested fix: Add a completion condition to Zämesetzli (e.g., all words found, or a time/attempt threshold) and trigger streak recording there.
 
 3. localStorage game state accumulates indefinitely.
@@ -81,7 +81,7 @@ _None._
 
 ### Branch: temp-holder (commits 90cc78d..87dbe18)
 
-2 application commits: AdSlot placeholder styling (`41077ee`), Schlagziil wrong-answer shake feedback (`87dbe18`).
+2 application commits: AdSlot placeholder styling (`41077ee`), Schlagloch wrong-answer shake feedback (`87dbe18`).
 
 **CRITICAL** (must fix before merge):
 
@@ -90,18 +90,18 @@ _None._
 **WARNING** (should fix):
 
 1. Shake animation on HeadlineCard uses `transform: translateX()` — broken under existing `transform: none !important` reduced-motion rule.
-   - File: `src/styles/tokens.css:49-53` (shake keyframe), `src/games/schlagziil/HeadlineCard.tsx:58`
+   - File: `src/styles/tokens.css:49-53` (shake keyframe), `src/games/schlagloch/HeadlineCard.tsx:58`
    - Problem: The `shake` keyframe uses `transform: translateX(±8px)`. The existing CRITICAL from the first review (`transform: none !important` in the `prefers-reduced-motion` media query at `tokens.css:116`) kills this animation's visual effect entirely — the transform is overridden to `none`. The `animation-duration: 0.01ms !important` rule fires first, so the animation is already effectively hidden for reduced-motion users (correct). However, this is yet another transform-based animation affected by the `transform: none !important` rule. This reinforces the urgency of fixing the original CRITICAL.
    - Suggested fix: Fix the original CRITICAL (remove `transform: none !important`). No changes needed to the shake animation itself.
 
 2. `wrongFlash` state is not scoped to the current headline — all headlines would flash if rendered simultaneously.
-   - File: `src/games/schlagziil/SchlagziilPage.tsx:45,113-118`
-   - Problem: `wrongFlash` is a single boolean in SchlagziilPage state, passed to the HeadlineCard at `currentIndex`. Currently only one HeadlineCard renders at a time (the active one), so this works. But if the layout ever changes to show multiple headlines (e.g., a grid view, or showing the previous card during transition), all visible cards would receive the same `wrongFlash` prop. Low risk since the current UI is single-card, but the state should ideally be scoped (e.g., `wrongFlashIndex: number | null`).
+   - File: `src/games/schlagloch/SchlaglochPage.tsx:45,113-118`
+   - Problem: `wrongFlash` is a single boolean in SchlaglochPage state, passed to the HeadlineCard at `currentIndex`. Currently only one HeadlineCard renders at a time (the active one), so this works. But if the layout ever changes to show multiple headlines (e.g., a grid view, or showing the previous card during transition), all visible cards would receive the same `wrongFlash` prop. Low risk since the current UI is single-card, but the state should ideally be scoped (e.g., `wrongFlashIndex: number | null`).
    - Suggested fix: Store `wrongFlashIndex` instead of a boolean, and only pass `wrongFlash={wrongFlashIndex === currentIndex}` to HeadlineCard.
 
 **NOTE** (consider):
 
-1. Schlagziil wrong-answer feedback resolves ROADMAP P1 item #2 (Schlagziil section).
+1. Schlagloch wrong-answer feedback resolves ROADMAP P1 item #2 (Schlagloch section).
    - File: `ROADMAP.md:94-100`
    - The implementation matches the suggested fix exactly: `useEffect` on `lastGuessResult === 'wrong'`, shows toast ("Falsch!"), passes `wrongFlash` prop for red-border + shake animation. This ROADMAP item can be marked as resolved once the branch merges.
 

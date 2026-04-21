@@ -1,25 +1,25 @@
 import { create } from 'zustand';
-import type { SchlagziilPuzzle, StreakData, LeaderboardGameType } from '@/types';
-import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagziil.data';
+import type { SchlaglochPuzzle, StreakData, LeaderboardGameType } from '@/types';
+import { SAMPLE_SCHLAGLOCH, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagloch.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate, getTodayDateCET } from '@/lib/supabase';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlagziilHeadlineGuess } from '@/lib/analytics';
+import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlaglochHeadlineGuess } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 
-/** Standard Schlagziil has 5 headlines; Rückblick (Sunday) has more. */
+/** Standard Schlagloch has 5 headlines; Rückblick (Sunday) has more. */
 const STANDARD_HEADLINE_COUNT = 5;
 const STANDARD_MAX_ERRORS = 3;
 const RUECKBLICK_MAX_ERRORS = 5;
 
-interface SchlagziilPuzzleWithAnswers extends SchlagziilPuzzle {
+interface SchlaglochPuzzleWithAnswers extends SchlaglochPuzzle {
   answers?: string[][];
   display_answers?: string[];
 }
 
-interface SchlagziilState {
-  puzzle: SchlagziilPuzzle | null;
+interface SchlaglochState {
+  puzzle: SchlaglochPuzzle | null;
   answers: string[][];
   displayAnswers: string[];
   currentIndex: number;
@@ -43,7 +43,7 @@ interface SchlagziilState {
   clearLastResult: () => void;
 }
 
-interface SchlagziilProgress {
+interface SchlaglochProgress {
   currentIndex: number;
   totalErrors: number;
   results: ('correct' | 'wrong' | null)[];
@@ -52,13 +52,13 @@ interface SchlagziilProgress {
   startedAt: number | null;
 }
 
-function getLeaderboardType(state: SchlagziilState): LeaderboardGameType {
-  return state.isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil';
+function getLeaderboardType(state: SchlaglochState): LeaderboardGameType {
+  return state.isRueckblick ? 'schlagloch_rueckblick' : 'schlagloch';
 }
 
-function persistSchlagziil(state: SchlagziilState): void {
+function persistSchlagloch(state: SchlaglochState): void {
   if (state.isArchive || !state.puzzle || state.status !== 'playing') return;
-  saveGameProgress<SchlagziilProgress>('schlagziil', state.puzzle.id, {
+  saveGameProgress<SchlaglochProgress>('schlagloch', state.puzzle.id, {
     currentIndex: state.currentIndex,
     totalErrors: state.totalErrors,
     results: state.results,
@@ -97,7 +97,7 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n];
 }
 
-export const useSchlagziil = create<SchlagziilState>((set, get) => ({
+export const useSchlagloch = create<SchlaglochState>((set, get) => ({
   puzzle: null,
   answers: [],
   displayAnswers: [],
@@ -109,7 +109,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   hintsUsed: [],
   status: 'loading',
   lastGuessResult: null,
-  streak: getStreak('schlagziil'),
+  streak: getStreak('schlagloch'),
   isArchive: false,
   isRueckblick: false,
   startedAt: null,
@@ -118,10 +118,10 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
   loadPuzzle: async (archiveDate?: string) => {
     set({ status: 'loading', isArchive: !!archiveDate });
     const fetched = archiveDate
-      ? await fetchPuzzleByDate<SchlagziilPuzzleWithAnswers>('schlagziil', archiveDate)
-      : await fetchTodaysPuzzle<SchlagziilPuzzleWithAnswers>('schlagziil');
+      ? await fetchPuzzleByDate<SchlaglochPuzzleWithAnswers>('schlagloch', archiveDate)
+      : await fetchTodaysPuzzle<SchlaglochPuzzleWithAnswers>('schlagloch');
     const fallbackDate = archiveDate ?? getTodayDateCET();
-    const puzzle: SchlagziilPuzzle = fetched ?? { ...SAMPLE_SCHLAGZIIL, date: fallbackDate };
+    const puzzle: SchlaglochPuzzle = fetched ?? { ...SAMPLE_SCHLAGLOCH, date: fallbackDate };
     const answers = fetched?.answers ?? DEMO_ANSWERS;
     const displayAnswers = fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS;
     const isRueckblick = puzzle.headlines.length > STANDARD_HEADLINE_COUNT;
@@ -129,7 +129,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
 
     // Restore in-progress state for today's puzzle
     if (!archiveDate) {
-      const saved = loadGameProgress<SchlagziilProgress>('schlagziil', puzzle.id);
+      const saved = loadGameProgress<SchlaglochProgress>('schlagloch', puzzle.id);
       if (saved && saved.results.some((r) => r === null)) {
         set({
           puzzle,
@@ -147,12 +147,12 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           elapsedSeconds: null,
           isRueckblick,
         });
-        trackGameStarted('schlagziil', false);
+        trackGameStarted('schlagloch', false);
         return;
       }
     }
 
-    clearGameProgress('schlagziil');
+    clearGameProgress('schlagloch');
     set({
       puzzle,
       answers,
@@ -168,7 +168,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       elapsedSeconds: null,
       isRueckblick,
     });
-    trackGameStarted('schlagziil', !!archiveDate);
+    trackGameStarted('schlagloch', !!archiveDate);
   },
 
   useHint: (index: number) => {
@@ -200,14 +200,14 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
       newRevealed[currentIndex] = displayAnswers[currentIndex] ?? answers[0];
       const headline = get().puzzle?.headlines[currentIndex];
       if (headline) {
-        trackSchlagziilHeadlineGuess('correct', currentIndex, headline.difficulty, get().hintsUsed[currentIndex]);
+        trackSchlaglochHeadlineGuess('correct', currentIndex, headline.difficulty, get().hintsUsed[currentIndex]);
       }
       set({ results: newResults, revealedAnswers: newRevealed, lastGuessResult: 'correct' });
-      persistSchlagziil(get());
+      persistSchlagloch(get());
     } else {
       const headline = get().puzzle?.headlines[currentIndex];
       if (headline) {
-        trackSchlagziilHeadlineGuess('wrong', currentIndex, headline.difficulty, get().hintsUsed[currentIndex]);
+        trackSchlaglochHeadlineGuess('wrong', currentIndex, headline.difficulty, get().hintsUsed[currentIndex]);
       }
       const newErrors = totalErrors + 1;
       if (newErrors >= maxErrors) {
@@ -223,21 +223,21 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
           void submitLeaderboardEntry(getLeaderboardType(get()), correctCount, elapsed);
         }
         const streakUpdate = get().isArchive ? {} : (() => {
-          const streak = recordGamePlayed('schlagziil');
-          checkStreakMilestone('schlagziil', streak.current);
+          const streak = recordGamePlayed('schlagloch');
+          checkStreakMilestone('schlagloch', streak.current);
           return { streak };
         })();
-        trackGameCompleted('schlagziil', 'lost', get().isArchive, correctCount, elapsed);
+        trackGameCompleted('schlagloch', 'lost', get().isArchive, correctCount, elapsed);
         if (!get().isArchive) {
           const emojiLine = newResults.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-          saveDailyResult('schlagziil', {
+          saveDailyResult('schlagloch', {
             outcome: 'lost',
             summary: `${correctCount}/${newResults.length}`,
             emojiLine,
             timeSeconds: elapsed,
           });
         }
-        clearGameProgress('schlagziil');
+        clearGameProgress('schlagloch');
         set({
           totalErrors: newErrors,
           results: newResults,
@@ -249,7 +249,7 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         });
       } else {
         set({ totalErrors: newErrors, lastGuessResult: 'wrong' });
-        persistSchlagziil(get());
+        persistSchlagloch(get());
       }
     }
   },
@@ -265,25 +265,25 @@ export const useSchlagziil = create<SchlagziilState>((set, get) => ({
         void submitLeaderboardEntry(getLeaderboardType(get()), correctCount, elapsed);
       }
       const streakUpdate2 = get().isArchive ? {} : (() => {
-          const streak = recordGamePlayed('schlagziil');
-          checkStreakMilestone('schlagziil', streak.current);
+          const streak = recordGamePlayed('schlagloch');
+          checkStreakMilestone('schlagloch', streak.current);
           return { streak };
         })();
-      trackGameCompleted('schlagziil', 'won', get().isArchive, correctCount, elapsed);
+      trackGameCompleted('schlagloch', 'won', get().isArchive, correctCount, elapsed);
       if (!get().isArchive) {
         const emojiLine = results.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-        saveDailyResult('schlagziil', {
+        saveDailyResult('schlagloch', {
           outcome: 'won',
           summary: `${correctCount}/${puzzle.headlines.length}`,
           emojiLine,
           timeSeconds: elapsed,
         });
       }
-      clearGameProgress('schlagziil');
+      clearGameProgress('schlagloch');
       set({ status: 'finished', elapsedSeconds: elapsed, ...streakUpdate2 });
     } else {
       set({ currentIndex: nextIndex, lastGuessResult: null });
-      persistSchlagziil(get());
+      persistSchlagloch(get());
     }
   },
 

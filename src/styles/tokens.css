@@ -234,14 +234,14 @@ body {
   to { transform: scaleX(1); transform-origin: left; }
 }
 
-/* Schlagziil: answer word fills into headline blank */
+/* Schlagloch: answer word fills into headline blank */
 @keyframes wordFillBlank {
   0% { opacity: 0; transform: scale(0.7) translateY(3px); }
   55% { opacity: 1; transform: scale(1.08) translateY(-1px); }
   100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Schlagziil: card exits before advancing to next headline */
+/* Schlagloch: card exits before advancing to next headline */
 @keyframes cardExit {
   from { opacity: 1; transform: translateX(0) scale(1); }
   to { opacity: 0; transform: translateX(-24px) scale(0.97); }

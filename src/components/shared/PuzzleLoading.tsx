@@ -1,6 +1,6 @@
 import { GameShell } from './GameShell';
 
-type PuzzleVariant = 'verbindige' | 'schlagziil' | 'zaemesetzli';
+type PuzzleVariant = 'verbindige' | 'schlagloch' | 'zaemesetzli';
 
 function SkeletonBlock({ className }: { className?: string }) {
   return (
@@ -32,7 +32,7 @@ function VerbindigeSkeleton() {
   );
 }
 
-function SchlagziilSkeleton() {
+function SchlaglochSkeleton() {
   return (
     <>
       <div className="flex flex-col gap-3">
@@ -72,7 +72,7 @@ function ZaemesetzliSkeleton() {
 
 const skeletons: Record<PuzzleVariant, React.FC> = {
   verbindige: VerbindigeSkeleton,
-  schlagziil: SchlagziilSkeleton,
+  schlagloch: SchlaglochSkeleton,
   zaemesetzli: ZaemesetzliSkeleton,
 };
 

@@ -3,17 +3,17 @@
 ## 2026-04-19
 
 ### Features
-- Wrong-answer shake feedback for Schlagziil headline cards (`87dbe18`)
+- Wrong-answer shake feedback for Schlagloch headline cards (`87dbe18`)
 - Persist game completion state in localStorage — prevent replaying same puzzle (`789b993`)
 - User accounts with Supabase Auth magic link sign-in (`dfe2fa9`)
 - Premium Verbindige results screen with performance tiers and animations (`0cd5e55`)
-- Finalize share card formats — Schlagziil accuracy grid + CTA (`6f5e768`)
+- Finalize share card formats — Schlagloch accuracy grid + CTA (`6f5e768`)
 - Add game feel to Zämesetzli — shake, confetti, rank celebrations (`ed06b94`)
-- Add game feel to Schlagziil — shake, toasts, confetti (`17bc2ed`)
+- Add game feel to Schlagloch — shake, toasts, confetti (`17bc2ed`)
 
 ### Fixes
 - Standardize puzzle identifier across header, result, and share text (`31bc00d`)
-- Display proper German strings for revealed Schlagziil answers (`1a2835f`)
+- Display proper German strings for revealed Schlagloch answers (`1a2835f`)
 
 ### Polish
 - Add subtle pulse animation to ErrorDots on latest filled dot (`a7859cd`)

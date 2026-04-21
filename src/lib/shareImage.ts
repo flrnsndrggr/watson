@@ -47,7 +47,7 @@ export interface ShareCardData {
 
 export type ShareCardGrid =
   | { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4 }[] }
-  | { type: 'schlagziil'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] }
+  | { type: 'schlagloch'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] }
   | {
       type: 'zaemesetzli';
       found: number;
@@ -176,8 +176,8 @@ function drawGrid(
 ) {
   if (grid.type === 'verbindige') {
     drawVerbindigeGrid(ctx, grid, cx, cy);
-  } else if (grid.type === 'schlagziil') {
-    drawSchlagziilGrid(ctx, grid, cx, cy);
+  } else if (grid.type === 'schlagloch') {
+    drawSchlaglochGrid(ctx, grid, cx, cy);
   } else {
     drawZaemesetzliGrid(ctx, grid, cx, cy);
   }
@@ -207,9 +207,9 @@ function drawVerbindigeGrid(
   }
 }
 
-function drawSchlagziilGrid(
+function drawSchlaglochGrid(
   ctx: CanvasRenderingContext2D,
-  grid: { type: 'schlagziil'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] },
+  grid: { type: 'schlagloch'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] },
   cx: number,
   cy: number,
 ) {
@@ -492,8 +492,8 @@ function storyDrawGrid(
 ) {
   if (grid.type === 'verbindige') {
     storyDrawVerbindigeGrid(ctx, grid, cx, cy);
-  } else if (grid.type === 'schlagziil') {
-    storyDrawSchlagziilGrid(ctx, grid, cx, cy);
+  } else if (grid.type === 'schlagloch') {
+    storyDrawSchlaglochGrid(ctx, grid, cx, cy);
   } else {
     storyDrawZaemesetzliGrid(ctx, grid, cx, cy);
   }
@@ -523,9 +523,9 @@ function storyDrawVerbindigeGrid(
   }
 }
 
-function storyDrawSchlagziilGrid(
+function storyDrawSchlaglochGrid(
   ctx: CanvasRenderingContext2D,
-  grid: { type: 'schlagziil'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] },
+  grid: { type: 'schlagloch'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] },
   cx: number,
   cy: number,
 ) {

@@ -54,7 +54,7 @@ Compare current state against the product vision. Focus areas:
 - Share text format per game (emoji grids, scores, watson URL)
 - Web Share API integration (native share sheet on mobile)
 - Instagram Story-optimized share image (1080x1920)
-- "Ich lese watson, und du?" tagline in Schlagziil shares
+- "Ich lese watson, und du?" tagline in Schlagloch shares
 
 **Navigation & IA:**
 - Landing page → game → results → next game flow

@@ -81,14 +81,14 @@ If any fails, revert changes and mark the item with `[!]` + reason.
 | Game | Route | Admin Route | Key Files |
 |---|---|---|---|
 | Verbindige | `/verbindige` | `/admin/verbindige` | `src/games/verbindige/` |
-| Schlagziil | `/schlagziil` | `/admin/schlagziil` | `src/games/schlagziil/` |
+| Schlagloch | `/schlagloch` | `/admin/schlagloch` | `src/games/schlagloch/` |
 | Zämesetzli | `/zaemesetzli` | `/admin/zaemesetzli` | `src/games/zaemesetzli/` |
 
 ## Supabase Tables
 
 - `puzzles` — parent table (id, game_type, publish_date)
 - `verbindige_puzzles` — groups JSONB
-- `schlagziil_puzzles` — headlines JSONB
+- `schlagloch_puzzles` — headlines JSONB
 - `zaemesetzli_puzzles` — emojis, valid_compounds, rank_thresholds
 - `game_sessions` — user play history
 - `user_profiles` — accounts

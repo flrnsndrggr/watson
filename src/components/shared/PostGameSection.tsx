@@ -33,9 +33,9 @@ const ALL_GAMES: GameConfig[] = [
     accentColor: 'var(--color-pink)',
   },
   {
-    path: '/schlagziil',
-    key: 'schlagziil',
-    name: 'Schlagziil',
+    path: '/schlagloch',
+    key: 'schlagloch',
+    name: 'Schlagloch',
     emoji: '📰',
     description: 'Errate die Wörter in watson-Schlagzeilen.',
     accentColor: 'var(--color-green)',

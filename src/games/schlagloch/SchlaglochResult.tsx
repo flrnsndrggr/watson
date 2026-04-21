@@ -12,8 +12,8 @@ import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
 import { computeGameStats } from '@/lib/gameStats';
 import type { ShareCardData } from '@/lib/shareImage';
-import type { SchlagziilHeadline } from '@/types';
-import { useSchlagziil } from './useSchlagziil';
+import type { SchlaglochHeadline } from '@/types';
+import { useSchlagloch } from './useSchlagloch';
 
 interface PerformanceTier {
   heading: string;
@@ -97,7 +97,7 @@ function useNextPuzzleCountdown(): string {
 }
 
 interface HeadlineReviewItemProps {
-  headline: SchlagziilHeadline;
+  headline: SchlaglochHeadline;
   result: 'correct' | 'wrong' | null;
   revealedAnswer: string | null;
   hintUsed: boolean;
@@ -193,14 +193,14 @@ function HeadlineReviewItem({
   );
 }
 
-export function SchlagziilResult() {
-  const { results, revealedAnswers, hintsUsed, puzzle, status, streak, isRueckblick } = useSchlagziil();
+export function SchlaglochResult() {
+  const { results, revealedAnswers, hintsUsed, puzzle, status, streak, isRueckblick } = useSchlagloch();
   const countdown = useNextPuzzleCountdown();
 
   const correctCount = results.filter((r) => r === 'correct').length;
   const todayBucket = status === 'finished' ? String(correctCount) : undefined;
   const stats = useMemo(
-    () => computeGameStats('schlagziil', todayBucket),
+    () => computeGameStats('schlagloch', todayBucket),
     [todayBucket],
   );
 
@@ -208,8 +208,8 @@ export function SchlagziilResult() {
 
   const total = puzzle.headlines.length;
   const tier = getPerformanceTier(correctCount, total);
-  const gameLabel = isRueckblick ? 'Schlagziil Rückblick' : 'Schlagziil';
-  const shareGameKey = isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil';
+  const gameLabel = isRueckblick ? 'Schlagloch Rückblick' : 'Schlagloch';
+  const shareGameKey = isRueckblick ? 'schlagloch_rueckblick' : 'schlagloch';
 
   // Build accuracy squares
   const accuracySquares = results.map((r, i) => {
@@ -227,13 +227,13 @@ export function SchlagziilResult() {
 
   const cardData: ShareCardData = {
     gameName: gameLabel,
-    gamePath: 'schlagziil',
+    gamePath: 'schlagloch',
     puzzleId: puzzle.date,
     heading: tier.heading,
     subheading: tier.sub,
     accentColor: TIER_HEX[tier.accentClass] ?? '#00C6FF',
     grid: {
-      type: 'schlagziil',
+      type: 'schlagloch',
       results: results.map((r) => (r === 'correct' ? 'correct' : 'wrong')),
       hints: [...hintsUsed],
     },
@@ -318,7 +318,7 @@ export function SchlagziilResult() {
       <NotificationPrompt />
 
       {/* Leaderboard */}
-      <LeaderboardPanel gameType={isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil'} puzzleDate={puzzle.date} showTime />
+      <LeaderboardPanel gameType={isRueckblick ? 'schlagloch_rueckblick' : 'schlagloch'} puzzleDate={puzzle.date} showTime />
 
       {/* Personal statistics */}
       {!isRueckblick && (
@@ -327,9 +327,9 @@ export function SchlagziilResult() {
 
       {/* Share buttons */}
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">
-        <ShareButton text={shareText} label="Ergebnis teilen" game="schlagziil" />
-        <ShareImageButton cardData={cardData} game="schlagziil" />
-        <StoryShareButton cardData={cardData} game="schlagziil" />
+        <ShareButton text={shareText} label="Ergebnis teilen" game="schlagloch" />
+        <ShareImageButton cardData={cardData} game="schlagloch" />
+        <StoryShareButton cardData={cardData} game="schlagloch" />
       </div>
 
       {/* Puzzle date */}
@@ -340,7 +340,7 @@ export function SchlagziilResult() {
       {/* Next puzzle countdown */}
       <div className="mt-4 text-center animate-[resultSlideUp_400ms_ease-out_900ms_both]">
         <p className="text-xs text-[var(--color-gray-text)]">
-          Nächsts {isRueckblick ? 'Rückblick' : 'Schlagziil'} in{' '}
+          Nächsts {isRueckblick ? 'Rückblick' : 'Schlagloch'} in{' '}
           <span className="font-semibold text-[var(--color-black)]">
             {countdown}
           </span>
@@ -351,7 +351,7 @@ export function SchlagziilResult() {
         <AdSlot type="mrec" />
       </div>
 
-      <PostGameSection currentGame="schlagziil" />
+      <PostGameSection currentGame="schlagloch" />
     </div>
   );
 }

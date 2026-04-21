@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { SAMPLE_VERBINDIGE } from '@/games/verbindige/verbindige.data';
 import { SAMPLE_ZAEMESETZLI } from '@/games/zaemesetzli/zaemesetzli.data';
-import { SAMPLE_SCHLAGZIIL } from '@/games/schlagziil/schlagziil.data';
+import { SAMPLE_SCHLAGLOCH } from '@/games/schlagloch/schlagloch.data';
 
 const games = [
   {
@@ -21,12 +21,12 @@ const games = [
     stat: `${SAMPLE_ZAEMESETZLI.emojis.length} Emojis, ${SAMPLE_ZAEMESETZLI.valid_compounds.length} Woerter`,
   },
   {
-    title: 'Schlagziil',
-    path: '/admin/schlagziil',
+    title: 'Schlagloch',
+    path: '/admin/schlagloch',
     color: 'var(--color-blue)',
-    puzzleId: SAMPLE_SCHLAGZIIL.id,
-    date: SAMPLE_SCHLAGZIIL.date,
-    stat: `${SAMPLE_SCHLAGZIIL.headlines.length} Schlagzeilen`,
+    puzzleId: SAMPLE_SCHLAGLOCH.id,
+    date: SAMPLE_SCHLAGLOCH.date,
+    stat: `${SAMPLE_SCHLAGLOCH.headlines.length} Schlagzeilen`,
   },
 ];
 

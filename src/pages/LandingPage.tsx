@@ -32,11 +32,11 @@ const GAMES: GameConfig[] = [
     gameType: 'zaemesetzli',
   },
   {
-    path: '/schlagziil',
-    name: 'Schlagziil',
+    path: '/schlagloch',
+    name: 'Schlagloch',
     emoji: '\u{1F4F0}',
     description: 'Errate die fehlenden W\u00F6rter in watson-Schlagzeilen.',
-    gameType: 'schlagziil',
+    gameType: 'schlagloch',
   },
 ];
 
@@ -49,7 +49,7 @@ interface GameStatus {
 function loadStatuses(): Record<GameType, GameStatus> {
   const today = getTodayDateCET();
   const dailyResults = getDailyResults();
-  const gameTypes: GameType[] = ['verbindige', 'zaemesetzli', 'schlagziil'];
+  const gameTypes: GameType[] = ['verbindige', 'zaemesetzli', 'schlagloch'];
   const result = {} as Record<GameType, GameStatus>;
   for (const gt of gameTypes) {
     const streak = getStreak(gt);

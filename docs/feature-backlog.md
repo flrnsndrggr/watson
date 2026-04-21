@@ -9,7 +9,7 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Game completion state: persist completed state per puzzle per day in localStorage (prevent replaying same puzzle) — done 2026-04-19
 - [x] Share card generation: implement `generateShareText()` per game with proper emoji grids and watson.ch URL — done 2026-04-19
 - [x] Verbindige share: emoji grid format (colored squares for solve order) — done 2026-04-19
-- [x] Schlagziil share: accuracy grid (green/red squares) + "Ich lese watson, und du?" — done 2026-04-19
+- [x] Schlagloch share: accuracy grid (green/red squares) + "Ich lese watson, und du?" — done 2026-04-19
 - [x] Zämesetzli share: score + compounds found format — done 2026-04-19
 
 ## Priority: Medium (User Engagement)
@@ -19,7 +19,7 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Streak prompt: show "Willst du deinen Streak behalten? Konto erstellen." after Day 3 — done 2026-04-19
 - [x] Profile page: `/profil` route showing streaks, stats, games played per game — done 2026-04-19
 - [x] Archive mode: `/archiv` route with calendar view of past puzzles (no streak credit) — done 2026-04-19
-- [x] Leaderboard: basic daily leaderboard per game (score-based for Zämesetzli, speed for Verbindige/Schlagziil) — done 2026-04-19
+- [x] Leaderboard: basic daily leaderboard per game (score-based for Zämesetzli, speed for Verbindige/Schlagloch) — done 2026-04-19
 
 ## Priority: Lower (Monetization & Integration)
 
@@ -27,13 +27,13 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Post-game ad slot: MREC 300x250 ad unit in results screen — done 2026-04-20
 - [x] Pre-game interstitial: 5-second ad shown once per session on mobile — done 2026-04-20
 - [x] Analytics events: implement core tracking (game_started, game_completed, game_shared, streak_milestone) — done 2026-04-20
-- [x] Analytics: game-specific events (verbindige_guess, schlagziil_headline_guess, zaemesetzli_word_found, zaemesetzli_hint_used) — done 2026-04-20
+- [x] Analytics: game-specific events (verbindige_guess, schlagloch_headline_guess, zaemesetzli_word_found, zaemesetzli_hint_used) — done 2026-04-20
 - [x] Push notification opt-in: daily reminder prompt with configurable time — done 2026-04-20
 - [x] Instagram story share: generate 1080x1920 canvas image with watson branding + result grid — done 2026-04-21
 
 ## Priority: Future (Post-Launch)
 
-- [x] Sunday Schlagziil "Rückblick": 10 headlines, harder difficulty, separate leaderboard — done 2026-04-21
+- [x] Sunday Schlagloch "Rückblick": 10 headlines, harder difficulty, separate leaderboard — done 2026-04-21
 - [x] Branded Verbindige editions: CMS tool for creating sponsor-themed puzzles — done 2026-04-21
 - [x] PWA: add service worker for offline play after initial puzzle load — done 2026-04-21
 - [ ] Performance: code-split per game (lazy-load game bundles)

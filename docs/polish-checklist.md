@@ -26,7 +26,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [x] Tile grid: ensure 44x44px minimum touch targets on mobile (WCAG AA) (2026-04-20)
 - [x] Deselect all: add "Auswahl löschen" button that clears all selected tiles (2026-04-20)
 
-## Schlagziil
+## Schlagloch
 
 - [x] Headline card: category label (Schweiz, Sport, etc.) styled with watson green (2026-04-20)
 - [x] Correct answer: green flash on headline card, auto-advance after 2s (2026-04-20)

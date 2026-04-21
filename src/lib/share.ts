@@ -1,19 +1,19 @@
 const GAME_LABELS: Record<string, string> = {
   verbindige: 'Verbindige',
   zaemesetzli: 'Zämesetzli',
-  schlagziil: 'Schlagziil',
-  schlagziil_rueckblick: 'Schlagziil Rückblick',
+  schlagloch: 'Schlagloch',
+  schlagloch_rueckblick: 'Schlagloch Rückblick',
 };
 
 const GAME_EMOJIS: Record<string, string> = {
   verbindige: '🇨🇭',
   zaemesetzli: '🧩',
-  schlagziil: '📰',
-  schlagziil_rueckblick: '📰',
+  schlagloch: '📰',
+  schlagloch_rueckblick: '📰',
 };
 
 const GAME_PATHS: Record<string, string> = {
-  schlagziil_rueckblick: 'schlagziil',
+  schlagloch_rueckblick: 'schlagloch',
 };
 
 export function generateShareText(

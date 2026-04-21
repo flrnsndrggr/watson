@@ -7,7 +7,7 @@ export const VERBINDIGE_STEPS: HowToPlayStep[] = [
   { icon: '❌', text: 'Du hast 4 Versuche. Danach ist das Spiel vorbei.' },
 ];
 
-export const SCHLAGZIIL_STEPS: HowToPlayStep[] = [
+export const SCHLAGLOCH_STEPS: HowToPlayStep[] = [
   { icon: '📰', text: 'Errate das fehlende Wort in 5 echten watson-Schlagzeilen.' },
   { icon: '⌨️', text: 'Tippe deine Antwort ein und drücke Enter.' },
   { icon: '❌', text: '3 Fehler insgesamt — dann ist Schluss.' },

@@ -8,15 +8,15 @@ import { NewPuzzleBanner } from '@/components/shared/NewPuzzleBanner';
 import { ArchiveBanner } from '@/components/shared/ArchiveBanner';
 import { HowToPlayModal } from '@/components/shared/HowToPlayModal';
 import { hasSeenHowToPlay } from '@/lib/howToPlayStorage';
-import { SCHLAGZIIL_STEPS } from '@/lib/howToPlayContent';
+import { SCHLAGLOCH_STEPS } from '@/lib/howToPlayContent';
 import { showToast } from '@/components/shared/Toast';
 import { useDailyReset } from '@/lib/useDailyReset';
 import { useStreak } from '@/lib/useStreak';
 import { HeadlineCard } from './HeadlineCard';
-import { SchlagziilResult } from './SchlagziilResult';
-import { useSchlagziil } from './useSchlagziil';
+import { SchlaglochResult } from './SchlaglochResult';
+import { useSchlagloch } from './useSchlagloch';
 
-export function SchlagziilPage() {
+export function SchlaglochPage() {
   const [searchParams] = useSearchParams();
   const archiveDate = searchParams.get('date');
 
@@ -37,9 +37,9 @@ export function SchlagziilPage() {
     advanceToNext,
     useHint,
     clearLastResult,
-  } = useSchlagziil();
+  } = useSchlagloch();
 
-  const { current: streak, recordPlay } = useStreak('schlagziil');
+  const { current: streak, recordPlay } = useStreak('schlagloch');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -48,7 +48,7 @@ export function SchlagziilPage() {
 
   useEffect(() => {
     loadPuzzle(archiveDate ?? undefined);
-    if (!hasSeenHowToPlay('schlagziil')) {
+    if (!hasSeenHowToPlay('schlagloch')) {
       setShowHowToPlay(true);
     }
   }, [loadPuzzle, archiveDate]);
@@ -112,7 +112,7 @@ export function SchlagziilPage() {
     prevStatus.current = status;
   }, [status, results]);
 
-  if (!puzzle) return <PuzzleLoading variant="schlagziil" />;
+  if (!puzzle) return <PuzzleLoading variant="schlagloch" />;
 
   const headline = puzzle.headlines[currentIndex];
   const isFinished = status === 'finished';
@@ -122,7 +122,7 @@ export function SchlagziilPage() {
       {isArchive && <ArchiveBanner date={puzzle?.date ?? archiveDate ?? ''} />}
       {!isArchive && isStale && <NewPuzzleBanner onRefresh={refresh} />}
       <GameHeader
-        title={isRueckblick ? 'Schlagziil Rückblick' : 'Schlagziil'}
+        title={isRueckblick ? 'Schlagloch Rückblick' : 'Schlagloch'}
         puzzleId={puzzle?.date ?? ''}
         subtitle={isRueckblick ? '10 Schlagzeilen aus der Woche' : 'Errate das fehlende Wort'}
         onInfoClick={() => setShowHowToPlay(true)}
@@ -131,9 +131,9 @@ export function SchlagziilPage() {
 
       {showHowToPlay && (
         <HowToPlayModal
-          gameId="schlagziil"
-          title="Schlagziil"
-          steps={SCHLAGZIIL_STEPS}
+          gameId="schlagloch"
+          title="Schlagloch"
+          steps={SCHLAGLOCH_STEPS}
           onClose={() => setShowHowToPlay(false)}
         />
       )}
@@ -183,7 +183,7 @@ export function SchlagziilPage() {
       )}
 
       {/* Results — includes headline review with article links */}
-      {isFinished && <SchlagziilResult />}
+      {isFinished && <SchlaglochResult />}
     </GameShell>
   );
 }

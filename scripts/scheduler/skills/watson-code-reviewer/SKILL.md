@@ -39,7 +39,7 @@ Review against:
 
 ### Game Correctness
 - Verbindige: group validation logic correct? Exactly 4 groups of 4?
-- Schlagziil: answer normalization handles umlauts and typos?
+- Schlagloch: answer normalization handles umlauts and typos?
 - Zämesetzli: compound validation working?
 
 ### Accessibility

@@ -5,7 +5,7 @@ const ADMIN_NAV = [
   { path: '/admin', label: 'Dashboard', end: true },
   { path: '/admin/verbindige', label: 'Verbindige' },
   { path: '/admin/zaemesetzli', label: 'Zaemesetzli' },
-  { path: '/admin/schlagziil', label: 'Schlagziil' },
+  { path: '/admin/schlagloch', label: 'Schlagloch' },
   { path: '/admin/verbindige-editions', label: 'Editions' },
 ];
 

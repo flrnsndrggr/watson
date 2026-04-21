@@ -1,4 +1,4 @@
-import { SAMPLE_SCHLAGZIIL, DEMO_ANSWERS } from '@/games/schlagziil/schlagziil.data';
+import { SAMPLE_SCHLAGLOCH, DEMO_ANSWERS } from '@/games/schlagloch/schlagloch.data';
 
 const DIFF_LABELS: Record<number, { label: string; bg: string; text: string }> = {
   1: { label: 'Einfach', bg: 'bg-green-100', text: 'text-green-700' },
@@ -6,14 +6,14 @@ const DIFF_LABELS: Record<number, { label: string; bg: string; text: string }> =
   3: { label: 'Schwer', bg: 'bg-red-100', text: 'text-red-700' },
 };
 
-export function AdminSchlagziil() {
-  const puzzle = SAMPLE_SCHLAGZIIL;
+export function AdminSchlagloch() {
+  const puzzle = SAMPLE_SCHLAGLOCH;
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Schlagziil Review</h1>
+          <h1 className="text-2xl font-bold">Schlagloch Review</h1>
           <p className="text-sm text-[var(--color-gray-text)]">
             Puzzle <span className="font-mono">{puzzle.id}</span> &middot; {puzzle.date}
           </p>

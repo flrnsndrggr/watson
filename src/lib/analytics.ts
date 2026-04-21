@@ -39,8 +39,8 @@ interface VerbindigeGuessEvent {
   difficulty?: 1 | 2 | 3 | 4;
 }
 
-interface SchlagziilHeadlineGuessEvent {
-  event: 'schlagziil_headline_guess';
+interface SchlaglochHeadlineGuessEvent {
+  event: 'schlagloch_headline_guess';
   result: 'correct' | 'wrong';
   headline_index: number;
   difficulty: 1 | 2 | 3;
@@ -72,7 +72,7 @@ type AnalyticsEvent =
   | GameSharedEvent
   | StreakMilestoneEvent
   | VerbindigeGuessEvent
-  | SchlagziilHeadlineGuessEvent
+  | SchlaglochHeadlineGuessEvent
   | ZaemesetzliWordFoundEvent
   | ZaemesetzliHintUsedEvent
   | NotificationOptInEvent;
@@ -170,13 +170,13 @@ export function trackVerbindigeGuess(
   emit({ event: 'verbindige_guess', result, guess_number: guessNumber, mistakes, difficulty });
 }
 
-export function trackSchlagziilHeadlineGuess(
+export function trackSchlaglochHeadlineGuess(
   result: 'correct' | 'wrong',
   headlineIndex: number,
   difficulty: 1 | 2 | 3,
   hintUsed: boolean,
 ): void {
-  emit({ event: 'schlagziil_headline_guess', result, headline_index: headlineIndex, difficulty, hint_used: hintUsed });
+  emit({ event: 'schlagloch_headline_guess', result, headline_index: headlineIndex, difficulty, hint_used: hintUsed });
 }
 
 export function trackZaemesetzliWordFound(

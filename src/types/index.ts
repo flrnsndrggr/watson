@@ -60,15 +60,15 @@ export interface RankThresholds {
 
 export type Rank = keyof RankThresholds;
 
-// ===== Schlagziil (The watson Archive Headline Game) =====
+// ===== Schlagloch (The watson Archive Headline Game) =====
 
-export interface SchlagziilPuzzle {
+export interface SchlaglochPuzzle {
   id: string;
   date: string;
-  headlines: SchlagziilHeadline[];
+  headlines: SchlaglochHeadline[];
 }
 
-export interface SchlagziilHeadline {
+export interface SchlaglochHeadline {
   display: string;
   article_url: string;
   article_year: number;
@@ -78,7 +78,7 @@ export interface SchlagziilHeadline {
   context_hint?: string;
 }
 
-export interface SchlagziilGuessResult {
+export interface SchlaglochGuessResult {
   correct: boolean;
   accepted_answer?: string;
 }
@@ -93,7 +93,7 @@ export interface UserProfile {
   streaks: {
     verbindige: StreakData;
     zaemesetzli: StreakData;
-    schlagziil: StreakData;
+    schlagloch: StreakData;
   };
 }
 
@@ -121,9 +121,9 @@ export interface VerbindigeEdition {
 
 // ===== Game State =====
 
-export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagziil';
+export type GameType = 'verbindige' | 'zaemesetzli' | 'schlagloch';
 
 /** Extended type that includes game variants used for separate leaderboards. */
-export type LeaderboardGameType = GameType | 'schlagziil_rueckblick';
+export type LeaderboardGameType = GameType | 'schlagloch_rueckblick';
 
 export type GameStatus = 'loading' | 'playing' | 'won' | 'lost';

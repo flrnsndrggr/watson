@@ -10,7 +10,7 @@ You are the games-watson puzzle content agent. You ensure there are always enoug
 1. Read `/Users/fs/Code/game-watson/AGENTS.md` for conventions.
 2. Read the game data models in:
    - `src/games/verbindige/verbindige.data.ts`
-   - `src/games/schlagziil/schlagziil.data.ts`
+   - `src/games/schlagloch/schlagloch.data.ts`
    - `src/games/zaemesetzli/zaemesetzli.data.ts`
 3. Read `src/types/index.ts` for shared types.
 
@@ -46,7 +46,7 @@ start it means more, up to 3 × 7 = 21 inserts to rebuild the full buffer.
 
 ```bash
 /Users/fs/Code/game-watson/scripts/watson-sql.sh "
-WITH games AS (SELECT unnest(ARRAY['verbindige','schlagziil','zaemesetzli']) AS game_type),
+WITH games AS (SELECT unnest(ARRAY['verbindige','schlagloch','zaemesetzli']) AS game_type),
      days  AS (SELECT (CURRENT_DATE + i)::date AS d FROM generate_series(1, 7) AS i),
      slots AS (SELECT g.game_type, d.d AS publish_date FROM games g CROSS JOIN days d)
 SELECT s.game_type, s.publish_date
@@ -85,7 +85,7 @@ For each game type with puzzles, spot-check the latest one:
 - Each group has a difficulty (1-4) and category name
 - All 4 difficulty levels present
 
-**Schlagziil**: Query `schlagziil_puzzles`. Validate:
+**Schlagloch**: Query `schlagloch_puzzles`. Validate:
 - Exactly 5 headlines in the JSONB array
 - Each headline has: original, blanked_word, display (with _____), category
 - blanked_word is actually a word in the original headline
@@ -98,13 +98,60 @@ For each game type with puzzles, spot-check the latest one:
 
 Log any validation errors as content gaps in ROADMAP.md under `## Content Gaps`.
 
+## No-repeats rule
+
+Once a word has been used in a puzzle, it can't be used again. A repeat
+makes the game feel stale and lets regular players recognise answers
+from memory. Before generating ANY puzzle, query the full history of
+words used per game and keep that list in context while authoring.
+
+```bash
+/Users/fs/Code/game-watson/scripts/watson-sql.sh "
+-- Verbindige: every tile text ever used
+SELECT 'verbindige' AS game, array_agg(DISTINCT lower(w)) AS used_words FROM (
+  SELECT jsonb_array_elements(jsonb_array_elements(groups)->'items')->>'text' AS w
+  FROM verbindige_puzzles
+) t
+UNION ALL
+-- Schlagloch: every blanked_word + every accepted_answer ever used
+SELECT 'schlagloch', array_agg(DISTINCT lower(w)) FROM (
+  SELECT jsonb_array_elements(headlines)->>'blanked_word' AS w FROM schlagloch_puzzles
+  UNION ALL
+  SELECT jsonb_array_elements(jsonb_array_elements(headlines)->'accepted_answers')::text AS w FROM schlagloch_puzzles
+) t
+UNION ALL
+-- Zaemesetzli: every compound word ever used
+SELECT 'zaemesetzli', array_agg(DISTINCT lower(w)) FROM (
+  SELECT jsonb_array_elements(valid_compounds)->>'word' AS w FROM zaemesetzli_puzzles
+) t;
+"
+```
+
+When authoring, compare every candidate word (Verbindige `text`,
+Schlagloch `blanked_word` + each `accepted_answers` entry, Zämesetzli
+compound `word`) case-insensitively against the returned array for that
+game. If a candidate already appears, pick a different word. Do this
+check BEFORE you write the final INSERT — not after — so you don't
+waste turns redoing work.
+
+Scope notes:
+- Categories/themes in Verbindige MAY repeat (you can do "Käsesorten"
+  twice with different cheeses). The no-repeat rule is about the
+  `text` field on items, not the category label.
+- Schlagloch headlines: the exact phrasing doesn't need to be unique,
+  but the answer word does. Two headlines about the Bundesrat with
+  different blanked words are fine.
+- Zämesetzli emojis MAY repeat across days (the pool resets each day).
+  But each compound `word` must be fresh.
+
 ## Step 3: Generate puzzles for every uncovered slot
 
 Iterate over every `(game_type, publish_date)` row returned by Step 1
 and generate a puzzle for each. Do NOT skip dates just because "tomorrow
 is fine" — the goal is a full 7-day buffer, not tomorrow-only coverage.
 Use the exact `publish_date` from the query (do not hardcode
-`CURRENT_DATE + 1`).
+`CURRENT_DATE + 1`). Apply the no-repeats rule above to every word you
+author.
 
 ### Verbindige — Swiss Connections
 Generate a puzzle with 4 groups of 4 items. Theme categories around:
@@ -134,9 +181,9 @@ SELECT id, '<jsonb groups payload>'::jsonb FROM ins;
 ```
 
 Replace `<target-date>` with the actual date from Step 1 (e.g. `DATE '2026-05-07'`).
-Same pattern for `schlagziil_puzzles (id, headlines)` and `zaemesetzli_puzzles (id, emojis, valid_compounds, max_score, rank_thresholds)`.
+Same pattern for `schlagloch_puzzles (id, headlines)` and `zaemesetzli_puzzles (id, emojis, valid_compounds, max_score, rank_thresholds)`.
 
-### Schlagziil — Headlines
+### Schlagloch — Headlines
 Generate 5 headline-style entries. Since we don't have access to watson.ch's API, create plausible Swiss news headlines covering:
 - Swiss politics (Bundesrat, Nationalrat, cantonal news)
 - Swiss sports (FC Basel, YB, Swiss ski team, Roger Federer legacy)

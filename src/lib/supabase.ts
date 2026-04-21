@@ -16,13 +16,13 @@ export function getTodayDateCET(): string {
 const GAME_TABLE: Record<GameType, string> = {
   verbindige: 'verbindige_puzzles',
   zaemesetzli: 'zaemesetzli_puzzles',
-  schlagziil: 'schlagziil_puzzles',
+  schlagloch: 'schlagloch_puzzles',
 };
 
 const GAME_SELECT: Record<GameType, string> = {
   verbindige: '*',
   zaemesetzli: '*',
-  schlagziil: '*',
+  schlagloch: '*',
 };
 
 interface PuzzleRow {

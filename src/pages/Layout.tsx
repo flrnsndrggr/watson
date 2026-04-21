@@ -66,7 +66,7 @@ const NAV_ITEMS = [
   { path: '/', label: 'Spiele' },
   { path: '/verbindige', label: 'Verbindige' },
   { path: '/zaemesetzli', label: 'Zämesetzli' },
-  { path: '/schlagziil', label: 'Schlagziil' },
+  { path: '/schlagloch', label: 'Schlagloch' },
 ];
 
 function LoginModal({ onClose }: { onClose: () => void }) {

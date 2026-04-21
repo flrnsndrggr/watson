@@ -8,7 +8,7 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
 - Skipped checks: Netlify deploy (MCP not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not granted)
 
 ### Notable commits
@@ -33,7 +33,7 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not available)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
 
 ### Notable commits
@@ -58,15 +58,15 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not available)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
 
 ### Notable commits
-- 87dbe18 feat: wrong-answer shake feedback for Schlagziil headline cards
+- 87dbe18 feat: wrong-answer shake feedback for Schlagloch headline cards
 - 41077ee polish: AdSlot placeholder with dashed border and "Anzeige" label
 - 17c2af7 docs: mark skeleton loader polish item complete
 - 8299d89 docs: sync changelog and update documentation
-- be79180 review: incremental code review for temp-holder (AdSlot, Schlagziil shake)
+- be79180 review: incremental code review for temp-holder (AdSlot, Schlagloch shake)
 
 ---
 
@@ -84,13 +84,13 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP permission not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
 - Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
 
 ### Notable commits
 - 70cfbcf feat: how-to-play onboarding modal for all 4 games
 - f2d35ab feat: streak prompt — nudge unauthenticated users to create an account after Day 3
-- bccba68 feat: polished Schlagziil results screen — share-first layout, countdown, performance tiers
+- bccba68 feat: polished Schlagloch results screen — share-first layout, countdown, performance tiers
 - 6df141c feat: staggered loss reveal for Verbindige — dramatic group-by-group answer unveil
 - 2f37b10 feat: streak tracking — calculate and display current streak per game
 - 353c9f7 perf: defer Supabase SDK from critical path — entry 60.95KB → 3.65KB gzipped
@@ -105,7 +105,7 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP permission not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
 - Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
 
 ### Notable commits
@@ -123,7 +123,7 @@
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP permission not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, but game removed in 6fa24b7 — SPA shell returns 200 regardless)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, but game removed in 6fa24b7 — SPA shell returns 200 regardless)
 - Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
 
 ### Notable commits
@@ -132,7 +132,7 @@
 - 789b993 feat: persist game completion state in localStorage
 - 9ff71ec polish: respect prefers-reduced-motion — disable confetti, kill transforms
 - a487c03 polish: add streak counter display to GameHeader
-- 1a2835f fix: display proper German strings for revealed Schlagziil answers
+- 1a2835f fix: display proper German strings for revealed Schlagloch answers
 - 5bb45e4 polish: improve ShareButton Web Share API integration
 
 ### Notes
@@ -148,15 +148,15 @@ Buchstäbli was removed in this release (6fa24b7). The `/buchstaebli` route stil
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP permission not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP permission not granted), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
 
 ### Notable commits
 - dfe2fa9 feat: user accounts with Supabase Auth magic link sign-in
 - 0cd5e55 feat: premium Verbindige results screen with performance tiers and animations
 - ed06b94 feat: add game feel to Zämesetzli — shake, confetti, rank celebrations
-- 6f5e768 feat: finalize share card formats — Schlagziil accuracy grid + CTA
-- 17bc2ed feat: add game feel to Schlagziil — shake, toasts, confetti
+- 6f5e768 feat: finalize share card formats — Schlagloch accuracy grid + CTA
+- 17bc2ed feat: add game feel to Schlagloch — shake, toasts, confetti
 - 8bd0acd ci: auto-deploy to Netlify on push to main
 - b51764b feat: add Verbindige shuffle button with staggered tile animation
 - 1c851cb feat: add daily puzzle reset with midnight CET rollover detection
@@ -172,12 +172,12 @@ Buchstäbli was removed in this release (6fa24b7). The `/buchstaebli` route stil
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not available)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
 
 ### Notable commits
 - eeef223 triage: verbindige QA findings from share flow scenario
-- d74bb67 triage: schlagziil QA findings from news reader scenario
+- d74bb67 triage: schlagloch QA findings from news reader scenario
 - 4d6d3bc triage: zaemesetzli QA findings and harden skill push instructions
 - 621b2d4 polish: fix share text format — use puzzle dates
 
@@ -191,7 +191,7 @@ Buchstäbli was removed in this release (6fa24b7). The `/buchstaebli` route stil
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP not available)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
 
 ### Notable commits
@@ -208,7 +208,7 @@ Buchstäbli was removed in this release (6fa24b7). The `/buchstaebli` route stil
 - HTTP status: all routes 200
 - Console errors: skipped (Chrome MCP not available)
 - Supabase: skipped (MCP permission not granted)
-- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl)
 - Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP permission not granted)
 
 ### Notable commits
@@ -227,7 +227,7 @@ Buchstäbli was removed in this release (6fa24b7). The `/buchstaebli` route stil
 - HTTP status: all routes 200
 - Console errors: not checked (no browser MCP available)
 - Supabase: not checked (MCP permission not granted)
-- Routes checked (HTTP 200): landing ✓, verbindige ✓, schlagziil ✓, zaemesetzli ✓
+- Routes checked (HTTP 200): landing ✓, verbindige ✓, schlagloch ✓, zaemesetzli ✓
 
 ### Notes
 

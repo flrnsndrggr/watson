@@ -7,7 +7,7 @@ Daily word games in Swiss German for watson.ch readers.
 | Game | Route | Description |
 |---|---|---|
 | Verbindige | `/verbindige` | Group 16 Swiss German words into 4 thematic categories |
-| Schlagziil | `/schlagziil` | Guess the watson.ch headline from a partial reveal |
+| Schlagloch | `/schlagloch` | Guess the watson.ch headline from a partial reveal |
 | Zämesetzli | `/zaemesetzli` | Combine emoji pairs to form Swiss German compound words |
 
 ## Tech Stack
@@ -32,7 +32,7 @@ VITE_SUPABASE_ANON_KEY=...
 
 ## Admin Panel
 
-Protected at `/admin` — requires Supabase auth. Includes puzzle editors for Verbindige, Schlagziil, and Zämesetzli.
+Protected at `/admin` — requires Supabase auth. Includes puzzle editors for Verbindige, Schlagloch, and Zämesetzli.
 
 ## Mundart Word Sourcing
 
