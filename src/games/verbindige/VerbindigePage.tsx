@@ -139,21 +139,21 @@ export function VerbindigePage() {
             <button
               onClick={handleShuffle}
               disabled={shufflePhase !== 'idle' || pendingCorrect != null}
-              className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-black)] transition-opacity hover:opacity-80 disabled:opacity-40"
+              className="min-h-[44px] rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-black)] transition-opacity hover:opacity-80 disabled:opacity-40"
             >
               Mischen
             </button>
             <button
               onClick={clearSelection}
               disabled={selected.length === 0 || pendingCorrect != null}
-              className="rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-black)] transition-opacity hover:opacity-80 disabled:opacity-40"
+              className="min-h-[44px] rounded border border-[var(--color-gray-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-black)] transition-opacity hover:opacity-80 disabled:opacity-40"
             >
               Löschen
             </button>
             <button
               onClick={submitGuess}
               disabled={selected.length !== 4 || pendingCorrect != null}
-              className="rounded bg-[var(--color-cyan)] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
+              className="min-h-[44px] rounded bg-[var(--color-cyan)] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-40"
             >
               Prüfen
             </button>

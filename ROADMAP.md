@@ -79,7 +79,7 @@ _Items from watson-qa-verbindige agent_
    - Evidence: Console log showed `NotAllowedError: Failed to execute 'writeText' on 'Clipboard': Document is not focused` thrown from `share.ts`. Post-click page read confirmed button label remained "Teilen" (not "Kopiert!"). Observed 2026-04-18.
    - Related: Zämesetzli #2 — same share error handling gap; share.ts fix would benefit both games
 
-7. [ ] P1 - Nav game links hidden off-screen on mobile — no scroll affordance
+7. [x] P1 - Nav game links hidden off-screen on mobile — no scroll affordance
    - Agent: watson-qa-verbindige
    - Scenario: Mobile UX — viewport constrained to 390px width
    - Problem: At 390px viewport width, the header allocates ~165px to the watson logo+badge and ~54px to the Login button, leaving only ~171px for the `<nav>` element. The 4 nav links (Spiele, Verbindige, Zämesetzli, Schlagziil) need ~335px total, so `scrollWidth` (347px) exceeds `clientWidth` (165px). `overflow-x-auto` on the nav handles the overflow silently — no gradient fade, clipping hint, or arrow signals that more items exist. A user landing on Verbindige via a shared link sees only "Spiele" and "Verbindige"; "Zämesetzli" and "Schlagziil" are invisible without scrolling.
@@ -88,7 +88,7 @@ _Items from watson-qa-verbindige agent_
    - Evidence: JS at 390px max-width confirmed `nav.scrollWidth=347, nav.clientWidth=165, isOverflowing=true`. Screenshot showed only "Spiele" + "Verbindige" + "Login" visible in nav bar with no visual hint of additional items. Observed 2026-04-20.
    - Related: #8 — both affect `Layout.tsx` nav on mobile; consider fixing together
 
-8. [ ] P2 - Action buttons and nav links below 44px touch target minimum
+8. [x] P2 - Action buttons and nav links below 44px touch target minimum
    - Agent: watson-qa-verbindige
    - Scenario: Mobile UX — measuring interactive element heights at 390px viewport
    - Problem: "Prüfen" and "Löschen" render at 38px tall (`py-2` = 8px padding each side + `text-sm` 20px line height). Nav links render at 32px tall (`py-1.5` = 6px each side). WCAG 2.5.5 recommends 44×44px minimum touch targets. Action buttons fall short by 6px, nav links by 12px. On a phone, tapping "Prüfen" right after tile selection is error-prone given the button's narrow vertical hit area.
@@ -288,7 +288,7 @@ _Items from watson-qa-zaemesetzli agent_
 
 _Critical findings from watson-code-reviewer_
 
-1. [ ] P1 - `transform: none !important` in reduced-motion media query breaks Toast and EmojiPool tooltip centering
+1. [x] P1 - `transform: none !important` in reduced-motion media query breaks Toast and EmojiPool tooltip centering
    - Agent: watson-code-reviewer
    - Scenario: Code review of `temp-holder` branch (2026-04-19)
    - Problem: `tokens.css:216` adds `transform: none !important` inside `@media (prefers-reduced-motion: reduce)`. This overrides ALL CSS transforms, including layout transforms. `Toast.tsx:44` uses `-translate-x-1/2` with `left-1/2` for centering — with `transform: none`, the toast renders at left 50% with no offset (off-center, clipped on mobile). Same issue in `EmojiPool.tsx:34` tooltip. The existing `animation-duration: 0.01ms` + `transition-duration: 0.01ms` already neuters motion; the blanket `transform: none` is unnecessary and breaks non-animation transforms.

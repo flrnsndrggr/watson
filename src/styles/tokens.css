@@ -221,11 +221,10 @@ body {
   to { transform: scaleX(1); transform-origin: left; }
 }
 
-/* Reduced motion — disable transforms, use opacity-only alternatives */
+/* Reduced motion — neuter animations/transitions but preserve layout transforms (e.g. translateX(-50%) for centering) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
-    transform: none !important;
   }
 }

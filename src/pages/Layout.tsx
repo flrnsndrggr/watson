@@ -1,9 +1,66 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from '@/components/shared/Toast';
 import { useAuth } from '@/lib/auth';
 import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
+
+/**
+ * Horizontally scrollable nav with gradient fade indicators on overflow edges.
+ * Shows a right fade when more items are hidden, left fade when scrolled right.
+ */
+function NavScroller({ children }: { children: React.ReactNode }) {
+  const scrollRef = useRef<HTMLElement>(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
+
+  useEffect(() => {
+    const nav = scrollRef.current;
+    if (!nav) return;
+
+    function update() {
+      if (!nav) return;
+      const { scrollLeft, scrollWidth, clientWidth } = nav;
+      setShowLeft(scrollLeft > 4);
+      setShowRight(scrollLeft + clientWidth < scrollWidth - 4);
+    }
+
+    update();
+    nav.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(nav);
+    return () => {
+      nav.removeEventListener('scroll', update);
+      ro.disconnect();
+    };
+  }, []);
+
+  return (
+    <div className="relative min-w-0 flex-1">
+      <nav
+        ref={scrollRef}
+        className="flex gap-1 overflow-x-auto scrollbar-none"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
+      >
+        {children}
+      </nav>
+      {/* Left fade */}
+      <div
+        className={`pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[var(--color-nav-bg)] to-transparent transition-opacity duration-150 ${
+          showLeft ? 'opacity-100' : 'opacity-0'
+        }`}
+        aria-hidden
+      />
+      {/* Right fade */}
+      <div
+        className={`pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-[var(--color-nav-bg)] to-transparent transition-opacity duration-150 ${
+          showRight ? 'opacity-100' : 'opacity-0'
+        }`}
+        aria-hidden
+      />
+    </div>
+  );
+}
 
 const NAV_ITEMS = [
   { path: '/', label: 'Spiele' },
@@ -92,12 +149,12 @@ export function Layout() {
               Spiele
             </span>
           </Link>
-          <nav className="flex gap-1 overflow-x-auto">
+          <NavScroller>
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`whitespace-nowrap rounded px-3 py-1.5 text-sm font-semibold transition-colors ${
+                className={`flex min-h-[44px] items-center whitespace-nowrap rounded px-3 text-sm font-semibold transition-colors ${
                   location.pathname === item.path
                     ? 'bg-white/10 text-white'
                     : 'text-white/60 hover:text-white'
@@ -106,7 +163,7 @@ export function Layout() {
                 {item.label}
               </Link>
             ))}
-          </nav>
+          </NavScroller>
           <div className="ml-auto flex items-center gap-2">
             {/* User account */}
             {!userLoading && (
