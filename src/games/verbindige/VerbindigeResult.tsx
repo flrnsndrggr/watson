@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ShareImageButton } from '@/components/shared/ShareImageButton';
 import { StoryShareButton } from '@/components/shared/StoryShareButton';
@@ -7,8 +7,10 @@ import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { NotificationPrompt } from '@/components/shared/NotificationPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
+import { StatsPanel } from '@/components/shared/StatsPanel';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
+import { computeGameStats } from '@/lib/gameStats';
 import type { ShareCardData } from '@/lib/shareImage';
 import { useVerbindige } from './useVerbindige';
 
@@ -129,6 +131,12 @@ export function VerbindigeResult() {
   const countdown = useNextPuzzleCountdown();
   const [showGroups, setShowGroups] = useState(false);
 
+  const todayBucket = status === 'won' ? String(mistakes) : status === 'lost' ? 'lost' : undefined;
+  const stats = useMemo(
+    () => computeGameStats('verbindige', todayBucket),
+    [todayBucket],
+  );
+
   if (status !== 'won' && status !== 'lost') return null;
 
   const tier = getPerformanceTier(status, mistakes);
@@ -240,6 +248,9 @@ export function VerbindigeResult() {
 
       {/* Leaderboard */}
       <LeaderboardPanel gameType="verbindige" puzzleDate={puzzle?.date} showTime />
+
+      {/* Personal statistics */}
+      <StatsPanel stats={stats} distributionLabel="Fehler-Verteilung" />
 
       {/* Share buttons */}
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">

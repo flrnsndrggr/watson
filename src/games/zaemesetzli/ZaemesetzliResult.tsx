@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ShareImageButton } from '@/components/shared/ShareImageButton';
 import { StoryShareButton } from '@/components/shared/StoryShareButton';
@@ -7,7 +7,9 @@ import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { NotificationPrompt } from '@/components/shared/NotificationPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
+import { StatsPanel } from '@/components/shared/StatsPanel';
 import { generateShareText } from '@/lib/share';
+import { computeGameStats } from '@/lib/gameStats';
 import type { ShareCardData } from '@/lib/shareImage';
 import { useZaemesetzli } from './useZaemesetzli';
 import type { Rank } from '@/types';
@@ -104,6 +106,12 @@ export function ZaemesetzliResult() {
     useZaemesetzli();
   const countdown = useNextPuzzleCountdown();
   const [showAllWords, setShowAllWords] = useState(false);
+
+  const todayBucket = (status === 'complete' || status === 'finished') ? currentRank : undefined;
+  const stats = useMemo(
+    () => computeGameStats('zaemesetzli', todayBucket),
+    [todayBucket],
+  );
 
   if ((status !== 'complete' && status !== 'finished') || !puzzle) return null;
 
@@ -226,6 +234,9 @@ export function ZaemesetzliResult() {
 
       {/* Leaderboard */}
       <LeaderboardPanel gameType="zaemesetzli" puzzleDate={puzzle.date} />
+
+      {/* Personal statistics */}
+      <StatsPanel stats={stats} distributionLabel="Rang-Verteilung" />
 
       {/* Share buttons */}
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">

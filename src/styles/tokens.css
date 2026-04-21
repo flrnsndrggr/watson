@@ -215,6 +215,12 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Stats panel: bar chart grow animation */
+@keyframes statsBarGrow {
+  from { transform: scaleX(0); transform-origin: left; }
+  to { transform: scaleX(1); transform-origin: left; }
+}
+
 /* Reduced motion — disable transforms, use opacity-only alternatives */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ShareImageButton } from '@/components/shared/ShareImageButton';
 import { StoryShareButton } from '@/components/shared/StoryShareButton';
@@ -7,8 +7,10 @@ import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { NotificationPrompt } from '@/components/shared/NotificationPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
+import { StatsPanel } from '@/components/shared/StatsPanel';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
+import { computeGameStats } from '@/lib/gameStats';
 import type { ShareCardData } from '@/lib/shareImage';
 import type { SchlagziilHeadline } from '@/types';
 import { useSchlagziil } from './useSchlagziil';
@@ -194,9 +196,14 @@ export function SchlagziilResult() {
   const { results, revealedAnswers, hintsUsed, puzzle, status, streak } = useSchlagziil();
   const countdown = useNextPuzzleCountdown();
 
-  if (status !== 'finished' || !puzzle) return null;
-
   const correctCount = results.filter((r) => r === 'correct').length;
+  const todayBucket = status === 'finished' ? String(correctCount) : undefined;
+  const stats = useMemo(
+    () => computeGameStats('schlagziil', todayBucket),
+    [todayBucket],
+  );
+
+  if (status !== 'finished' || !puzzle) return null;
   const tier = getPerformanceTier(correctCount);
 
   // Build accuracy squares
@@ -305,6 +312,9 @@ export function SchlagziilResult() {
 
       {/* Leaderboard */}
       <LeaderboardPanel gameType="schlagziil" puzzleDate={puzzle.date} showTime />
+
+      {/* Personal statistics */}
+      <StatsPanel stats={stats} distributionLabel="Treffer-Verteilung" />
 
       {/* Share buttons */}
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">
