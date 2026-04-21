@@ -1,0 +1,17 @@
+{
+  "name": "watson Spiele",
+  "short_name": "watson",
+  "description": "Tägliche Spiele von watson.ch: Verbindige, Zämesetzli, Schlagziil.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A1A",
+  "theme_color": "#00C6FF",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
