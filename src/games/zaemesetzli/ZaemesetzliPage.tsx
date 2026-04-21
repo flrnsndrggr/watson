@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
@@ -36,6 +36,7 @@ export function ZaemesetzliPage() {
     puzzle,
     selectedEmojis,
     foundWords,
+    hintsUsed,
     score,
     currentRank,
     lastResult,
@@ -174,6 +175,23 @@ export function ZaemesetzliPage() {
     else showToast('Alle Wörter gefunden!');
   }
 
+  // After the first hint, compute which emojis still appear in unfound compounds.
+  // Productive emojis glow to guide the player; exhausted ones dim.
+  const productiveEmojis = useMemo(() => {
+    if (!puzzle || hintsUsed === 0) return undefined;
+    const foundWordSet = new Set(foundWords.map((fw) => fw.word.toLowerCase()));
+    const unfound = puzzle.valid_compounds.filter(
+      (c) => !foundWordSet.has(c.word.toLowerCase()),
+    );
+    const emojis = new Set<string>();
+    for (const compound of unfound) {
+      for (const emoji of compound.components) {
+        emojis.add(emoji);
+      }
+    }
+    return emojis;
+  }, [puzzle, foundWords, hintsUsed]);
+
   if (!puzzle) return <PuzzleLoading variant="zaemesetzli" />;
 
   return (
@@ -210,6 +228,7 @@ export function ZaemesetzliPage() {
           <EmojiPool
             emojis={puzzle.emojis}
             selectedEmojis={selectedEmojis}
+            hintableEmojis={productiveEmojis}
             onSelect={selectEmoji}
           />
 

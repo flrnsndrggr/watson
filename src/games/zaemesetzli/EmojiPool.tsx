@@ -8,7 +8,7 @@ interface EmojiPoolProps {
   onSelect: (emoji: string) => void;
 }
 
-function EmojiButton({ item, isSelected, isHintable, onSelect }: { item: EmojiItem; isSelected: boolean; isHintable: boolean; onSelect: () => void }) {
+function EmojiButton({ item, isSelected, hintMode, isHintable, onSelect }: { item: EmojiItem; isSelected: boolean; hintMode: boolean; isHintable: boolean; onSelect: () => void }) {
   const [showNoun, setShowNoun] = useState(false);
 
   function handleDragStart(e: React.DragEvent) {
@@ -19,6 +19,22 @@ function EmojiButton({ item, isSelected, isHintable, onSelect }: { item: EmojiIt
 
   function handleDragEnd(e: React.DragEvent) {
     (e.currentTarget as HTMLElement).style.opacity = '';
+  }
+
+  // Three visual states:
+  // 1. Selected: cyan highlight (always wins)
+  // 2. Hint mode + hintable: pulsing glow draws attention to productive emojis
+  // 3. Hint mode + not hintable: dimmed — this emoji has no remaining compounds
+  // 4. Normal (no hint): equal neutral styling for all
+  let stateClass: string;
+  if (isSelected) {
+    stateClass = 'scale-110 bg-[var(--color-cyan)] shadow-md ring-2 ring-[var(--color-cyan)]';
+  } else if (hintMode && isHintable) {
+    stateClass = 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80 animate-[hintGlow_2s_ease-in-out_infinite]';
+  } else if (hintMode) {
+    stateClass = 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80 opacity-40';
+  } else {
+    stateClass = 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80';
   }
 
   return (
@@ -36,12 +52,7 @@ function EmojiButton({ item, isSelected, isHintable, onSelect }: { item: EmojiIt
       className={`
         relative flex h-14 w-14 items-center justify-center rounded-lg text-2xl
         transition-all duration-[var(--transition-fast)] select-none cursor-grab active:cursor-grabbing
-        ${isSelected
-          ? 'scale-110 bg-[var(--color-cyan)] shadow-md ring-2 ring-[var(--color-cyan)]'
-          : isHintable
-            ? 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80 animate-[hintGlow_2s_ease-in-out_infinite]'
-            : 'bg-[var(--color-gray-bg)] hover:bg-[var(--color-gray-bg)]/80 opacity-50'
-        }
+        ${stateClass}
       `}
       aria-label={item.canonical_noun}
     >
@@ -56,6 +67,8 @@ function EmojiButton({ item, isSelected, isHintable, onSelect }: { item: EmojiIt
 }
 
 export function EmojiPool({ emojis, selectedEmojis, hintableEmojis, onSelect }: EmojiPoolProps) {
+  const hintMode = !!hintableEmojis;
+
   return (
     <div className="flex flex-wrap justify-center gap-3 py-4">
       {emojis.map((item) => (
@@ -63,7 +76,8 @@ export function EmojiPool({ emojis, selectedEmojis, hintableEmojis, onSelect }: 
           key={item.emoji}
           item={item}
           isSelected={selectedEmojis.includes(item.emoji)}
-          isHintable={!hintableEmojis || hintableEmojis.has(item.emoji)}
+          hintMode={hintMode}
+          isHintable={hintMode && hintableEmojis.has(item.emoji)}
           onSelect={() => onSelect(item.emoji)}
         />
       ))}
