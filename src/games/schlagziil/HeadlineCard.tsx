@@ -14,6 +14,8 @@ interface HeadlineCardProps {
   hintUsed: boolean;
   onUseHint: () => void;
   shaking?: boolean;
+  /** Card is about to exit (sliding out before next headline) */
+  exiting?: boolean;
   /** Skip entrance animation (e.g. in the review list) */
   skipEntrance?: boolean;
 }
@@ -32,6 +34,7 @@ export function HeadlineCard({
   hintUsed,
   onUseHint,
   shaking,
+  exiting,
   skipEntrance,
 }: HeadlineCardProps) {
   const [input, setInput] = useState('');
@@ -59,7 +62,8 @@ export function HeadlineCard({
   }
 
   const entranceClass = skipEntrance ? '' : 'animate-[cardEnter_400ms_ease-out]';
-  const correctPulseClass = isCorrect === true ? 'animate-[correctPulse_600ms_ease-out]' : '';
+  const exitClass = exiting ? 'animate-[cardExit_350ms_ease-in_forwards]' : '';
+  const correctPulseClass = isCorrect === true && !exiting ? 'animate-[correctPulse_600ms_ease-out]' : '';
 
   return (
     <div
@@ -72,7 +76,7 @@ export function HeadlineCard({
           : isCorrect === false
             ? 'border-[var(--color-pink)] bg-pink-50'
             : 'border-[var(--color-gray-bg)] bg-white'
-      } ${shaking ? 'animate-[shake_400ms_ease]' : ''} ${correctPulseClass} ${entranceClass}`}
+      } ${shaking ? 'animate-[shake_400ms_ease]' : ''} ${correctPulseClass} ${entranceClass} ${exitClass}`}
     >
       {/* Year + Category badge */}
       <div className="flex items-center gap-2">
@@ -94,9 +98,25 @@ export function HeadlineCard({
         )}
       </div>
 
-      {/* Headline text */}
+      {/* Headline text — fills in the answer when revealed */}
       <p className="mt-2 text-lg font-semibold leading-snug">
-        &laquo;{display}&raquo;
+        &laquo;{revealedAnswer ? (() => {
+          const parts = display.split(/_+/);
+          const colorClass = isCorrect
+            ? 'text-[var(--color-green)] decoration-[var(--color-green)]'
+            : 'text-[var(--color-pink)] decoration-[var(--color-pink)]';
+          return (
+            <>
+              {parts[0]}
+              <span
+                className={`inline-block font-bold underline decoration-2 underline-offset-2 ${colorClass} animate-[wordFillBlank_500ms_ease-out]`}
+              >
+                {revealedAnswer}
+              </span>
+              {parts[1]}
+            </>
+          );
+        })() : display}&raquo;
       </p>
 
       {/* Hint */}
@@ -117,17 +137,10 @@ export function HeadlineCard({
         </div>
       )}
 
-      {/* Input or revealed answer */}
+      {/* Input or article link after answer reveal */}
       {revealedAnswer ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span
-            className={`inline-block rounded px-3 py-1 text-sm font-bold animate-[answerReveal_400ms_ease-out] ${
-              isCorrect ? 'bg-[var(--color-green)] text-white' : 'bg-[var(--color-pink)] text-white'
-            }`}
-          >
-            {revealedAnswer}
-          </span>
-          {hintUsed && <span className="text-xs">💡</span>}
+          {hintUsed && <span className="text-xs" aria-label="Tipp benutzt">💡</span>}
           {articleDate && (
             <span className="text-xs text-[var(--color-gray-text)]">{articleDate}</span>
           )}

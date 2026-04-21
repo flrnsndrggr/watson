@@ -42,6 +42,7 @@ export function SchlagziilPage() {
   const { current: streak, recordPlay } = useStreak('schlagziil');
   const { isStale, refresh } = useDailyReset(puzzle?.date ?? null, loadPuzzle);
   const [shaking, setShaking] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const prevStatus = useRef(status);
 
@@ -62,8 +63,16 @@ export function SchlagziilPage() {
   useEffect(() => {
     if (lastGuessResult === 'correct') {
       showToast('Richtig! ✓');
-      const timer = setTimeout(advanceToNext, 2000);
-      return () => clearTimeout(timer);
+      // Start card exit animation 350ms before advancing
+      const exitTimer = setTimeout(() => setExiting(true), 1650);
+      const advanceTimer = setTimeout(() => {
+        setExiting(false);
+        advanceToNext();
+      }, 2000);
+      return () => {
+        clearTimeout(exitTimer);
+        clearTimeout(advanceTimer);
+      };
     }
 
     if (lastGuessResult === 'wrong') {
@@ -168,6 +177,7 @@ export function SchlagziilPage() {
             hintUsed={hintsUsed[currentIndex]}
             onUseHint={() => useHint(currentIndex)}
             shaking={shaking}
+            exiting={exiting}
           />
         </>
       )}
