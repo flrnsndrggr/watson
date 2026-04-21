@@ -1,6 +1,25 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { getTodayDateCET } from '@/lib/supabase';
 
+const DISMISSED_KEY_PREFIX = 'watson_banner_dismissed_';
+
+function readDismissed(puzzleDate: string | null): boolean {
+  if (!puzzleDate) return false;
+  try {
+    return sessionStorage.getItem(DISMISSED_KEY_PREFIX + puzzleDate) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeDismissed(puzzleDate: string): void {
+  try {
+    sessionStorage.setItem(DISMISSED_KEY_PREFIX + puzzleDate, '1');
+  } catch {
+    // sessionStorage unavailable (private mode, quota) — silent fail
+  }
+}
+
 /**
  * Detects midnight CET rollover and signals when a new puzzle is available.
  *
@@ -15,12 +34,26 @@ export function useDailyReset(
   // Track whether a midnight rollover happened while the page was open
   const [rolledOver, setRolledOver] = useState(false);
 
+  // Track whether the user already clicked "Spielen" and no newer puzzle was found.
+  // Persisted to sessionStorage keyed by puzzle date so the banner stays
+  // dismissed across navigation within the same browser session — but
+  // re-appears for a genuinely new puzzle date.
+  const [dismissed, setDismissed] = useState<boolean>(() => readDismissed(puzzleDate));
+
+  // Re-sync dismissal when the puzzle date changes (load completes, midnight
+  // rollover, archive nav). A different date may already be marked dismissed
+  // from an earlier visit, or may be fresh.
+  useEffect(() => {
+    setDismissed(readDismissed(puzzleDate));
+  }, [puzzleDate]);
+
   // Derive staleness from props + rollover flag (no setState in effect needed)
   const isStale = useMemo(() => {
     if (!puzzleDate) return false;
+    if (dismissed) return false;
     if (rolledOver) return true;
     return puzzleDate !== getTodayDateCET();
-  }, [puzzleDate, rolledOver]);
+  }, [puzzleDate, rolledOver, dismissed]);
 
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -51,6 +84,7 @@ export function useDailyReset(
 
     const ms = msUntilMidnightCET();
     timerRef.current = setTimeout(() => {
+      setDismissed(false);
       setRolledOver(true);
     }, ms);
 
@@ -64,6 +98,7 @@ export function useDailyReset(
     function handleVisibility() {
       if (!puzzleDate) return;
       if (document.visibilityState === 'visible' && puzzleDate !== getTodayDateCET()) {
+        setDismissed(false);
         setRolledOver(true);
       }
     }
@@ -72,9 +107,14 @@ export function useDailyReset(
   }, [puzzleDate]);
 
   const refresh = useCallback(() => {
+    // Persist dismissal for the current puzzle date so the banner doesn't
+    // immediately re-appear if loadPuzzle returns a puzzle with the same date
+    // (e.g. no fresh puzzle is published in the DB yet).
+    if (puzzleDate) writeDismissed(puzzleDate);
+    setDismissed(true);
     setRolledOver(false);
     onRefresh();
-  }, [onRefresh]);
+  }, [onRefresh, puzzleDate]);
 
   return { isStale, refresh };
 }
