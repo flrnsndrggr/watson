@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ShareImageButton } from '@/components/shared/ShareImageButton';
+import { StoryShareButton } from '@/components/shared/StoryShareButton';
 import { PostGameSection } from '@/components/shared/PostGameSection';
 import { StreakBadge } from '@/components/shared/StreakBadge';
 import { StreakPrompt } from '@/components/shared/StreakPrompt';
 import { NotificationPrompt } from '@/components/shared/NotificationPrompt';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
+import { StatsPanel } from '@/components/shared/StatsPanel';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { generateShareText } from '@/lib/share';
+import { computeGameStats } from '@/lib/gameStats';
 import type { ShareCardData } from '@/lib/shareImage';
 import type { SchlagziilHeadline } from '@/types';
 import { useSchlagziil } from './useSchlagziil';
@@ -194,10 +197,16 @@ export function SchlagziilResult() {
   const { results, revealedAnswers, hintsUsed, puzzle, status, streak, isRueckblick } = useSchlagziil();
   const countdown = useNextPuzzleCountdown();
 
+  const correctCount = results.filter((r) => r === 'correct').length;
+  const todayBucket = status === 'finished' ? String(correctCount) : undefined;
+  const stats = useMemo(
+    () => computeGameStats('schlagziil', todayBucket),
+    [todayBucket],
+  );
+
   if (status !== 'finished' || !puzzle) return null;
 
   const total = puzzle.headlines.length;
-  const correctCount = results.filter((r) => r === 'correct').length;
   const tier = getPerformanceTier(correctCount, total);
   const gameLabel = isRueckblick ? 'Schlagziil Rückblick' : 'Schlagziil';
   const shareGameKey = isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil';
@@ -311,10 +320,16 @@ export function SchlagziilResult() {
       {/* Leaderboard */}
       <LeaderboardPanel gameType={isRueckblick ? 'schlagziil_rueckblick' : 'schlagziil'} puzzleDate={puzzle.date} showTime />
 
+      {/* Personal statistics */}
+      {!isRueckblick && (
+        <StatsPanel stats={stats} distributionLabel="Ergebnis-Verteilung" />
+      )}
+
       {/* Share buttons */}
       <div className="mt-5 flex items-center justify-center gap-2 animate-[resultSlideUp_400ms_ease-out_800ms_both]">
         <ShareButton text={shareText} label="Ergebnis teilen" game="schlagziil" />
         <ShareImageButton cardData={cardData} game="schlagziil" />
+        <StoryShareButton cardData={cardData} game="schlagziil" />
       </div>
 
       {/* Puzzle date */}
