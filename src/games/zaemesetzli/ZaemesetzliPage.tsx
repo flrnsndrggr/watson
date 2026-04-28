@@ -46,6 +46,7 @@ export function ZaemesetzliPage() {
     status,
     isArchive,
     selectEmoji,
+    deselectEmoji,
     clearEmojiSelection,
     submitCombination,
     finishGame,
@@ -147,9 +148,9 @@ export function ZaemesetzliPage() {
       submitCombination();
     } else if (e.key === 'Backspace' && selectedEmojis.length > 0) {
       e.preventDefault();
-      clearEmojiSelection();
+      deselectEmoji(selectedEmojis[selectedEmojis.length - 1]);
     }
-  }, [status, selectedEmojis.length, clearEmojiSelection, submitCombination]);
+  }, [status, selectedEmojis, deselectEmoji, submitCombination]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -236,6 +237,7 @@ export function ZaemesetzliPage() {
           <CombineSlots
             selectedEmojis={selectedEmojis}
             onClear={clearEmojiSelection}
+            onRemove={deselectEmoji}
             onDrop={selectEmoji}
             celebration={lastFoundCompound}
             rejected={rejected}

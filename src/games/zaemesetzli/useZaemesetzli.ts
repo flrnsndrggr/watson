@@ -43,6 +43,7 @@ interface ZaemesetzliState {
 
   loadPuzzle: (archiveDate?: string) => Promise<void>;
   selectEmoji: (emoji: string) => void;
+  deselectEmoji: (emoji: string) => void;
   clearEmojiSelection: () => void;
   submitCombination: () => void;
   finishGame: () => void;
@@ -143,9 +144,17 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
   selectEmoji: (emoji) => {
     const { selectedEmojis } = get();
-    if (selectedEmojis.length < 3 && !selectedEmojis.includes(emoji)) {
+    // Toggle: tap again to deselect
+    if (selectedEmojis.includes(emoji)) {
+      set({ selectedEmojis: selectedEmojis.filter((e) => e !== emoji) });
+    } else if (selectedEmojis.length < 3) {
       set({ selectedEmojis: [...selectedEmojis, emoji] });
     }
+  },
+
+  deselectEmoji: (emoji) => {
+    const { selectedEmojis } = get();
+    set({ selectedEmojis: selectedEmojis.filter((e) => e !== emoji) });
   },
 
   clearEmojiSelection: () => set({ selectedEmojis: [] }),
