@@ -7,7 +7,7 @@ const ADMIN_NAV = [
   { path: '/admin/verbindige', label: 'Verbindige' },
   { path: '/admin/zaemesetzli', label: 'Zaemesetzli' },
   { path: '/admin/schlagloch', label: 'Schlagloch' },
-  { path: '/admin/quizzhuber', label: 'Quizzhuber' },
+  { path: '/admin/quizzhuber', label: 'Quizz den Huber' },
   { path: '/admin/aufgedeckt', label: 'Aufgedeckt' },
   { path: '/admin/quizzticle', label: 'Quizzticle' },
   { path: '/admin/verbindige-editions', label: 'Editions' },

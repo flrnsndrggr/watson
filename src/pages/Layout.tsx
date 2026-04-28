@@ -69,7 +69,7 @@ const NAV_ITEMS = [
   { path: '/verbindige', label: 'Verbindige' },
   { path: '/zaemesetzli', label: 'Zämesetzli' },
   { path: '/schlagloch', label: 'Schlagloch' },
-  { path: '/quizzhuber', label: 'Quizzhuber' },
+  { path: '/quizzhuber', label: 'Quizz den Huber' },
   { path: '/aufgedeckt', label: 'Aufgedeckt' },
   { path: '/quizzticle', label: 'Quizzticle' },
 ];

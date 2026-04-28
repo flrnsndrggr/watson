@@ -46,7 +46,7 @@ export function QuizzhuberPage() {
   return (
     <GameShell>
       <GameHeader
-        title="Quizzhuber"
+        title="Quizz den Huber"
         puzzleId={String(puzzle.episode)}
         subtitle={puzzle.intro}
       />

@@ -12,6 +12,9 @@ You are the games-watson puzzle content agent. You ensure there are always enoug
    - `src/games/verbindige/verbindige.data.ts`
    - `src/games/schlagloch/schlagloch.data.ts`
    - `src/games/zaemesetzli/zaemesetzli.data.ts`
+   - `src/games/quizzhuber/quizzhuber.data.ts`
+   - `src/games/aufgedeckt/aufgedeckt.data.ts`
+   - `src/games/quizzticle/quizzticle.data.ts`
 3. Read `src/types/index.ts` for shared types.
 
 ## Database access
@@ -46,7 +49,7 @@ start it means more, up to 3 × 7 = 21 inserts to rebuild the full buffer.
 
 ```bash
 /Users/fs/Code/game-watson/scripts/watson-sql.sh "
-WITH games AS (SELECT unnest(ARRAY['verbindige','schlagloch','zaemesetzli']) AS game_type),
+WITH games AS (SELECT unnest(ARRAY['verbindige','schlagloch','zaemesetzli','quizzhuber','aufgedeckt','quizzticle']) AS game_type),
      days  AS (SELECT (CURRENT_DATE + i)::date AS d FROM generate_series(1, 7) AS i),
      slots AS (SELECT g.game_type, d.d AS publish_date FROM games g CROSS JOIN days d)
 SELECT s.game_type, s.publish_date
@@ -96,6 +99,21 @@ For each game type with puzzles, spot-check the latest one:
 - max_score > 0
 - rank_thresholds present
 
+**Quizz den Huber**: Query `quizzhuber_puzzles`. Validate:
+- `episode` int present, `intro` non-empty
+- exactly 10 questions in the JSONB `questions` array
+- each question: `prompt`, `options` array of length 4, `correct_index` ∈ [0,3]
+
+**Aufgedeckt**: Query `aufgedeckt_puzzles`. Validate:
+- `episode` int present, `threshold` int present
+- exactly 10 rounds in the JSONB `rounds` array
+- each round: `image_url` is https, `answer` non-empty, `accepted_answers` non-empty
+
+**Quizzticle**: Query `quizzticle_puzzles`. Validate:
+- `episode`, `prompt`, `slot_count`, `duration_seconds` (>0) all present
+- `items.length === slot_count`
+- each item: `display` non-empty, `accepted_answers` non-empty
+
 Log any validation errors as content gaps in ROADMAP.md under `## Content Gaps`.
 
 ## No-repeats rule
@@ -123,6 +141,23 @@ UNION ALL
 -- Zaemesetzli: every compound word ever used
 SELECT 'zaemesetzli', array_agg(DISTINCT lower(w)) FROM (
   SELECT jsonb_array_elements(valid_compounds)->>'word' AS w FROM zaemesetzli_puzzles
+) t
+UNION ALL
+-- Quizz den Huber: every question prompt ever used
+SELECT 'quizzhuber', array_agg(DISTINCT lower(w)) FROM (
+  SELECT jsonb_array_elements(questions)->>'prompt' AS w FROM quizzhuber_puzzles
+) t
+UNION ALL
+-- Aufgedeckt: every canonical answer ever used
+SELECT 'aufgedeckt', array_agg(DISTINCT lower(w)) FROM (
+  SELECT jsonb_array_elements(rounds)->>'answer' AS w FROM aufgedeckt_puzzles
+) t
+UNION ALL
+-- Quizzticle: every slot item display + every prompt ever used
+SELECT 'quizzticle', array_agg(DISTINCT lower(w)) FROM (
+  SELECT jsonb_array_elements(items)->>'display' AS w FROM quizzticle_puzzles
+  UNION ALL
+  SELECT prompt FROM quizzticle_puzzles
 ) t;
 "
 ```
@@ -242,6 +277,122 @@ Generate a set of emojis and valid compound combinations:
 - 6-10 valid compounds (pairs of emojis that form a German compound word)
 - Example: sun + flower = Sonnenblume, snow + man = Schneemann
 - Include Swiss-themed compounds where possible
+
+### Quizz den Huber — host-driven trivia (10 questions)
+A weekly format inspired by watson.ch's "Quizz den Huber". Editorial
+host persona presenting a themed set of ten Swiss-flavoured trivia
+questions with four multiple-choice options each.
+
+Required JSONB shape:
+- `episode` (int) — increment from the latest existing episode for this game.
+- `intro` (text) — 1–3 sentences in the host's voice setting up the week's theme.
+- `questions` (array of exactly 10 objects):
+  - `prompt`: question text
+  - `options`: array of exactly 4 distinct strings
+  - `correct_index`: integer 0..3 (which option is correct)
+  - `category` (optional): one of "Geschichte", "Geografie", "Politik",
+    "Sprache", "Musik", "Sport", "Brauchtum", "Wirtschaft", "Wissenschaft"
+  - `explanation` (optional): one short sentence shown after answer reveal
+
+Authoring rules:
+- All ten questions must answer in Swiss-relevant context (Swiss politics,
+  Swiss history, Swiss geography, Swiss culture). One or two questions
+  with a Swiss angle on international topics is fine; pure international
+  trivia is wrong.
+- Mix difficulty: 2–3 easy, 4–5 medium, 2–3 hard.
+- Distinct categories — don't ship 10 Geografie questions.
+- Spread `correct_index` across 0..3; don't always pick option 0.
+
+Insert template:
+```bash
+/Users/fs/Code/game-watson/scripts/watson-sql.sh "
+WITH ins AS (
+  INSERT INTO puzzles (id, game_type, publish_date)
+  VALUES (gen_random_uuid(), 'quizzhuber', DATE '<target-date>')
+  RETURNING id
+)
+INSERT INTO quizzhuber_puzzles (id, episode, intro, questions)
+SELECT id, <episode-int>, '<intro-text>', '<jsonb questions array>'::jsonb FROM ins;
+"
+```
+
+### Aufgedeckt — image-tile reveal
+Players uncover tiles of a hidden image and type the depicted answer.
+Ten rounds per puzzle.
+
+Required JSONB shape:
+- `episode` (int) — increment from latest.
+- `threshold` (int, default 80) — tile-count target shown in the title.
+- `rounds` (array of exactly 10 objects):
+  - `image_url`: https URL, must resolve. Stable hosts only — Wikimedia
+    Commons (`upload.wikimedia.org/...`) is preferred. Avoid news-site
+    hotlinks (they 404 within months).
+  - `answer`: canonical display answer
+  - `accepted_answers`: 2+ string variants (full name, abbreviation,
+    foreign-language equivalents where relevant — e.g. ["SBB","CFF","FFS"]).
+  - `cols`, `rows` (optional, both default 5): tile grid dimensions
+  - `hint` (optional): short clue text
+
+Authoring rules:
+- Subjects must be **iconic Swiss visual references** — Matterhorn,
+  Roger Federer, Toblerone, Bahnhofstrasse, Rivella, SBB Re 460, Eiger
+  Nordwand, Tinguely sculptures, Sechseläuten Böögg, etc.
+- Image must clearly depict the canonical answer (no abstract photos).
+- Always verify image URLs return 200 before inserting.
+- No two rounds with the same answer in one puzzle.
+
+Insert template:
+```bash
+/Users/fs/Code/game-watson/scripts/watson-sql.sh "
+WITH ins AS (
+  INSERT INTO puzzles (id, game_type, publish_date)
+  VALUES (gen_random_uuid(), 'aufgedeckt', DATE '<target-date>')
+  RETURNING id
+)
+INSERT INTO aufgedeckt_puzzles (id, episode, threshold, rounds)
+SELECT id, <episode-int>, <threshold-int>, '<jsonb rounds array>'::jsonb FROM ins;
+"
+```
+
+### Quizzticle — timed list-fill
+Sporcle-style: one prompt, N slots, fixed time on the clock. Player
+types as many items as possible.
+
+Required JSONB shape:
+- `episode` (int) — increment from latest.
+- `prompt` (text) — the category statement (e.g. "Alle 26 Schweizer Kantone").
+- `category` (optional text) — short badge label (e.g. "Geografie").
+- `slot_count` (int) — must equal `items.length`.
+- `duration_seconds` (int, typical 1200 = 20 min; harder topics get longer).
+- `items` (array of objects):
+  - `display`: canonical answer string
+  - `accepted_answers`: 1+ string variants. **Always** include
+    diacritics-stripped, abbreviation, and foreign-language forms where
+    they exist (e.g. ["Zürich","Zurich","ZH"], ["Genf","Genève","Geneva","GE"]).
+
+Authoring rules:
+- The list must be **exhaustive and finite** — "every X" with a known
+  count, not "famous Y" (open-ended). Good: 26 cantons, 7 Bundesräte
+  currently sitting, 4 Landessprachen. Bad: "famous Swiss writers" (no
+  hard upper bound, contestable).
+- All answers must be **publicly verifiable**, not editorial picks.
+- Sort `items` by display alphabetically OR by a meaningful natural
+  order (e.g. by year for "Bundesratswahlen seit 2010").
+- Don't repeat a list across episodes — once "26 Kantone" is shipped, it
+  can't be the prompt again until the agent rotates topics every ~year.
+
+Insert template:
+```bash
+/Users/fs/Code/game-watson/scripts/watson-sql.sh "
+WITH ins AS (
+  INSERT INTO puzzles (id, game_type, publish_date)
+  VALUES (gen_random_uuid(), 'quizzticle', DATE '<target-date>')
+  RETURNING id
+)
+INSERT INTO quizzticle_puzzles (id, episode, prompt, slot_count, duration_seconds, items, category)
+SELECT id, <episode-int>, '<prompt>', <n>, <seconds>, '<jsonb items array>'::jsonb, '<category-or-null>' FROM ins;
+"
+```
 
 ## Step 4: Commit content gap report
 

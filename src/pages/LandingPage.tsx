@@ -49,7 +49,7 @@ const GAMES: GameConfig[] = [
   },
   {
     path: '/quizzhuber',
-    name: 'Quizzhuber',
+    name: 'Quizz den Huber',
     emoji: '\u{1F914}',
     description: '10 Fragen quer durch die Schweiz. Beweg deinen Stolz.',
     gameType: 'quizzhuber',

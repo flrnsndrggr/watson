@@ -30,13 +30,13 @@ export function QuizzhuberResult() {
   const shareText = generateShareText(
     'verbindige', // reuse the share-text helper; treats puzzle date as identifier
     puzzle.date ?? puzzle.episode,
-    `Quizzhuber #${puzzle.episode} — ${correct}/${total}\n${emojiLine}`,
+    `Quizz den Huber #${puzzle.episode} — ${correct}/${total}\n${emojiLine}`,
   );
 
   return (
     <div className="text-center">
       <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold">
-        Quizzhuber #{puzzle.episode}
+        Quizz den Huber #{puzzle.episode}
       </h1>
       <p className="mt-1 text-sm text-[var(--color-gray-text)]">{verdict}</p>
 

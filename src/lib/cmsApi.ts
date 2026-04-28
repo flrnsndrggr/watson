@@ -139,7 +139,7 @@ export const GAME_LABELS: Record<GameType, string> = {
   verbindige: 'Verbindige',
   zaemesetzli: 'Zaemesetzli',
   schlagloch: 'Schlagloch',
-  quizzhuber: 'Quizzhuber',
+  quizzhuber: 'Quizz den Huber',
   aufgedeckt: 'Aufgedeckt',
   quizzticle: 'Quizzticle',
 };

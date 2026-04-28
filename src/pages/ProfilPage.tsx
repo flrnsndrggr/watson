@@ -22,7 +22,7 @@ const GAMES: GameInfo[] = [
   { type: 'verbindige', name: 'Verbindige', emoji: '🇨🇭', path: '/verbindige', color: 'var(--color-cyan)' },
   { type: 'zaemesetzli', name: 'Zämesetzli', emoji: '🧩', path: '/zaemesetzli', color: 'var(--color-green)' },
   { type: 'schlagloch', name: 'Schlagloch', emoji: '📰', path: '/schlagloch', color: 'var(--color-blue)' },
-  { type: 'quizzhuber', name: 'Quizzhuber', emoji: '🤔', path: '/quizzhuber', color: 'var(--color-blue)' },
+  { type: 'quizzhuber', name: 'Quizz den Huber', emoji: '🤔', path: '/quizzhuber', color: 'var(--color-blue)' },
   { type: 'aufgedeckt', name: 'Aufgedeckt', emoji: '🔍', path: '/aufgedeckt', color: 'var(--color-pink)' },
   { type: 'quizzticle', name: 'Quizzticle', emoji: '⏱', path: '/quizzticle', color: 'var(--color-cyan)' },
 ];
