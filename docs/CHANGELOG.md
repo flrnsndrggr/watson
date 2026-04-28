@@ -1,5 +1,102 @@
 # Changelog
 
+## 2026-04-28
+
+### Features
+- Three new recurring formats — Quizzhuber, Aufgedeckt, Quizzticle (`7a8fd69`)
+- Gamification phase 0: leaderboard, events, streaks server sync (`6d10f80`)
+- Gamification phase 1.1+1.2: at-risk streak indicator + Eis-Tag freeze (`36cd433`)
+- Gamification phase 1.3: account prompt at day-3 threshold (`6b0706a`)
+- Gamification phase 2: achievements with 11 launch badges (`747c318`)
+- Gamification phase 3: period leaderboards (Heute / Woche / Monat / Allzeit) (`2045bc7`)
+- Gamification phase 4: web push subscriptions, account-agnostic (`a18a44f`)
+- Tap-to-toggle emoji selection and slot removal in Zämesetzli (`608dcc3`)
+- Code-split per game with lazy-load and dependency isolation (`f744242`)
+- Close out cross-game polish checklist (`0bde57a`)
+- Rebrand scheduler fleet dashboard with watson palette (`c5052f8`)
+
+### Fixes
+- Show toast on `navigator.share` success path (`8954b55`)
+- Move toast from `top-[100px]` to `top-[60px]` to avoid covering emoji pool (`91dcd07`)
+- `useAnimatedScore` tracks actual display value to prevent stale counter (`bac2066`)
+- Schlagloch: derive answers + display answers from headline rows (`39022a9`)
+- Bump service worker cache to v3 for supabase fetch fix (`9a5023d`)
+- Join game tables on `id`, not `puzzle_id` (`3239591`)
+
+### Polish
+- Animate score counter and pop effect in RankBar (`fffb04f`)
+- Tighten visual fidelity to watson.ch chrome (`95539b1`)
+
+### Content
+- Rename Eis-Tag → Joker (less Duolingo, more quiz-show) (`99f5744`)
+
+### Performance
+- Stub unused Supabase modules — vendor-supabase 48.53KB → 27.09KB gzip (`0e762bc`)
+
+## 2026-04-21
+
+### Features
+- PWA service worker for offline play (`964c565`)
+- Sunday Schlagziil Rückblick: 10 headlines, harder difficulty, separate leaderboard (`7397f4a`)
+- Branded Verbindige editions CMS for sponsor-themed puzzles (`4485938`)
+- Zämesetzli emoji-only submission (drop typing) (`3b35f98`)
+- Schlagziil answer fills into headline blank with smooth card transitions (`b62400b`)
+- StatsPanel and StoryShareButton for Schlagziil results (`863f436`)
+- Difficulty-aware compound progress for Zämesetzli (`96dc3e4`)
+- Mobile nav with scroll fade indicators and 44px touch targets (`db0d3b6`)
+- Zämesetzli emoji hint glow and productive-emoji guidance (`dcee2a0`)
+- watson-puzzle-content scheduler maintains 7-day rolling buffer (`221dbeb`)
+
+### Fixes
+- Show numeric score alongside rank in RankBar (`d796375`)
+- Remove autoFocus on mobile to prevent keyboard covering headline (`07cc10a`)
+- Render umlaut directly — JSX text does not interpret `\u` escapes (`fbe4508`)
+- Bump service worker cache version for new shell (`74ef604`)
+- Persist Neues-Raetsel banner dismissal across navigation (`de723a5`)
+
+### Polish
+- Gentle bounce-back animation on invalid Zämesetzli compounds (`c86c77f`)
+- Subtle hint glow on combinable Zämesetzli emojis (`2e5774f`)
+- Verbindige watson-ified — colors, typography, layout, microcopy (`a94652e`)
+
+### Content
+- Tighten emoji meanings, drop ghost compounds in Zämesetzli (`f109690`)
+
+### Rename
+- Schlagziil → Schlagloch (`501479e`)
+
+## 2026-04-20
+
+### Features
+- Personalized daily dashboard landing page (`36403f6`)
+- Sponsor bar above game area (`a00c0ee`)
+- Pre-game interstitial ad: 5s countdown, once per session, mobile only (`a027899`)
+- MREC 300x250 ad slot in post-game results screen (`c86320c`)
+- Analytics event tracking for all games (`141ecb7`)
+- Game-specific analytics events (`3bb6cd7`)
+- Visual share card generation for all games (`f9fb599`)
+- Daily sweep celebration + combined share card on landing page (`84370e2`)
+- Schlagziil correct answer celebration animations (`2886174`)
+- PostGameSection as daily-progress-aware engagement driver (`c757ab2`)
+- Persist in-progress game state across page refreshes (`7ecadb8`)
+- "Ich bi fertig" finish button for Zämesetzli (`058683e`)
+- Duplicate guess prevention and toast feedback in Verbindige (`49f6fe5`)
+
+### Fixes
+- ARIA labels on interactive elements across all games (`77b21d5`)
+- Keyboard navigation for Verbindige and Zämesetzli (`72ed260`)
+- Add missing `alt_nouns` for phonetic emoji readings (`bd70b29`)
+- Correct production URL in share text (`70a1ab9`)
+- Toast feedback on share + clipboard error handling (`55b6ca0`)
+- Repeated same-result feedback in Zämesetzli (`92e588a`)
+- Screen reader space in GameHeader (`0e8e7fa`)
+- Add missing `@supabase/supabase-js` dependency (`f4d133f`)
+
+### Polish
+- Custom 404 page with link back to landing (`9e4196f`)
+- Improved ShareButton feedback for Web Share API vs clipboard (`50d5059`)
+- Tile selection animation complete (`da1c539`)
+
 ## 2026-04-19
 
 ### Features

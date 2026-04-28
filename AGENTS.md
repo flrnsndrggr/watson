@@ -83,6 +83,9 @@ If any fails, revert changes and mark the item with `[!]` + reason.
 | Verbindige | `/verbindige` | `/admin/verbindige` | `src/games/verbindige/` |
 | Schlagloch | `/schlagloch` | `/admin/schlagloch` | `src/games/schlagloch/` |
 | Zämesetzli | `/zaemesetzli` | `/admin/zaemesetzli` | `src/games/zaemesetzli/` |
+| Quizzhuber | `/quizzhuber` | — | `src/games/quizzhuber/` |
+| Aufgedeckt | `/aufgedeckt` | — | `src/games/aufgedeckt/` |
+| Quizzticle | `/quizzticle` | — | `src/games/quizzticle/` |
 
 ## Supabase Tables
 
@@ -90,6 +93,9 @@ If any fails, revert changes and mark the item with `[!]` + reason.
 - `verbindige_puzzles` — groups JSONB
 - `schlagloch_puzzles` — headlines JSONB
 - `zaemesetzli_puzzles` — emojis, valid_compounds, rank_thresholds
+- `quizzhuber_puzzles` — weekly MCQ questions
+- `aufgedeckt_puzzles` — weekly image-tile puzzles
+- `quizzticle_puzzles` — weekly timed list-fill puzzles
 - `game_sessions` — user play history
 - `user_profiles` — accounts
 - `streaks` — per-game streak tracking

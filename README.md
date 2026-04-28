@@ -4,11 +4,14 @@ Daily word games in Swiss German for watson.ch readers.
 
 ## Games
 
-| Game | Route | Description |
-|---|---|---|
-| Verbindige | `/verbindige` | Group 16 Swiss German words into 4 thematic categories |
-| Schlagloch | `/schlagloch` | Guess the watson.ch headline from a partial reveal |
-| Zämesetzli | `/zaemesetzli` | Combine emoji pairs to form Swiss German compound words |
+| Game | Route | Cadence | Description |
+|---|---|---|---|
+| Verbindige | `/verbindige` | Daily | Group 16 Swiss German words into 4 thematic categories |
+| Schlagloch | `/schlagloch` | Daily | Guess the watson.ch headline from a partial reveal |
+| Zämesetzli | `/zaemesetzli` | Daily | Combine emoji pairs to form Swiss German compound words |
+| Quizzhuber | `/quizzhuber` | Weekly | Persona-driven 10-question MCQ quiz |
+| Aufgedeckt | `/aufgedeckt` | Weekly | Image-tile reveal — fewer tiles uncovered = better |
+| Quizzticle | `/quizzticle` | Weekly | Timed list-fill with Swiss school-grade scoring |
 
 ## Tech Stack
 
