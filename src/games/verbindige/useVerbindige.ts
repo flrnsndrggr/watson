@@ -50,21 +50,26 @@ interface VerbindigeState {
 }
 
 interface VerbindigeProgress {
+  status: 'playing' | 'won' | 'lost';
   remainingItems: VerbindigeItem[];
   solvedGroups: SolvedGroup[];
   mistakes: number;
   previousGuesses: string[];
   startedAt: number | null;
+  elapsedSeconds: number | null;
 }
 
 function persistState(state: VerbindigeState): void {
-  if (state.isArchive || !state.puzzle || state.status !== 'playing') return;
+  if (state.isArchive || !state.puzzle) return;
+  if (state.status === 'loading') return;
   saveGameProgress<VerbindigeProgress>('verbindige', state.puzzle.id, {
+    status: state.status,
     remainingItems: state.remainingItems,
     solvedGroups: state.solvedGroups,
     mistakes: state.mistakes,
     previousGuesses: state.previousGuesses,
     startedAt: state.startedAt,
+    elapsedSeconds: state.elapsedSeconds,
   });
 }
 
@@ -102,10 +107,11 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       : await fetchTodaysPuzzle<VerbindigePuzzle>('verbindige');
     const puzzle = fetched ?? SAMPLE_VERBINDIGE;
 
-    // Restore in-progress state for today's puzzle
+    // Restore in-progress OR completed state for today's puzzle.
     if (!archiveDate) {
       const saved = loadGameProgress<VerbindigeProgress>('verbindige', puzzle.id);
-      if (saved && saved.remainingItems.length > 0) {
+      const hasState = saved && (saved.remainingItems.length > 0 || saved.status !== 'playing');
+      if (saved && hasState) {
         set({
           puzzle,
           remainingItems: saved.remainingItems,
@@ -113,9 +119,9 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           mistakes: saved.mistakes,
           previousGuesses: saved.previousGuesses,
           startedAt: saved.startedAt,
-          status: 'playing',
+          status: saved.status ?? 'playing',
           selected: [],
-          elapsedSeconds: null,
+          elapsedSeconds: saved.elapsedSeconds ?? null,
         });
         trackGameStarted('verbindige', false);
         return;
@@ -192,14 +198,12 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           perfect: get().mistakes === 0,
         });
       }
-      clearGameProgress('verbindige');
     }
     set(updates);
 
-    // Persist after correct group (if still playing)
-    if (!won) {
-      persistState({ ...get(), ...updates } as VerbindigeState);
-    }
+    // Persist after every correct group, including the winning one — keeps
+    // the result screen restorable on reload.
+    persistState({ ...get(), ...updates } as VerbindigeState);
   },
 
   submitGuess: () => {
@@ -292,13 +296,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         }
       }
       set(lostUpdates);
-
-      // Persist progress or clear on loss
-      if (lost) {
-        clearGameProgress('verbindige');
-      } else {
-        persistState(get());
-      }
+      persistState(get());
 
       // If lost, reveal unsolved groups with revealedOnLoss flag
       if (lost) {
@@ -316,6 +314,8 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           solvedGroups: [...alreadySolved, ...unsolvedGroups],
           remainingItems: [],
         });
+        // Persist the fully-revealed final state so reload shows the result.
+        persistState(get());
       }
     }
   },

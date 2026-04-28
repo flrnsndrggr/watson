@@ -32,6 +32,7 @@ export function VerbindigePage() {
     maxMistakes,
     pendingCorrect,
     isArchive,
+    solvedGroups,
   } = useVerbindige();
 
   const reducedMotion = usePrefersReducedMotion();
@@ -64,12 +65,15 @@ export function VerbindigePage() {
     }
   }, [loadPuzzle, archiveDate]);
 
-  // Reset reveal state when a new puzzle loads
+  // Reset reveal state when a new puzzle loads. If a lost state is restored
+  // from persistence (all 4 groups already solved), skip the animation gate.
   useEffect(() => {
     if (status === 'playing') {
       setRevealComplete(false);
+    } else if (status === 'lost' && solvedGroups.length === 4) {
+      setRevealComplete(true);
     }
-  }, [status]);
+  }, [status, solvedGroups.length]);
 
   // Keyboard support
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
