@@ -310,15 +310,15 @@ export function LandingPage() {
       {canRecover && (
         <div className="mb-4 flex flex-col items-center gap-2 rounded-lg border border-[var(--color-cyan)]/30 bg-[var(--color-cyan)]/[0.06] p-3 text-center">
           <p className="text-sm">
-            <span aria-hidden>🧊</span>{' '}
+            <span aria-hidden>🃏</span>{' '}
             <span className="font-semibold">Streak in Gefahr.</span>
             {' '}Du hast {recoverableGames.length === 1
               ? `einen ${recoverableGames[0].name}-Streak`
               : `${recoverableGames.length} Streaks`}
-            {' '}gestern verpasst. Eis-Tag einsetzen?
+            {' '}gestern verpasst. Joker einsetzen?
           </p>
           <p className="text-xs text-[var(--color-gray-text)]">
-            {freezesBanked} Eis-{freezesBanked === 1 ? 'Tag' : 'Tage'} verfügbar
+            {freezesBanked} Joker verfügbar
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {recoverableGames.map((g) => (

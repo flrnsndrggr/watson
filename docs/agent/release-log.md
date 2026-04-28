@@ -1,5 +1,39 @@
 # Release Log
 
+## Release — 2026-04-28 14:00
+
+- Commits: 84370e2..6b0706a (103 commits)
+- Netlify deploy: skipped (MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: skipped (MCP not available)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), schlagloch ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl, game removed — SPA shell returns 200)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available), Supabase logs (MCP not available)
+
+### Notable commits
+- 6b0706a feat(gamification): phase 1.3 — account prompt at the day-3 threshold
+- 36cd433 feat(gamification): phase 1.1+1.2 — at-risk streak indicator + Eis-Tag freeze
+- 6d10f80 feat(gamification): phase 0 plumbing — leaderboard, events, streaks server sync
+- 608dcc3 feat(zaemesetzli): tap-to-toggle emoji selection and slot removal
+- f744242 feat: code-split per game with lazy-load and dependency isolation
+- 501479e rename: Schlagziil -> Schlagloch
+- 964c565 feat: add PWA service worker for offline play
+- 4485938 feat: branded Verbindige editions CMS for sponsor-themed puzzles
+- 9a5023d fix(sw): bump cache version to v3 so users pick up supabase fetch fix
+- 3239591 fix(supabase): join game tables on id, not puzzle_id
+
+### Notes
+Large release spanning 8 days (2026-04-20 to 2026-04-28) with 103 commits. Major additions include gamification phase 0–1.3 (leaderboard, streaks, Eis-Tag freeze, account prompts), PWA service worker, code splitting, and the Schlagziil→Schlagloch rename. Without Chrome MCP, JS rendering and console errors could not be verified.
+
+---
+
+## Last Verified
+- Commit: 6b0706a
+- Date: 2026-04-28
+
+---
+
 ## Release — 2026-04-20 23:45
 
 - Commits: 49f6fe5..84370e2 (4 commits)

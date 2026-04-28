@@ -244,7 +244,7 @@ export function getRecoverableStreak(gameType: GameType): StreakData | null {
 }
 
 /**
- * Apply an Eis-Tag for a recoverable streak: treat yesterday as played so the
+ * Apply a Joker for a recoverable streak: treat yesterday as played so the
  * next play continues the streak. Decrements freeze bank. No-op if the streak
  * is no longer recoverable.
  */

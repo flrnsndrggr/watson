@@ -33,7 +33,7 @@ export function StreakFreezeModal({
     const ok = await applyStreakFreeze(gameType);
     setSubmitting(false);
     if (!ok) {
-      setError('Eis-Tag konnte nicht eingesetzt werden — bitte neu laden.');
+      setError('Joker konnte nicht eingesetzt werden — bitte neu laden.');
       return;
     }
     onApplied();
@@ -52,20 +52,20 @@ export function StreakFreezeModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center">
-          <div className="text-4xl" aria-hidden>🧊</div>
+          <div className="text-4xl" aria-hidden>🃏</div>
           <h2 className="mt-2 font-[family-name:var(--font-heading)] text-lg font-bold">
-            Eis-Tag einsetzen?
+            Joker einsetzen?
           </h2>
           <p className="mt-2 text-sm text-[var(--color-gray-text)]">
             Du hast gestern <span className="font-semibold text-[var(--color-black)]">{gameName}</span> verpasst.
-            Setz einen Eis-Tag ein, um deinen{' '}
+            Setz einen Joker ein, um deinen{' '}
             <span className="font-semibold text-[var(--color-pink)]">
               {recoverable.current}-Tage-Streak
             </span>{' '}
             zu retten.
           </p>
           <p className="mt-3 text-xs text-[var(--color-gray-text)]">
-            Verfügbar: {freezesBanked} Eis-{freezesBanked === 1 ? 'Tag' : 'Tage'}
+            Verfügbar: {freezesBanked} Joker
             {' · '}Verdienst: alle 7 Streak-Tage einer (max. 2 gespart)
           </p>
         </div>
@@ -91,7 +91,7 @@ export function StreakFreezeModal({
             disabled={submitting}
             className="flex-1 rounded bg-[var(--color-cyan)] py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {submitting ? 'Eis-Tag …' : 'Eis-Tag einsetzen'}
+            {submitting ? 'Joker …' : 'Joker einsetzen'}
           </button>
         </div>
       </div>
