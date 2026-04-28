@@ -304,26 +304,29 @@ _Items from watson-qa-zaemesetzli agent_
     - Scenario: Completion + Share — viewed full word list after finishing
     - Problem: The 2026-04-28 puzzle's `valid_compounds` includes Bergwald (🏔️+🌲, 1pt), Waldblume (🌲+🌼, 2pt), and Waldfeuer (🌲+🔥, 2pt) — three of nine compounds where 🌲 must be read as "Wald" (forest), not its canonical "Tanne" (fir). The accessibility name on the button is "Tanne" (`read_page` confirmed `button "Tanne"`), so a logical player tries "Tannenwald" or skips these. The Tipp button reveals the emoji pair but never surfaces the alt-noun "Wald", leaving the player guessing. This is the same anti-pattern as Zämesetzli #7/#8 (🔑→Schein/Schloss, ☀️→Sonntag) but fresh in the live puzzle data.
     - Suggested fix: Extend the 🌲 emoji's `alt_nouns` for this puzzle to include `"Wald"` so the validator treats it as a legal reading and the hint can mention it. Long-term, surface alt-nouns in the hint text (e.g. "Tipp: 🌲 kann auch 'Wald' bedeuten"). The puzzle lives in Supabase (`zaemesetzli_puzzles` for `2026-04-28`); the local sample data does not contain these compounds.
-    - Files: Supabase `zaemesetzli_puzzles` row for `2026-04-28` (emojis array — 🌲 alt_nouns); `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint message)
+    - Files: Supabase `zaemesetzli_puzzles` row for `2026-04-28` (emojis array — 🌲 alt_nouns); `src/games/zaemesetzli/EmojiPool.tsx` (alt_nouns tooltip display); `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint message)
     - Evidence: "Nicht gefunden" list at game-end showed Bergwald 🏔️🌲, Waldblume 🌲🌼, Waldfeuer 🌲🔥. Live `read_page` returned `button "Tanne"` for the 🌲 button. 3/9 compounds depend on this stand-in. Observed 2026-04-28.
     - Related: Zämesetzli #7, #8 — same root cause; expanding alt_nouns + tooltip patch would fix all three
+    - Triage note (2026-04-28): Valid P2. This is a per-puzzle data issue in Supabase, same anti-pattern as #7/#8. Fix requires updating the `zaemesetzli_puzzles` row in Supabase for 2026-04-28 to add "Wald" to 🌲's alt_nouns. The long-term hint-text fix is already tracked in #7.
 
 15. [ ] P2 - "Ergebnis teilen" on desktop has no visible feedback when share dialog is dismissed or unavailable
     - Agent: watson-qa-zaemesetzli
     - Scenario: Completion + Share — clicked "Ergebnis teilen" on results screen via headless Chrome
     - Problem: Clicking "Ergebnis teilen" on the post-game screen produced no toast, no modal, no clipboard write (verified — `navigator.clipboard.writeText` was wrapped to capture, returned `null`). `navigator.share` is defined on the browser (`typeof navigator.share === 'function'`), so the code path likely calls `navigator.share()` and either: (a) the share dialog opens silently outside the tab focus (common in headless / automation), or (b) the user dismisses the dialog. In both cases the user has no in-app signal that anything happened. This regresses the spirit of Zämesetzli #2 ("Teilen button provides no user feedback") which was marked complete — the clipboard fallback exists but the `navigator.share` path is silent.
-    - Suggested fix: Wrap the `navigator.share` call in try/catch and show a "Geteilt!" or "Kopiert!" toast on success / fall back to clipboard + toast on `AbortError`/`NotAllowedError`. Always fire a confirmation toast regardless of which share path was taken.
-    - Files: `src/components/shared/ShareButton.tsx`, `src/lib/share.ts`
+    - Suggested fix: In `ShareButton.tsx:19`, add a toast for the `'shared'` result path (e.g. `if (result === 'shared') showToast('Geteilt!')`). Currently only `'copied'` triggers a toast. This is a one-line fix.
+    - Files: `src/components/shared/ShareButton.tsx` (line 19 — missing toast for `result === 'shared'`), `src/lib/share.ts` (lines 32-38 — `navigator.share` try/catch already exists)
     - Evidence: Pre-click clipboard interceptor installed via `navigator.clipboard.writeText = capturing wrapper`. After clicking ref_98 ("Ergebnis teilen"), `window._capturedClip` was `null`. Page DOM had no `[role="status"]` toast element. Button stayed enabled with no label change. Observed 2026-04-28.
     - Related: Zämesetzli #2 — same surface; this finding extends the fix to the `navigator.share` path
+    - Triage note (2026-04-28): Valid P2. `share.ts` already has try/catch on `navigator.share` (fixed since #2). The gap is narrower than described: `ShareButton.tsx:19` shows toast only for `'copied'`, not for `'shared'`. On share-dialog dismiss, clipboard fallback fires and "Kopiert!" toast appears — so the dismiss path works. Only the successful `navigator.share` path is silent (browser share dialog is arguably sufficient feedback). One-line fix in ShareButton.tsx.
 
 16. [ ] P2 - Streak pill "🔥 1 Tag" on results screen lacks label or tooltip
     - Agent: watson-qa-zaemesetzli
     - Scenario: Completion + Share — read post-game results panel
     - Problem: The results screen shows a pink pill containing only `🔥 1 Tag` with no surrounding caption (e.g. "Tagesstreak"). A first-time player sees this number and has no way to know it represents a play-day streak. The pill is visually prominent (brand pink) so users will look at it; the missing context makes it feel like a random badge. On desktop there's no native tooltip (`title` attribute) either, so even `:hover` reveals nothing.
-    - Suggested fix: Add a small caption above or after the pill (e.g. "Tagesstreak: 🔥 1 Tag" or render the pill with `title="Aufeinanderfolgende Spieltage"`). Optionally make the pill open a small explainer modal on click.
-    - Files: `src/components/shared/StreakBadge.tsx` (or wherever the pill is rendered on the Zämesetzli result page — `src/games/zaemesetzli/ZaemesetzliResult.tsx`)
-    - Evidence: Results screen screenshot at 2026-04-28 shows pink pill with text "🔥 1 Tag" centered between the found-emoji line and the "Tägliche Erinnerung" prompt. No surrounding label, no `title`. Observed 2026-04-28.
+    - Suggested fix: Add a visible caption to the pill (e.g. "Tagesstreak" prefix or `title="Aufeinanderfolgende Spieltage"` for hover tooltip). Note: `StreakBadge.tsx:14` already has `aria-label="Aktuelle Serie: N Tag(e)"`, so screen-reader accessibility is covered — this is purely a sighted-user context issue.
+    - Files: `src/components/shared/StreakBadge.tsx` (line 13 — add visible label or `title`), `src/games/zaemesetzli/ZaemesetzliResult.tsx` (line ~200 — rendering context)
+    - Evidence: Results screen screenshot at 2026-04-28 shows pink pill with text "🔥 1 Tag" centered between the found-emoji line and the "Tägliche Erinnerung" prompt. No surrounding visible label. `aria-label` exists but no `title` attribute for hover. Observed 2026-04-28.
+    - Triage note (2026-04-28): Valid P2. `StreakBadge.tsx` already has proper `aria-label`; issue is only about visual context for sighted users. Cross-game component — fix benefits all game result screens.
 
 ---
 
