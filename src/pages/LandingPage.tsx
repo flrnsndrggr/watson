@@ -42,8 +42,20 @@ const GAMES: GameConfig[] = [
 
 interface GameStatus {
   playedToday: boolean;
+  inProgress: boolean;
   streak: StreakData;
   result: DailyResult | null;
+}
+
+function hasInProgressForToday(game: GameType, today: string): boolean {
+  try {
+    const raw = localStorage.getItem(`watson_progress_${game}`);
+    if (!raw) return false;
+    const env = JSON.parse(raw) as { date?: string };
+    return env.date === today;
+  } catch {
+    return false;
+  }
 }
 
 function loadStatuses(): Record<GameType, GameStatus> {
@@ -53,8 +65,11 @@ function loadStatuses(): Record<GameType, GameStatus> {
   const result = {} as Record<GameType, GameStatus>;
   for (const gt of gameTypes) {
     const streak = getStreak(gt);
+    const playedToday = streak.last_played === today;
     result[gt] = {
-      playedToday: streak.last_played === today,
+      playedToday,
+      // "in progress" only counts when not yet finished today
+      inProgress: !playedToday && hasInProgressForToday(gt, today),
       streak,
       result: dailyResults.results[gt] ?? null,
     };
@@ -153,6 +168,14 @@ export function LandingPage() {
     }
   }, [allPlayed, hasAnyResult]);
 
+  const todayCET = getTodayDateCET();
+  const todayLong = new Date(`${todayCET}T00:00:00`).toLocaleDateString('de-CH', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Zurich',
+  });
+
   return (
     <GameShell>
       {/* Hero */}
@@ -162,6 +185,11 @@ export function LandingPage() {
         </h1>
         <p className="mt-1 text-sm text-[var(--color-gray-text)] italic">
           Spiel, aber deep.
+        </p>
+        <p className="mt-2 text-xs text-[var(--color-gray-text)]">
+          <span className="font-semibold text-[color:var(--ink,var(--color-black))]">{todayLong}</span>
+          <span className="mx-2 opacity-60">·</span>
+          <span className="font-mono">#{todayCET}</span>
         </p>
       </div>
 
@@ -203,14 +231,19 @@ export function LandingPage() {
           const played = status.playedToday;
           const result = status.result;
 
+          const inProgress = status.inProgress;
+          const ariaStatus = played ? 'gespielt' : inProgress ? 'läuft' : 'nicht gestartet';
           return (
             <Link
               key={game.path}
               to={game.path}
+              aria-label={`${game.name}: ${ariaStatus}`}
               className={`group flex items-center gap-4 rounded-lg border-2 p-4 transition-all duration-[var(--transition-fast)] ${
                 played
                   ? 'border-[var(--color-green)]/30 bg-[var(--color-green)]/[0.03]'
-                  : 'border-[var(--color-gray-bg)] hover:border-[var(--color-cyan)] hover:shadow-sm'
+                  : inProgress
+                    ? 'border-[var(--color-cyan)]/40 bg-[var(--color-cyan)]/[0.03]'
+                    : 'border-[var(--color-gray-bg)] hover:border-[var(--color-cyan)] hover:shadow-sm'
               }`}
             >
               <span
@@ -234,9 +267,13 @@ export function LandingPage() {
                     <span className="rounded bg-[var(--color-green)] px-1.5 py-0.5 text-[10px] font-bold text-white">
                       GESPIELT
                     </span>
-                  ) : (
+                  ) : inProgress ? (
                     <span className="rounded bg-[var(--color-cyan)] px-1.5 py-0.5 text-[10px] font-bold text-white">
-                      TÄGLICH
+                      LÄUFT
+                    </span>
+                  ) : (
+                    <span className="rounded bg-[var(--color-gray-bg)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-gray-text)]">
+                      OFFEN
                     </span>
                   )}
                   {status.streak.current >= 2 && (
@@ -256,7 +293,11 @@ export function LandingPage() {
                   </p>
                 ) : (
                   <p className="mt-0.5 text-sm text-[var(--color-gray-text)]">
-                    {played ? 'Weiter spielen oder Ergebnis ansehen' : game.description}
+                    {played
+                      ? 'Weiter spielen oder Ergebnis ansehen'
+                      : inProgress
+                        ? 'Weiter spielen — Spielstand gespeichert'
+                        : game.description}
                   </p>
                 )}
               </div>

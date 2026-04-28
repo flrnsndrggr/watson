@@ -46,10 +46,10 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 
 ## Cross-Game
 
-- [ ] Landing page: show today's date and puzzle numbers
-- [ ] Landing page: game cards with play status (not started / in progress / completed)
+- [x] Landing page: show today's date and puzzle numbers (2026-04-28)
+- [x] Landing page: game cards with play status (not started / in progress / completed) (2026-04-28)
 - [x] Navigation: active route highlighted in layout nav (pre-existing)
 - [x] Mobile: verify all games work on 375px viewport with one-thumb interaction (2026-04-21)
-- [ ] Dark mode: respect `prefers-color-scheme` (watson nav is already dark)
-- [ ] Keyboard navigation: full tab-through support for all interactive elements
-- [ ] ARIA labels: announce game state changes for screen readers
+- [x] Dark mode: respect `prefers-color-scheme` (watson nav is already dark) (2026-04-28)
+- [x] Keyboard navigation: full tab-through support for all interactive elements (2026-04-28)
+- [x] ARIA labels: announce game state changes for screen readers (2026-04-28)
