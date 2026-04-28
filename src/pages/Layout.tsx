@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from '@/components/shared/Toast';
 import { AccountPromptHost } from '@/components/shared/AccountPromptHost';
+import { AchievementCelebrationHost } from '@/components/shared/AchievementCelebration';
 import { useAuth } from '@/lib/auth';
 import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
@@ -241,6 +242,9 @@ export function Layout() {
 
       {/* Account-prompt host — listens to triggerAccountPrompt() events */}
       <AccountPromptHost />
+
+      {/* Achievement celebration — listens to achievement-unlocked events */}
+      <AchievementCelebrationHost />
 
       {/* Admin login modal */}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}

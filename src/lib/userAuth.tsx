@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from './supabase';
 import { UserAuthContext, type UserAuthState } from './userAuthContext';
 import { reconcileStreaksOnLogin } from './streaks';
+import { reconcileAchievementsOnLogin } from './achievements';
 
 export function UserAuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<UserAuthState>({
@@ -14,7 +15,10 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState({ user: session?.user ?? null, session, loading: false });
-      if (session?.user) void reconcileStreaksOnLogin(session.user.id);
+      if (session?.user) {
+        void reconcileStreaksOnLogin(session.user.id);
+        void reconcileAchievementsOnLogin(session.user.id);
+      }
     });
 
     // Listen for auth changes (magic link callback, sign out, etc.)
@@ -22,9 +26,10 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setState({ user: session?.user ?? null, session, loading: false });
-      // Reconcile streaks on fresh sign-in (not on token refresh)
+      // Reconcile on fresh sign-in (not on token refresh)
       if (event === 'SIGNED_IN' && session?.user) {
         void reconcileStreaksOnLogin(session.user.id);
+        void reconcileAchievementsOnLogin(session.user.id);
       }
     });
 

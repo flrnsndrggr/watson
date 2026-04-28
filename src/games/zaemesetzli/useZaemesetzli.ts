@@ -10,6 +10,7 @@ import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
 import { getStreak as readStreak } from '@/lib/streaks';
+import { checkAchievements } from '@/lib/achievements';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -228,11 +229,16 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       trackGameCompleted('zaemesetzli', 'complete', isArchiveSession, newScore);
       if (!isArchiveSession) {
         const rankLabel = newRank.charAt(0).toUpperCase() + newRank.slice(1);
+        const totalMundart = puzzle.valid_compounds.filter((c) => c.is_mundart).length;
+        const foundMundart = newFoundWords.filter((c) => c.is_mundart).length;
         saveDailyResult('zaemesetzli', {
           outcome: 'complete',
           summary: `${newFoundWords.length}/${puzzle.valid_compounds.length} \u00B7 ${rankLabel}`,
+          perfect: newFoundWords.length === puzzle.valid_compounds.length,
+          allMundart: totalMundart > 0 && foundMundart === totalMundart,
         });
         triggerAccountPrompt(readStreak('zaemesetzli').current);
+        setTimeout(() => { void checkAchievements(); }, 0);
       }
       clearGameProgress('zaemesetzli');
     }
@@ -276,6 +282,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
           const streak = recordGamePlayed('zaemesetzli');
           checkStreakMilestone('zaemesetzli', streak.current);
           triggerAccountPrompt(streak.current);
+          setTimeout(() => { void checkAchievements(); }, 0);
           return { streak };
         })()
       : {};
@@ -284,9 +291,13 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
 
     if (!isArchive) {
       const rankLabel = currentRank.charAt(0).toUpperCase() + currentRank.slice(1);
+      const totalMundart = puzzle.valid_compounds.filter((c) => c.is_mundart).length;
+      const foundMundart = foundWords.filter((c) => c.is_mundart).length;
       saveDailyResult('zaemesetzli', {
         outcome: 'complete',
         summary: `${foundWords.length}/${puzzle.valid_compounds.length} · ${rankLabel}`,
+        perfect: foundWords.length === puzzle.valid_compounds.length,
+        allMundart: totalMundart > 0 && foundMundart === totalMundart,
       });
     }
 

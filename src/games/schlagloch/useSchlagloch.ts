@@ -9,6 +9,7 @@ import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlag
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
+import { checkAchievements } from '@/lib/achievements';
 
 /** Standard Schlagloch has 5 headlines; Rückblick (Sunday) has more. */
 const STANDARD_HEADLINE_COUNT = 5;
@@ -228,6 +229,7 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
           const streak = recordGamePlayed('schlagloch');
           checkStreakMilestone('schlagloch', streak.current);
           triggerAccountPrompt(streak.current);
+          setTimeout(() => { void checkAchievements(); }, 0);
           return { streak };
         })();
         trackGameCompleted('schlagloch', 'lost', get().isArchive, correctCount, elapsed);
@@ -271,6 +273,7 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
           const streak = recordGamePlayed('schlagloch');
           checkStreakMilestone('schlagloch', streak.current);
           triggerAccountPrompt(streak.current);
+          setTimeout(() => { void checkAchievements(); }, 0);
           return { streak };
         })();
       trackGameCompleted('schlagloch', 'won', get().isArchive, correctCount, elapsed);
@@ -281,6 +284,7 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
           summary: `${correctCount}/${puzzle.headlines.length}`,
           emojiLine,
           timeSeconds: elapsed,
+          perfect: correctCount === puzzle.headlines.length,
         });
       }
       clearGameProgress('schlagloch');

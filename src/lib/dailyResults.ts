@@ -6,6 +6,10 @@ export interface DailyResult {
   summary: string;
   emojiLine?: string;
   timeSeconds?: number | null;
+  /** True when the player finished without a single mistake / all words found. */
+  perfect?: boolean;
+  /** Zämesetzli only: every Mundart compound was found. */
+  allMundart?: boolean;
 }
 
 /** Per-day results for all games */

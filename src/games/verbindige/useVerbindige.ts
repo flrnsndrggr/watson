@@ -9,6 +9,7 @@ import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackVerbin
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
+import { checkAchievements } from '@/lib/achievements';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -172,6 +173,9 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         checkStreakMilestone('verbindige', updates.streak.current);
         void submitLeaderboardEntry('verbindige', score, elapsed);
         triggerAccountPrompt(updates.streak.current);
+        // Run achievement detection after the daily-result write below — defer
+        // by a microtask so saveDailyResult is in localStorage by then.
+        setTimeout(() => { void checkAchievements(); }, 0);
       }
       trackGameCompleted('verbindige', 'won', get().isArchive, score, elapsed);
       if (!get().isArchive) {
@@ -185,6 +189,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           summary: `${get().mistakes}/4 Fehler`,
           emojiLine,
           timeSeconds: elapsed,
+          perfect: get().mistakes === 0,
         });
       }
       clearGameProgress('verbindige');
@@ -275,6 +280,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           checkStreakMilestone('verbindige', lostUpdates.streak.current);
           void submitLeaderboardEntry('verbindige', 0, elapsed);
           triggerAccountPrompt(lostUpdates.streak.current);
+          setTimeout(() => { void checkAchievements(); }, 0);
         }
         trackGameCompleted('verbindige', 'lost', get().isArchive, 0, elapsed);
         if (!get().isArchive) {

@@ -6,6 +6,7 @@ import { PlayCalendar } from '@/components/shared/PlayCalendar';
 import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
 import { getStreak } from '@/lib/streaks';
+import { ACHIEVEMENTS, getUnlocks } from '@/lib/achievements';
 import type { GameType, StreakData } from '@/types';
 import { useState } from 'react';
 
@@ -157,7 +158,74 @@ export function ProfilPage() {
         ))}
       </div>
 
+      {/* Achievements */}
+      <AchievementsWall />
+
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </GameShell>
+  );
+}
+
+function AchievementsWall() {
+  const unlocks = getUnlocks();
+  const total = ACHIEVEMENTS.length;
+  const unlocked = ACHIEVEMENTS.filter((a) => a.id in unlocks).length;
+
+  return (
+    <section className="mt-8">
+      <div className="mb-3 flex items-baseline justify-between">
+        <h2 className="font-[family-name:var(--font-heading)] text-lg font-bold">
+          Erfolge
+        </h2>
+        <span className="text-xs text-[var(--color-gray-text)]">
+          {unlocked} / {total} freigeschaltet
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {ACHIEVEMENTS.map((a) => {
+          const isUnlocked = a.id in unlocks;
+          const unlockedAt = unlocks[a.id]?.unlocked_at;
+          const dateLabel = unlockedAt
+            ? new Date(unlockedAt).toLocaleDateString('de-CH', {
+                day: 'numeric',
+                month: 'short',
+              })
+            : null;
+          return (
+            <div
+              key={a.id}
+              className={`rounded-lg border-2 p-3 transition-colors ${
+                isUnlocked
+                  ? 'border-[var(--color-pink)]/30 bg-[var(--color-pink)]/[0.04]'
+                  : 'border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]/30'
+              }`}
+              title={a.description}
+            >
+              <div
+                className={`text-2xl ${isUnlocked ? '' : 'grayscale opacity-30'}`}
+                aria-hidden
+              >
+                {a.emoji}
+              </div>
+              <div
+                className={`mt-1 font-[family-name:var(--font-heading)] text-sm font-bold ${
+                  isUnlocked ? 'text-[var(--color-black)]' : 'text-[var(--color-gray-text)]'
+                }`}
+              >
+                {a.name}
+              </div>
+              <div className="mt-0.5 text-[11px] leading-snug text-[var(--color-gray-text)]">
+                {a.description}
+              </div>
+              {isUnlocked && dateLabel && (
+                <div className="mt-1 text-[10px] font-semibold text-[var(--color-pink)]">
+                  {dateLabel}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
