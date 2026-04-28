@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from './supabase';
 import { UserAuthContext, type UserAuthState } from './userAuthContext';
+import { reconcileStreaksOnLogin } from './streaks';
 
 export function UserAuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<UserAuthState>({
@@ -13,13 +14,18 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState({ user: session?.user ?? null, session, loading: false });
+      if (session?.user) void reconcileStreaksOnLogin(session.user.id);
     });
 
     // Listen for auth changes (magic link callback, sign out, etc.)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setState({ user: session?.user ?? null, session, loading: false });
+      // Reconcile streaks on fresh sign-in (not on token refresh)
+      if (event === 'SIGNED_IN' && session?.user) {
+        void reconcileStreaksOnLogin(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
