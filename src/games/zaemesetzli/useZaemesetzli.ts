@@ -8,6 +8,8 @@ import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackZaemesetzliWordFound, trackZaemesetzliHintUsed } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
+import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
+import { getStreak as readStreak } from '@/lib/streaks';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -230,6 +232,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
           outcome: 'complete',
           summary: `${newFoundWords.length}/${puzzle.valid_compounds.length} \u00B7 ${rankLabel}`,
         });
+        triggerAccountPrompt(readStreak('zaemesetzli').current);
       }
       clearGameProgress('zaemesetzli');
     }
@@ -272,6 +275,7 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
       ? (() => {
           const streak = recordGamePlayed('zaemesetzli');
           checkStreakMilestone('zaemesetzli', streak.current);
+          triggerAccountPrompt(streak.current);
           return { streak };
         })()
       : {};

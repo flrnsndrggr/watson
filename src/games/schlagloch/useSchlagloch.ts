@@ -8,6 +8,7 @@ import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlaglochHeadlineGuess } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
+import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
 
 /** Standard Schlagloch has 5 headlines; Rückblick (Sunday) has more. */
 const STANDARD_HEADLINE_COUNT = 5;
@@ -226,6 +227,7 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
         const streakUpdate = get().isArchive ? {} : (() => {
           const streak = recordGamePlayed('schlagloch');
           checkStreakMilestone('schlagloch', streak.current);
+          triggerAccountPrompt(streak.current);
           return { streak };
         })();
         trackGameCompleted('schlagloch', 'lost', get().isArchive, correctCount, elapsed);
@@ -268,6 +270,7 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
       const streakUpdate2 = get().isArchive ? {} : (() => {
           const streak = recordGamePlayed('schlagloch');
           checkStreakMilestone('schlagloch', streak.current);
+          triggerAccountPrompt(streak.current);
           return { streak };
         })();
       trackGameCompleted('schlagloch', 'won', get().isArchive, correctCount, elapsed);

@@ -8,6 +8,7 @@ import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackVerbindigeGuess } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
+import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -170,6 +171,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         updates.streak = recordGamePlayed('verbindige');
         checkStreakMilestone('verbindige', updates.streak.current);
         void submitLeaderboardEntry('verbindige', score, elapsed);
+        triggerAccountPrompt(updates.streak.current);
       }
       trackGameCompleted('verbindige', 'won', get().isArchive, score, elapsed);
       if (!get().isArchive) {
@@ -272,6 +274,7 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
           lostUpdates.streak = recordGamePlayed('verbindige');
           checkStreakMilestone('verbindige', lostUpdates.streak.current);
           void submitLeaderboardEntry('verbindige', 0, elapsed);
+          triggerAccountPrompt(lostUpdates.streak.current);
         }
         trackGameCompleted('verbindige', 'lost', get().isArchive, 0, elapsed);
         if (!get().isArchive) {
