@@ -3,9 +3,17 @@ import { Link } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { ShareButton } from '@/components/shared/ShareButton';
-import { getStreak } from '@/lib/streaks';
+import { StreakFreezeModal } from '@/components/shared/StreakFreezeModal';
+import {
+  getStreak,
+  getStreakRaw,
+  getRecoverableStreak,
+  getFreezesBankedSync,
+} from '@/lib/streaks';
 import { getTodayDateCET } from '@/lib/dateUtils';
 import { getDailyResults, type DailyResult } from '@/lib/dailyResults';
+import { getStreakRiskLevel, type RiskLevel } from '@/lib/streakRisk';
+import { logEvent } from '@/lib/events';
 import type { GameType, StreakData } from '@/types';
 
 interface GameConfig {
@@ -44,6 +52,9 @@ interface GameStatus {
   playedToday: boolean;
   inProgress: boolean;
   streak: StreakData;
+  rawStreak: StreakData;
+  recoverable: StreakData | null;
+  riskLevel: RiskLevel;
   result: DailyResult | null;
 }
 
@@ -65,20 +76,28 @@ function loadStatuses(): Record<GameType, GameStatus> {
   const result = {} as Record<GameType, GameStatus>;
   for (const gt of gameTypes) {
     const streak = getStreak(gt);
+    const rawStreak = getStreakRaw(gt);
     const playedToday = streak.last_played === today;
     result[gt] = {
       playedToday,
       // "in progress" only counts when not yet finished today
       inProgress: !playedToday && hasInProgressForToday(gt, today),
       streak,
+      rawStreak,
+      recoverable: getRecoverableStreak(gt),
+      riskLevel: getStreakRiskLevel(rawStreak),
       result: dailyResults.results[gt] ?? null,
     };
   }
   return result;
 }
 
-function useGameStatuses(): Record<GameType, GameStatus> {
+function useGameStatuses(nonce: number = 0): Record<GameType, GameStatus> {
   const [statuses, setStatuses] = useState<Record<GameType, GameStatus>>(() => loadStatuses());
+
+  useEffect(() => {
+    setStatuses(loadStatuses());
+  }, [nonce]);
 
   useEffect(() => {
     function reload() {
@@ -146,13 +165,50 @@ function buildDailySweepShareText(
 }
 
 export function LandingPage() {
-  const statuses = useGameStatuses();
+  const [statusesNonce, setStatusesNonce] = useState(0);
+  const statuses = useGameStatuses(statusesNonce);
+  const [freezeModalGame, setFreezeModalGame] = useState<GameConfig | null>(null);
+  const reloadStatuses = () => setStatusesNonce((n) => n + 1);
   const playedCount = GAMES.filter((g) => statuses[g.gameType].playedToday).length;
   const totalStreak = GAMES.reduce((sum, g) => sum + statuses[g.gameType].streak.current, 0);
   const allPlayed = playedCount === GAMES.length;
   const hasAnyResult = GAMES.some((g) => statuses[g.gameType].result !== null);
   const countdown = useNextPuzzleCountdown();
   const confettiFired = useRef(false);
+  const atRiskGames = GAMES.filter(
+    (g) => statuses[g.gameType].riskLevel !== 'safe' && !statuses[g.gameType].playedToday,
+  );
+  const recoverableGames = GAMES.filter((g) => statuses[g.gameType].recoverable !== null);
+  const freezesBanked = getFreezesBankedSync();
+  const canRecover = freezesBanked > 0 && recoverableGames.length > 0;
+
+  // Log at-risk visibility once per day per game (de-duped via localStorage).
+  useEffect(() => {
+    const today = getTodayDateCET();
+    const KEY = 'watson_at_risk_logged';
+    let logged: Record<string, string> = {};
+    try {
+      logged = JSON.parse(localStorage.getItem(KEY) ?? '{}');
+    } catch {
+      logged = {};
+    }
+    let dirty = false;
+    for (const g of atRiskGames) {
+      if (logged[g.gameType] === today) continue;
+      logged[g.gameType] = today;
+      dirty = true;
+      void logEvent('streak_at_risk_seen', {
+        gameType: g.gameType,
+        payload: {
+          current: statuses[g.gameType].rawStreak.current,
+          level: statuses[g.gameType].riskLevel,
+        },
+      });
+    }
+    if (dirty) {
+      try { localStorage.setItem(KEY, JSON.stringify(logged)); } catch { /* ignore */ }
+    }
+  }, [atRiskGames, statuses]);
 
   // Confetti when all games are completed
   useEffect(() => {
@@ -221,6 +277,64 @@ export function LandingPage() {
         )}
       </div>
 
+      {/* At-risk streak chip — fires after 18:00 CET when a streak ≥ 2 hasn't
+          been played today. Critical (≥ 22:00) shows a brighter pink. */}
+      {atRiskGames.length > 0 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-4 flex flex-wrap items-center justify-center gap-2"
+        >
+          {atRiskGames.map((g) => {
+            const s = statuses[g.gameType];
+            const critical = s.riskLevel === 'critical';
+            return (
+              <Link
+                key={g.gameType}
+                to={g.path}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-transform hover:scale-[1.02] ${
+                  critical
+                    ? 'bg-[var(--color-pink)] text-white animate-pulse'
+                    : 'bg-[var(--color-pink)]/15 text-[var(--color-pink)]'
+                }`}
+              >
+                <span aria-hidden>⏰</span>
+                {s.rawStreak.current}-Tage-{g.name}-Streak — heute spielen!
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Recoverable streak banner — exactly one missed day, freeze available. */}
+      {canRecover && (
+        <div className="mb-4 flex flex-col items-center gap-2 rounded-lg border border-[var(--color-cyan)]/30 bg-[var(--color-cyan)]/[0.06] p-3 text-center">
+          <p className="text-sm">
+            <span aria-hidden>🧊</span>{' '}
+            <span className="font-semibold">Streak in Gefahr.</span>
+            {' '}Du hast {recoverableGames.length === 1
+              ? `einen ${recoverableGames[0].name}-Streak`
+              : `${recoverableGames.length} Streaks`}
+            {' '}gestern verpasst. Eis-Tag einsetzen?
+          </p>
+          <p className="text-xs text-[var(--color-gray-text)]">
+            {freezesBanked} Eis-{freezesBanked === 1 ? 'Tag' : 'Tage'} verfügbar
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {recoverableGames.map((g) => (
+              <button
+                key={g.gameType}
+                type="button"
+                onClick={() => setFreezeModalGame(g)}
+                className="rounded bg-[var(--color-cyan)] px-3 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-90"
+              >
+                {g.name} retten ({statuses[g.gameType].recoverable!.current} Tage)
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Sponsor bar */}
       <AdSlot type="sponsor-bar" className="mb-5" />
 
@@ -241,9 +355,11 @@ export function LandingPage() {
               className={`group flex items-center gap-4 rounded-lg border-2 p-4 transition-all duration-[var(--transition-fast)] ${
                 played
                   ? 'border-[var(--color-green)]/30 bg-[var(--color-green)]/[0.03]'
-                  : inProgress
-                    ? 'border-[var(--color-cyan)]/40 bg-[var(--color-cyan)]/[0.03]'
-                    : 'border-[var(--color-gray-bg)] hover:border-[var(--color-cyan)] hover:shadow-sm'
+                  : status.riskLevel !== 'safe'
+                    ? 'border-[var(--color-pink)]/50 bg-[var(--color-pink)]/[0.03]'
+                    : inProgress
+                      ? 'border-[var(--color-cyan)]/40 bg-[var(--color-cyan)]/[0.03]'
+                      : 'border-[var(--color-gray-bg)] hover:border-[var(--color-cyan)] hover:shadow-sm'
               }`}
             >
               <span
@@ -375,6 +491,20 @@ export function LandingPage() {
       <div className="mt-8 flex justify-center">
         <AdSlot type="mrec" />
       </div>
+
+      {freezeModalGame && (
+        <StreakFreezeModal
+          gameType={freezeModalGame.gameType}
+          gameName={freezeModalGame.name}
+          recoverable={statuses[freezeModalGame.gameType].recoverable!}
+          freezesBanked={freezesBanked}
+          onClose={() => setFreezeModalGame(null)}
+          onApplied={() => {
+            setFreezeModalGame(null);
+            reloadStatuses();
+          }}
+        />
+      )}
     </GameShell>
   );
 }
