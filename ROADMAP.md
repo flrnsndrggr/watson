@@ -283,6 +283,48 @@ _Items from watson-qa-zaemesetzli agent_
     - Evidence: `gh run view` → "The job was not started because an Actions budget is preventing further use". `netlify deploy --prod` → "Error: Unauthorized". Observed 2026-04-20.
     - Priority re-escalated to P0: CI pipeline was the only deploy path and it is now broken; 3 fixes on main are undeployed.
 
+12. [ ] P1 - Rank bar shows "0 Pkt · noch 8 bis Geselle" mid-game when actual score is 3
+    - Agent: watson-qa-zaemesetzli
+    - Scenario: Pool & Slots / Scoring — found Apfelbaum (+1), used Tipp (-1), found Bergsee (+1), found Bergblume (+2), then read rank bar
+    - Problem: After absolute score reached 3 (crossing the Lehrling threshold of 3), the rank bar's right-side label rendered `0 Pkt · noch 8 bis Geselle`. The same state on the post-game results screen renders `3 Pkt · noch 5 bis Geselle` — and `watson_daily_results` records `3/9 · Lehrling`. The `8` shown mid-game equals the absolute Geselle threshold (8), implying the rank bar is reading `displayScore = 0` while the underlying state is 3. Per `RankBar.tsx:82-84`, the format is `${displayScore} Pkt · noch ${thresholds[nextRank] - displayScore} bis ${RANK_LABELS[nextRank]}`, so the only way to get `0 / 8` is `displayScore === 0`. Either the score state is being reset on rank-up, or `useAnimatedScore` is stuck at 0 (e.g., parent re-mount resets the hook). The bug makes the user see a confusing "you have zero points" right after they leveled up.
+    - Suggested fix: Step through the rank-up path — verify `score` state is not reset in `useZaemesetzli.ts` when `currentRank` advances. Inspect whether `RankBar` receives a stable parent (no remounts on rank change). Add a render log to confirm `score` vs `displayScore` divergence. Consider removing `key={score}` from the span (`RankBar.tsx:77`) since it forces remount on every score change, or adopt `useAnimatedScore`'s output directly without keying.
+    - Files: `src/components/shared/RankBar.tsx` (lines 57-86), `src/games/zaemesetzli/useZaemesetzli.ts` (submitWord/setRank logic)
+    - Evidence: JS DOM read at 2026-04-28 returned `{rankBar:["0 Pkt · noch 8 bis Geselle"]}` while `watson_daily_results` for the same session stored `2026-04-28.zaemesetzli.summary = "3/9 · Lehrling"`. Found list shows Apfelbaum 1pt, Bergsee 1pt, Bergblume 2pt minus 1 Tipp = 3 absolute. Results screen on the same page later shows `Lehrling · 3 Pkt · noch 5 bis Geselle`. Observed 2026-04-28.
+
+13. [ ] P2 - Invalid-combo toast renders over emoji pool, partly obscuring next-click targets
+    - Agent: watson-qa-zaemesetzli
+    - Scenario: Invalid Combinations — submitted 🔥+🪨 (Feuer + Stein), no valid compound
+    - Problem: The "Keine Kombination gefunden" toast container is positioned at `top-[100px]` (`Toast.tsx:48`). On the Zämesetzli page at desktop widths the toast lands directly over the emoji pool grid. The screenshot from this run shows the toast covering the 🍎 (Apfel), 🏔️ (Berg), and 🌊 (Wasser) buttons for 2.5s. A user who wants to immediately try another combo can't see those emojis and may click through the toast (`pointer-events: auto` on inner div). On mobile (~390px viewport) the visual collision is tighter still since the pool is closer to the top.
+    - Suggested fix: Move the toast below the slot/Prüfen area instead of `top-[100px]`. Either anchor it bottom-center (`bottom-[120px]`) or render it in-flow above the slots so it never sits on the pool. Alternatively shorten the auto-dismiss timer for invalid-combo toasts to ~1s.
+    - Files: `src/components/shared/Toast.tsx` (line 48)
+    - Evidence: Screenshot taken immediately after submitting 🔥+🪨 shows the dark "Keine Kombination gefunden" pill horizontally centered at y≈155, covering the row of emoji tiles. Toast dwell time is 2.5s + 0.5s fade per `Toast.tsx:32-37`. Observed 2026-04-28.
+
+14. [ ] P2 - 🌲 (Tanne) emoji used as "Wald" in 3 of 9 compounds with no in-UI guidance
+    - Agent: watson-qa-zaemesetzli
+    - Scenario: Completion + Share — viewed full word list after finishing
+    - Problem: The 2026-04-28 puzzle's `valid_compounds` includes Bergwald (🏔️+🌲, 1pt), Waldblume (🌲+🌼, 2pt), and Waldfeuer (🌲+🔥, 2pt) — three of nine compounds where 🌲 must be read as "Wald" (forest), not its canonical "Tanne" (fir). The accessibility name on the button is "Tanne" (`read_page` confirmed `button "Tanne"`), so a logical player tries "Tannenwald" or skips these. The Tipp button reveals the emoji pair but never surfaces the alt-noun "Wald", leaving the player guessing. This is the same anti-pattern as Zämesetzli #7/#8 (🔑→Schein/Schloss, ☀️→Sonntag) but fresh in the live puzzle data.
+    - Suggested fix: Extend the 🌲 emoji's `alt_nouns` for this puzzle to include `"Wald"` so the validator treats it as a legal reading and the hint can mention it. Long-term, surface alt-nouns in the hint text (e.g. "Tipp: 🌲 kann auch 'Wald' bedeuten"). The puzzle lives in Supabase (`zaemesetzli_puzzles` for `2026-04-28`); the local sample data does not contain these compounds.
+    - Files: Supabase `zaemesetzli_puzzles` row for `2026-04-28` (emojis array — 🌲 alt_nouns); `src/games/zaemesetzli/ZaemesetzliPage.tsx` (hint message)
+    - Evidence: "Nicht gefunden" list at game-end showed Bergwald 🏔️🌲, Waldblume 🌲🌼, Waldfeuer 🌲🔥. Live `read_page` returned `button "Tanne"` for the 🌲 button. 3/9 compounds depend on this stand-in. Observed 2026-04-28.
+    - Related: Zämesetzli #7, #8 — same root cause; expanding alt_nouns + tooltip patch would fix all three
+
+15. [ ] P2 - "Ergebnis teilen" on desktop has no visible feedback when share dialog is dismissed or unavailable
+    - Agent: watson-qa-zaemesetzli
+    - Scenario: Completion + Share — clicked "Ergebnis teilen" on results screen via headless Chrome
+    - Problem: Clicking "Ergebnis teilen" on the post-game screen produced no toast, no modal, no clipboard write (verified — `navigator.clipboard.writeText` was wrapped to capture, returned `null`). `navigator.share` is defined on the browser (`typeof navigator.share === 'function'`), so the code path likely calls `navigator.share()` and either: (a) the share dialog opens silently outside the tab focus (common in headless / automation), or (b) the user dismisses the dialog. In both cases the user has no in-app signal that anything happened. This regresses the spirit of Zämesetzli #2 ("Teilen button provides no user feedback") which was marked complete — the clipboard fallback exists but the `navigator.share` path is silent.
+    - Suggested fix: Wrap the `navigator.share` call in try/catch and show a "Geteilt!" or "Kopiert!" toast on success / fall back to clipboard + toast on `AbortError`/`NotAllowedError`. Always fire a confirmation toast regardless of which share path was taken.
+    - Files: `src/components/shared/ShareButton.tsx`, `src/lib/share.ts`
+    - Evidence: Pre-click clipboard interceptor installed via `navigator.clipboard.writeText = capturing wrapper`. After clicking ref_98 ("Ergebnis teilen"), `window._capturedClip` was `null`. Page DOM had no `[role="status"]` toast element. Button stayed enabled with no label change. Observed 2026-04-28.
+    - Related: Zämesetzli #2 — same surface; this finding extends the fix to the `navigator.share` path
+
+16. [ ] P2 - Streak pill "🔥 1 Tag" on results screen lacks label or tooltip
+    - Agent: watson-qa-zaemesetzli
+    - Scenario: Completion + Share — read post-game results panel
+    - Problem: The results screen shows a pink pill containing only `🔥 1 Tag` with no surrounding caption (e.g. "Tagesstreak"). A first-time player sees this number and has no way to know it represents a play-day streak. The pill is visually prominent (brand pink) so users will look at it; the missing context makes it feel like a random badge. On desktop there's no native tooltip (`title` attribute) either, so even `:hover` reveals nothing.
+    - Suggested fix: Add a small caption above or after the pill (e.g. "Tagesstreak: 🔥 1 Tag" or render the pill with `title="Aufeinanderfolgende Spieltage"`). Optionally make the pill open a small explainer modal on click.
+    - Files: `src/components/shared/StreakBadge.tsx` (or wherever the pill is rendered on the Zämesetzli result page — `src/games/zaemesetzli/ZaemesetzliResult.tsx`)
+    - Evidence: Results screen screenshot at 2026-04-28 shows pink pill with text "🔥 1 Tag" centered between the found-emoji line and the "Tägliche Erinnerung" prompt. No surrounding label, no `title`. Observed 2026-04-28.
+
 ---
 
 ## Code Review Escalations
