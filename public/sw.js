@@ -12,8 +12,10 @@
 // Bump both versions on every deploy that changes behaviour — the activate
 // handler nukes any cache whose name doesn't match and returning players
 // immediately pull the fresh shell. v2 = Schlagziil -> Schlagloch rename.
-const CACHE_VERSION = 'watson-v2-schlagloch';
-const API_CACHE = 'watson-api-v2-schlagloch';
+// v3 = supabase puzzle fetch fix (puzzle_id -> id) so users with the v2 cache
+// pick up the corrected JS bundle that actually loads today's DB puzzles.
+const CACHE_VERSION = 'watson-v3-supabase-fetch-fix';
+const API_CACHE = 'watson-api-v3-supabase-fetch-fix';
 
 // Minimal app-shell URLs cached on install.
 // Vite hashed assets are cached at runtime via fetch handler.
