@@ -74,7 +74,7 @@ export async function fetchPuzzleByDate<T>(gameType: GameType, date: string): Pr
     const { data: gameData, error: gameError } = await supabase
       .from(table)
       .select(select)
-      .eq('puzzle_id', row.id)
+      .eq('id', row.id)
       .maybeSingle();
 
     if (gameError || !gameData) return null;
@@ -112,7 +112,7 @@ export async function fetchTodaysPuzzle<T>(gameType: GameType): Promise<T | null
     const { data: gameData, error: gameError } = await supabase
       .from(table)
       .select(select)
-      .eq('puzzle_id', row.id)
+      .eq('id', row.id)
       .maybeSingle();
 
     if (gameError || !gameData) return null;
