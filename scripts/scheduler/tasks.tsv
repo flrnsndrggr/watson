@@ -1,13 +1,13 @@
 # task_id	skill_subdir	cron	branch	coord_mode	worktree_subdir
-watson-roadmap-worker	watson-roadmap-worker	50 * * * *	main	main-locked	main-shared
-watson-triage	watson-triage	27 3,8,13,18 * * *	main	main-locked	main-shared
-watson-code-reviewer	watson-code-reviewer	11 */3 * * *	main	main-locked	main-shared
-watson-release-manager	watson-release-manager	37 */2 * * *	main	main-locked	main-shared
-watson-game-polish	watson-game-polish	17 */3 * * *	main	main-locked	main-shared
-watson-puzzle-content	watson-puzzle-content	43 */4 * * *	main	main-locked	main-shared
-watson-feature-worker	watson-feature-worker	23 */3 * * *	main	main-locked	main-shared
-watson-game-designer	watson-game-designer	3 */2 * * *	main	main-locked	main-shared
-watson-ux-innovator	watson-ux-innovator	33 1,5,9,13,17,21 * * *	main	main-locked	main-shared
-watson-performance	watson-performance	47 */6 * * *	main	main-locked	main-shared
+watson-roadmap-worker	watson-roadmap-worker	50 */6 * * *	main	main-locked	main-shared
+watson-triage	watson-triage	27 8,20 * * *	main	main-locked	main-shared
+watson-code-reviewer	watson-code-reviewer	11 14 * * *	main	main-locked	main-shared
+watson-release-manager	watson-release-manager	37 16 * * *	main	main-locked	main-shared
+watson-game-polish	watson-game-polish	17 10 * * *	main	main-locked	main-shared
+watson-puzzle-content	watson-puzzle-content	43 11 * * *	main	main-locked	main-shared
+watson-feature-worker	watson-feature-worker	23 12 * * *	main	main-locked	main-shared
+watson-game-designer	watson-game-designer	3 13 * * *	main	main-locked	main-shared
+watson-ux-innovator	watson-ux-innovator	33 15 * * 1,4	main	main-locked	main-shared
+watson-performance	watson-performance	47 17 * * 2,5	main	main-locked	main-shared
 watson-architect	watson-architect	47 9 * * 3	main	main-locked	main-shared
-watson-docs	watson-docs	53 7,19 * * *	main	main-locked	main-shared
+watson-docs	watson-docs	53 18 * * *	main	main-locked	main-shared

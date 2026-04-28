@@ -12,15 +12,11 @@
         <string>/Users/fs/Code/game-watson-wt/main-shared</string>
         <string>main-locked</string>
     </array>
-    <!-- cron "33 1,5,9,13,17,21 * * *" · worktree: main-shared · branch: main · coord: main-locked -->
+    <!-- cron "33 15 * * 1,4" · worktree: main-shared · branch: main · coord: main-locked -->
     <key>StartCalendarInterval</key>
     <array>
-        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>1</integer></dict>
-        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>5</integer></dict>
-        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>9</integer></dict>
-        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>13</integer></dict>
-        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>17</integer></dict>
-        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>21</integer></dict>
+        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>15</integer><key>Weekday</key><integer>1</integer></dict>
+        <dict><key>Minute</key><integer>33</integer><key>Hour</key><integer>15</integer><key>Weekday</key><integer>4</integer></dict>
     </array>
     <key>RunAtLoad</key>
     <false/>
