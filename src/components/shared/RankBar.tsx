@@ -23,10 +23,13 @@ function useAnimatedScore(target: number): number {
   const [display, setDisplay] = useState(target);
   const rafRef = useRef<number>(0);
   const startRef = useRef<number | null>(null);
-  const fromRef = useRef(target);
+  // Tracks the last value actually shown to the user (updated every rAF step).
+  // Unlike the old fromRef (only updated on animation completion), this stays
+  // in sync even when animations are cancelled mid-flight.
+  const currentRef = useRef(target);
 
   useEffect(() => {
-    const from = fromRef.current;
+    const from = currentRef.current;
     if (from === target) return;
 
     const duration = 400; // ms
@@ -40,10 +43,9 @@ function useAnimatedScore(target: number): number {
       const eased = 1 - (1 - t) * (1 - t);
       const current = Math.round(from + (target - from) * eased);
       setDisplay(current);
+      currentRef.current = current;
       if (t < 1) {
         rafRef.current = requestAnimationFrame(step);
-      } else {
-        fromRef.current = target;
       }
     }
 

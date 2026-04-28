@@ -283,7 +283,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Evidence: `gh run view` → "The job was not started because an Actions budget is preventing further use". `netlify deploy --prod` → "Error: Unauthorized". Observed 2026-04-20.
     - Priority re-escalated to P0: CI pipeline was the only deploy path and it is now broken; 3 fixes on main are undeployed.
 
-12. [ ] P1 - Rank bar shows "0 Pkt · noch 8 bis Geselle" mid-game when actual score is 3
+12. [x] P1 - Rank bar shows "0 Pkt · noch 8 bis Geselle" mid-game when actual score is 3
     - Agent: watson-qa-zaemesetzli
     - Scenario: Pool & Slots / Scoring — found Apfelbaum (+1), used Tipp (-1), found Bergsee (+1), found Bergblume (+2), then read rank bar
     - Problem: After absolute score reached 3 (crossing the Lehrling threshold of 3), the rank bar's right-side label rendered `0 Pkt · noch 8 bis Geselle`. The same state on the post-game results screen renders `3 Pkt · noch 5 bis Geselle` — and `watson_daily_results` records `3/9 · Lehrling`. The `8` shown mid-game equals the absolute Geselle threshold (8), implying the rank bar is reading `displayScore = 0` while the underlying state is 3. Per `RankBar.tsx:82-84`, the format is `${displayScore} Pkt · noch ${thresholds[nextRank] - displayScore} bis ${RANK_LABELS[nextRank]}`, so the only way to get `0 / 8` is `displayScore === 0`. Either the score state is being reset on rank-up, or `useAnimatedScore` is stuck at 0 (e.g., parent re-mount resets the hook). The bug makes the user see a confusing "you have zero points" right after they leveled up.
