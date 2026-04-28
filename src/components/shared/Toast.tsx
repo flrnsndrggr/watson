@@ -9,6 +9,7 @@ interface ToastMessage {
 let toastId = 0;
 const listeners = new Set<(msg: ToastMessage) => void>();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function showToast(text: string) {
   const msg = { id: ++toastId, text };
   listeners.forEach((fn) => fn(msg));

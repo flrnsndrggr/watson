@@ -41,17 +41,19 @@ export function QuizzticlePage() {
     return () => clearInterval(t);
   }, [status, tickSecond]);
 
-  // Auto-snap matcher: every keystroke, try to match. Clear input on success.
-  useEffect(() => {
-    if (status !== 'playing') return;
-    if (!input.trim()) return;
-    const matched = tryMatch(input);
+  // Auto-snap matcher lives directly in the input's onChange handler — no
+  // setState-in-effect, since matching is an event-driven side effect of
+  // typing, not a sync to external state.
+  function handleInputChange(value: string) {
+    setInput(value);
+    if (status !== 'playing' || !value.trim()) return;
+    const matched = tryMatch(value);
     if (matched !== null) {
       setInput('');
       setFlash('correct');
       setTimeout(() => setFlash(null), 250);
     }
-  }, [input, tryMatch, status]);
+  }
 
   if (!puzzle || status === 'loading') {
     return (
@@ -108,7 +110,7 @@ export function QuizzticlePage() {
         ref={inputRef}
         type="text"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={(e) => handleInputChange(e.target.value)}
         placeholder="Tippe los — Treffer rasten automatisch ein"
         className={`mb-3 w-full min-h-[44px] rounded-lg border-2 px-3 text-sm transition-colors focus:outline-none ${
           flash === 'correct'

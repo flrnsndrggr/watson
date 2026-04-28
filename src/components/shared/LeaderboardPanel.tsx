@@ -76,12 +76,17 @@ export function LeaderboardPanel({ gameType, puzzleDate, showTime }: Leaderboard
 
       {period === 'today' ? (
         <DailyBody
+          key={`d:${gameType}:${puzzleDate ?? 'today'}`}
           gameType={gameType}
           puzzleDate={puzzleDate}
           showTime={showTime}
         />
       ) : (
-        <PeriodBody gameType={gameType} period={period} />
+        <PeriodBody
+          key={`p:${gameType}:${period}`}
+          gameType={gameType}
+          period={period}
+        />
       )}
     </div>
   );
@@ -102,9 +107,10 @@ function DailyBody({
   const [userRank, setUserRank] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Param changes are handled by the parent re-keying us so loading=true on
+  // mount is the natural state; this effect only ever flips loading→false.
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     fetchLeaderboard(gameType, puzzleDate).then((result) => {
       if (cancelled) return;
       setEntries(result.entries);
@@ -189,9 +195,10 @@ function PeriodBody({
   const [data, setData] = useState<LeaderboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Same pattern as DailyBody: parent re-keys when params change, so initial
+  // loading=true is naturally correct and the effect only flips to false.
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     fetchLeaderboardSummary(gameType, period).then((res) => {
       if (cancelled) return;
       setData(res);

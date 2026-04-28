@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { AdSlot } from '@/components/shared/AdSlot';
@@ -118,23 +118,25 @@ function loadStatuses(): Record<GameType, GameStatus> {
 }
 
 function useGameStatuses(nonce: number = 0): Record<GameType, GameStatus> {
-  const [statuses, setStatuses] = useState<Record<GameType, GameStatus>>(() => loadStatuses());
+  // `tick` is bumped by focus / visibility events so the memo recomputes;
+  // `nonce` is driven by external callers (e.g. the freeze modal). Both
+  // are pure deps of `loadStatuses`, no setState-in-effect required.
+  const [tick, setTick] = useState(0);
+  // `loadStatuses()` reads localStorage — those reads aren't reactive, so we
+  // use `nonce` and `tick` as explicit recomputation triggers. The lint rule
+  // can't tell they're version triggers and not unused.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const statuses = useMemo(() => loadStatuses(), [nonce, tick]);
 
   useEffect(() => {
-    setStatuses(loadStatuses());
-  }, [nonce]);
-
-  useEffect(() => {
-    function reload() {
-      setStatuses(loadStatuses());
-    }
-    window.addEventListener('focus', reload);
+    function bump() { setTick((t) => t + 1); }
     function handleVisibility() {
-      if (document.visibilityState === 'visible') reload();
+      if (document.visibilityState === 'visible') bump();
     }
+    window.addEventListener('focus', bump);
     document.addEventListener('visibilitychange', handleVisibility);
     return () => {
-      window.removeEventListener('focus', reload);
+      window.removeEventListener('focus', bump);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
