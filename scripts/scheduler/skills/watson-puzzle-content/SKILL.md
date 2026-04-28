@@ -153,23 +153,61 @@ Use the exact `publish_date` from the query (do not hardcode
 `CURRENT_DATE + 1`). Apply the no-repeats rule above to every word you
 author.
 
-### Verbindige — Swiss Connections
-Generate a puzzle with 4 groups of 4 items. Theme categories around:
-- Swiss cantons, cities, mountains, lakes
-- Swiss German expressions and Mundart words
-- Swiss brands, companies, cultural icons
-- Current events (general Swiss news topics)
-- watson-related pop culture (Picdump, Spass, etc.)
-- Food: Swiss dishes, cheeses, chocolate brands
-- **watson-internet-culture flavour** — things only a watson reader would
-  land instantly: stock sentences from watson-Kommentaren ("Typisch X",
-  "bin Weg", "Ratschlag dä Woche"), Picdump-Favoriten, recurring jokes.
-  Use this sparingly (at most one such group per puzzle, ideally the
-  purple / tricky slot) — it's watson signature, not watson gimmick.
+### Verbindige — Mundart Connections (Idiotikon-style)
+**This is a dialect puzzle, not a Connections-with-Swiss-flavour puzzle.**
+Every one of the 16 items is a Schweizerdeutsch / Mundart word. The four
+groups are formed by **shared Hochdeutsch meaning** — i.e. four dialect
+words that all translate to the same Standard German concept.
 
-Difficulty: Yellow (1) = obvious grouping, Green (2) = requires some knowledge, Blue (3) = tricky overlaps, Purple (4) = unexpected connection.
+Canonical pattern (from `verbindige.data.ts`):
+- Group "Wörter für Kopf" (difficulty 1): Gring (ZH), Grind (BE), Bire (AG),
+  Tscholi (SG) — four dialect words, all = "Kopf".
+- Group "Gemüse auf Mundart" (difficulty 2): Rüebli, Kabis, Härdöpfel, Nüssli —
+  four dialect names, all = vegetables.
+- Group "Fortbewegungsmittel" (difficulty 3): Töffli, Velo, Trottinett, Güxi —
+  four dialect names for things you ride.
 
-Ensure items could plausibly appear in multiple groups (that's what makes it fun).
+Hard rules:
+- **Items MUST be Mundart vocabulary**, not Standard German nouns, not
+  proper nouns (cantons, brands, parties, mountain names, Bundesräte
+  surnames, TV shows). If an item would appear in a Hochdeutsch dictionary
+  with the same spelling and meaning, it is wrong.
+- **Each group's `category_label` is the Hochdeutsch meaning** the four
+  dialect words share (e.g. "Kopf", "Karotte", "betrunken", "klein"). Not
+  a topic label like "Gemüse" — the Hochdeutsch *equivalent*.
+- **Each item has a `region` code** (ZH, BE, BS, VS, GR, AG, SG, LU, CH for
+  pan-Swiss). Use the Idiotikon as authoritative source of regional spread.
+- **Items must rotate** — check the `used_words` query (Step 3). Mundart
+  vocabulary is finite; reuse is the failure mode, not novelty.
+
+Source material — use **only these**, in this order of preference:
+1. `scripts/mundart-word-bank.json` — the project's curated, Idiotikon-derived
+   word bank. Read it first; pick groups whose Hochdeutsch meaning you can
+   cover with 4 distinct dialect words.
+2. The Idiotikon API client at `src/lib/idiotikon.ts` — call it from a
+   short tsx one-shot if the word bank is thin for the meaning you want.
+   Refresh the word bank by running `npx tsx scripts/seed-from-idiotikon.ts`
+   instead of inventing words.
+3. The full canonical reference: digital.idiotikon.ch — only consult when
+   the API and the word bank both lack coverage.
+
+Never invent a Mundart word. If you can't find four cited dialect synonyms
+for a meaning in the sources above, pick a different meaning.
+
+Theme suggestions (the **shared meaning** across dialects):
+- Body parts: Kopf, Bauch, Hände, Füsse
+- Food/drink: betrunken, Essen, Brot, Süssigkeit
+- Verbs: arbeiten, schlafen, rennen, weinen
+- Adjectives: klein, müde, dumm, fein
+- Weather: Regen, Wind, Kälte
+- Household: Schrank, Tasse, Decke, Fenster
+
+Difficulty: 1 = wide pan-Swiss synonyms (every dialect has them), 2 = mixed
+regional, 3 = some words only known in one canton, 4 = obscure or
+near-extinct dialect words that need the Idiotikon.
+
+Ensure items could plausibly belong to a different group (a Berner word
+for "Kopf" might also sound like a word for "Bauch" — that's the trick).
 
 Insert via the wrapper, one CTE per target date:
 
