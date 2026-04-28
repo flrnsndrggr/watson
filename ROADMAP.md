@@ -331,59 +331,6 @@ _Weekly architecture review findings from watson-architect_
 
 ---
 
-## Buchstäbli QA Findings
-
-_Items from watson-qa-buchstaebli agent_
-
-1. [!] P1 - No toast for "not in word list" — silent rejection on invalid words
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Validation Responses — submitting valid German words not in puzzle list
-   - Problem: When a word passes all pre-checks (4+ letters, contains center letter A, uses available letters) but is not in the puzzle's valid word list, the input clears silently with no feedback toast. LASTERN, LASTEN, and RASTEN were all rejected this way. Players have no indication whether their word was wrong, misspelled, or simply not in this puzzle's set.
-   - Suggested fix: Show a "Kein gültiges Wort" toast (mirroring the center-letter toast that already fires) when submission fails the word-list validation step.
-   - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler), `src/components/shared/Toast.tsx`
-   - Evidence: LASTERN (all 7 letters, pangram attempt), LASTEN (6 letters), RASTEN (6 letters) all silently rejected — input cleared, score unchanged, MutationObserver captured zero toast DOM insertions. Center-letter toast ("Der Buchstabe A muss dabei sein") fires correctly via same observer confirming toast infrastructure works. Observed 2026-04-19.
-   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** No `src/games/buchstaebli/` directory, no `/buchstaebli` route in `App.tsx`, no Buchstäbli references in source. All 5 Buchstäbli findings (#1–#5) reference non-existent files. Needs human review: is this a planned game, or were these findings generated against a different deployment?
-   - Related: #2, #3 — all three validation-toast gaps would be fixed in one pass if/when the game exists
-
-2. [!] P1 - No "already found" toast on duplicate word submission
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Validation Responses — re-submitting an already-found word (RATEN twice)
-   - Problem: After RATEN was accepted (score 22→17 Pkt), submitting RATEN again produced no "Schon gefunden!" toast, did not clear the input (word stayed visible), and silently blocked the re-add. Player has zero feedback about why Enter had no effect.
-   - Suggested fix: Show "Schon gefunden! ✓" toast and clear the input when a duplicate is detected.
-   - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler)
-   - Evidence: Second RATEN: found count stayed at 1, score stayed "noch 17 Pkt bis Lehrling", MutationObserver captured no DOM insertions, input ref still showed "RATEN". Observed 2026-04-19.
-   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** See #1 triage note.
-
-3. [!] P2 - No "too short" toast for sub-4-letter submissions
-   - Agent: watson-qa-buchstaebli
-   - Scenario: Validation Responses — submitting TAN (3 letters, contains center letter A)
-   - Problem: Submitting TAN (T, A, N) causes the input to clear silently with no "Zu kurz!" toast. The center-letter check fires a toast but the minimum-length check does not. A player who types a short word gets no feedback about the 4-letter minimum.
-   - Suggested fix: Show "Zu kurz! (mind. 4 Buchstaben)" toast for words under 4 letters, consistent with the center-letter toast pattern.
-   - Files: `src/games/buchstaebli/useBuchstaebli.ts` (submit handler)
-   - Evidence: TAN submitted, MutationObserver empty, input cleared to placeholder. Observed 2026-04-19.
-   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** See #1 triage note.
-   - Related: #1 — all three validation-toast gaps can be fixed in one pass through the submit handler
-
-4. [!] P2 - Center letter button missing aria-label indicating it is required
-   - Agent: watson-qa-buchstaebli
-   - Scenario: First Play — reviewing ARIA labels on hex grid
-   - Problem: All 7 hex letter buttons have no `aria-label`. The center letter A is visually distinct (cyan background) but has no accessible label indicating it must appear in every word. Screen reader users hear only "A" with no hint it is mandatory.
-   - Suggested fix: Add `aria-label="A – Pflichtbuchstabe"` to the center button and `aria-label="R"` etc. to outer buttons. Add `role="group" aria-label="Buchstaben"` to the hex container.
-   - Files: `src/games/buchstaebli/BuchstaebliGrid.tsx` (or equivalent hex letter component)
-   - Evidence: All 7 buttons returned `null` for `getAttribute('aria-label')`. Computed bg confirmed A is `rgb(0,198,255)` (cyan), others `rgb(236,236,236)`. Observed 2026-04-19.
-   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** See #1 triage note.
-
-5. [!] P2 - Buchstäbli is an orphaned route — live but not linked from navigation
-   - Agent: watson-qa-buchstaebli
-   - Scenario: First Play — navigating to game from landing page
-   - Problem: The main nav shows only Verbindige, Zämesetzli, Schlagloch. The game is fully playable at `/buchstaebli` but a user starting at the homepage cannot discover it. The game appears to have been removed from the nav while the route and game logic remain deployed, leaving it in a half-removed state.
-   - Suggested fix: Either restore the nav link (if the game is meant to stay live) or remove the route from the production deploy to avoid confusion.
-   - Files: `src/pages/Layout.tsx` (nav links), `src/App.tsx` (router config)
-   - Evidence: Nav links on production: [Spiele, Verbindige, Zämesetzli, Schlagloch]. Direct navigation to `/buchstaebli` loads a fully functional game. Observed 2026-04-19.
-   - Triage note (2026-04-20): **Blocked — Buchstäbli does not exist in codebase.** No `/buchstaebli` route in `App.tsx`. No `src/games/buchstaebli/` directory. If the game was live on production, it may have been deployed from a different branch or removed since. See #1 triage note.
-
----
-
 ## Content Gaps
 
 _Missing or invalid puzzle data from watson-puzzle-content_
