@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { getTodayDateCET } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 
 const DISMISSED_KEY_PREFIX = 'watson_banner_dismissed_';
 

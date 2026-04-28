@@ -33,12 +33,20 @@ const AdminSchlagloch = lazy(() => import('@/pages/admin/AdminSchlagloch').then(
 const AdminVerbindigeEditions = lazy(() => import('@/pages/admin/AdminVerbindigeEditions').then(m => ({ default: m.AdminVerbindigeEditions })));
 const VerbindigeEditionPage = lazy(() => import('@/games/verbindige/VerbindigeEditionPage').then(m => ({ default: m.VerbindigeEditionPage })));
 
+function ChunkLoader() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-3 border-[var(--color-cyan)] border-t-transparent" />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <DeferredUserAuth>
       <BrowserRouter>
-        <Suspense fallback={null}>
+        <Suspense fallback={<ChunkLoader />}>
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<LandingPage />} />

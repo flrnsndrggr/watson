@@ -36,4 +36,4 @@ Items for the `watson-feature-worker` agent. Pick the first unchecked item, impl
 - [x] Sunday Schlagloch "Rückblick": 10 headlines, harder difficulty, separate leaderboard — done 2026-04-21
 - [x] Branded Verbindige editions: CMS tool for creating sponsor-themed puzzles — done 2026-04-21
 - [x] PWA: add service worker for offline play after initial puzzle load — done 2026-04-21
-- [ ] Performance: code-split per game (lazy-load game bundles)
+- [x] Performance: code-split per game (lazy-load game bundles) — done 2026-04-28

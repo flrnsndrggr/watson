@@ -1,5 +1,5 @@
 import type { GameType } from '@/types';
-import { getTodayDateCET } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 
 /**
  * Persist and restore in-progress game state via localStorage.

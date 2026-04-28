@@ -1,5 +1,5 @@
 import type { GameType, StreakData } from '@/types';
-import { getTodayDateCET } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 
 const STORAGE_KEY = 'watson_streaks';
 

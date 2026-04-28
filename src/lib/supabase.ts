@@ -1,15 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import type { GameType, VerbindigeEdition } from '@/types';
+import { getTodayDateCET } from '@/lib/dateUtils';
+
+// Re-export so existing consumers that import from supabase.ts keep working
+export { getTodayDateCET };
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-/** Returns today's date in YYYY-MM-DD format (Europe/Zurich timezone). */
-export function getTodayDateCET(): string {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
-}
 
 // ----- Game-specific table names and column selects -----
 

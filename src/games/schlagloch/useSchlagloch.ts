@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import type { SchlaglochPuzzle, StreakData, LeaderboardGameType } from '@/types';
 import { SAMPLE_SCHLAGLOCH, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagloch.data';
-import { fetchTodaysPuzzle, fetchPuzzleByDate, getTodayDateCET } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlaglochHeadlineGuess } from '@/lib/analytics';

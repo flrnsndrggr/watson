@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getDailyResults, type DailyResult } from '@/lib/dailyResults';
 import { getStreak } from '@/lib/streaks';
-import { getTodayDateCET } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 import { ShareButton } from '@/components/shared/ShareButton';
 import type { GameType } from '@/types';
 

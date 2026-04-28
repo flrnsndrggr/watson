@@ -4,7 +4,7 @@ import { GameShell } from '@/components/shared/GameShell';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { getStreak } from '@/lib/streaks';
-import { getTodayDateCET } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 import { getDailyResults, type DailyResult } from '@/lib/dailyResults';
 import type { GameType, StreakData } from '@/types';
 

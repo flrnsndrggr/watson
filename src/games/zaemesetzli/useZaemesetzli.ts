@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import type { ZaemesetzliPuzzle, Rank, CompoundWord, StreakData } from '@/types';
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
-import { fetchTodaysPuzzle, fetchPuzzleByDate, getTodayDateCET } from '@/lib/supabase';
+import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
+import { getTodayDateCET } from '@/lib/dateUtils';
 import { recordGamePlayed, getStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackZaemesetzliWordFound, trackZaemesetzliHintUsed } from '@/lib/analytics';
