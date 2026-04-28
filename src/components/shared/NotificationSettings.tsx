@@ -32,7 +32,9 @@ export function NotificationSettings() {
 
   async function handleToggle() {
     if (enabled) {
-      disableNotifications();
+      setEnabling(true);
+      await disableNotifications();
+      setEnabling(false);
       setEnabled(false);
       showToast('Erinnerung deaktiviert');
     } else {
@@ -53,7 +55,7 @@ export function NotificationSettings() {
   function handleTimeChange(newTime: string) {
     setTime(newTime);
     if (enabled) {
-      updateReminderTime(newTime);
+      void updateReminderTime(newTime);
     }
   }
 

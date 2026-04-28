@@ -14,8 +14,10 @@
 // immediately pull the fresh shell. v2 = Schlagziil -> Schlagloch rename.
 // v3 = supabase puzzle fetch fix (puzzle_id -> id) so users with the v2 cache
 // pick up the corrected JS bundle that actually loads today's DB puzzles.
-const CACHE_VERSION = 'watson-v3-supabase-fetch-fix';
-const API_CACHE = 'watson-api-v3-supabase-fetch-fix';
+// v4 = web push handlers (push + notificationclick) — bump so existing SWs
+// install the new handlers on next visit.
+const CACHE_VERSION = 'watson-v4-web-push';
+const API_CACHE = 'watson-api-v4-web-push';
 
 // Minimal app-shell URLs cached on install.
 // Vite hashed assets are cached at runtime via fetch handler.
@@ -119,3 +121,54 @@ async function staleWhileRevalidate(request, cacheName) {
 
   return cached || fetchPromise;
 }
+
+// ----- Web Push -----
+//
+// Payload contract (sent by the dispatcher):
+//   { title, body, url?, tag? }
+// `url` is opened on click; `tag` collapses duplicate notifications.
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = { title: 'watson Spiele', body: event.data.text() };
+  }
+  const {
+    title = 'watson Spiele',
+    body = 'Heutige Rätsel warten.',
+    url = '/',
+    tag,
+  } = payload || {};
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      tag,
+      icon: '/icons.svg',
+      badge: '/favicon.svg',
+      data: { url },
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        // Focus an existing tab on the same origin if one is open.
+        for (const client of clients) {
+          if ('focus' in client && client.url.startsWith(self.location.origin)) {
+            return client.focus().then(() => {
+              if ('navigate' in client) client.navigate(url);
+            });
+          }
+        }
+        return self.clients.openWindow(url);
+      }),
+  );
+});

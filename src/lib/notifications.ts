@@ -53,11 +53,24 @@ export function saveNotificationPrefs(prefs: NotificationPrefs): void {
   }
 }
 
-/** Enable notifications: request permission, save prefs */
-export async function enableNotifications(reminderTime: string): Promise<boolean> {
-  const permission = await requestNotificationPermission();
-  if (permission !== 'granted') return false;
+/** Parse "HH:MM" → hour 0–23. */
+function hourFromTime(time: string): number {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(time);
+  if (!m) return 8;
+  const h = parseInt(m[1], 10);
+  return Number.isFinite(h) ? Math.max(0, Math.min(23, h)) : 8;
+}
 
+/**
+ * Enable: request OS permission, subscribe to push, save prefs.
+ * Returns false on permission denial or push subscribe failure.
+ */
+export async function enableNotifications(reminderTime: string): Promise<boolean> {
+  // Lazy import keeps the push lib (and supabase reference) out of the
+  // critical path for users who never open Profil settings.
+  const { subscribeToPush } = await import('@/lib/push');
+  const result = await subscribeToPush(hourFromTime(reminderTime));
+  if (!result.ok) return false;
   saveNotificationPrefs({
     enabled: true,
     reminderTime,
@@ -66,20 +79,24 @@ export async function enableNotifications(reminderTime: string): Promise<boolean
   return true;
 }
 
-/** Disable notifications */
-export function disableNotifications(): void {
+/** Disable: unsubscribe from push, persist disabled prefs. */
+export async function disableNotifications(): Promise<void> {
+  const { unsubscribeFromPush } = await import('@/lib/push');
+  await unsubscribeFromPush();
   saveNotificationPrefs({
     ...getNotificationPrefs(),
     enabled: false,
   });
 }
 
-/** Update the reminder time */
-export function updateReminderTime(time: string): void {
+/** Update the reminder hour both locally and on the server row. */
+export async function updateReminderTime(time: string): Promise<void> {
   saveNotificationPrefs({
     ...getNotificationPrefs(),
     reminderTime: time,
   });
+  const { updateReminderHour } = await import('@/lib/push');
+  await updateReminderHour(hourFromTime(time));
 }
 
 /** Check if the notification prompt has been dismissed */

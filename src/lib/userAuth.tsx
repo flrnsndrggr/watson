@@ -3,6 +3,7 @@ import { supabase } from './supabase';
 import { UserAuthContext, type UserAuthState } from './userAuthContext';
 import { reconcileStreaksOnLogin } from './streaks';
 import { reconcileAchievementsOnLogin } from './achievements';
+import { linkPushSubscriptionOnLogin } from './push';
 
 export function UserAuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<UserAuthState>({
@@ -18,6 +19,7 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         void reconcileStreaksOnLogin(session.user.id);
         void reconcileAchievementsOnLogin(session.user.id);
+        void linkPushSubscriptionOnLogin();
       }
     });
 
@@ -30,6 +32,7 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       if (event === 'SIGNED_IN' && session?.user) {
         void reconcileStreaksOnLogin(session.user.id);
         void reconcileAchievementsOnLogin(session.user.id);
+        void linkPushSubscriptionOnLogin();
       }
     });
 
