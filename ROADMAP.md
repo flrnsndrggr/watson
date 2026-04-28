@@ -309,7 +309,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Related: Zämesetzli #7, #8 — same root cause; expanding alt_nouns + tooltip patch would fix all three
     - Triage note (2026-04-28): Valid P2. This is a per-puzzle data issue in Supabase, same anti-pattern as #7/#8. Fix requires updating the `zaemesetzli_puzzles` row in Supabase for 2026-04-28 to add "Wald" to 🌲's alt_nouns. The long-term hint-text fix is already tracked in #7.
 
-15. [ ] P2 - "Ergebnis teilen" on desktop has no visible feedback when share dialog is dismissed or unavailable
+15. [x] P2 - "Ergebnis teilen" on desktop has no visible feedback when share dialog is dismissed or unavailable
     - Agent: watson-qa-zaemesetzli
     - Scenario: Completion + Share — clicked "Ergebnis teilen" on results screen via headless Chrome
     - Problem: Clicking "Ergebnis teilen" on the post-game screen produced no toast, no modal, no clipboard write (verified — `navigator.clipboard.writeText` was wrapped to capture, returned `null`). `navigator.share` is defined on the browser (`typeof navigator.share === 'function'`), so the code path likely calls `navigator.share()` and either: (a) the share dialog opens silently outside the tab focus (common in headless / automation), or (b) the user dismisses the dialog. In both cases the user has no in-app signal that anything happened. This regresses the spirit of Zämesetzli #2 ("Teilen button provides no user feedback") which was marked complete — the clipboard fallback exists but the `navigator.share` path is silent.

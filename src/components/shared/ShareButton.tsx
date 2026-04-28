@@ -16,7 +16,8 @@ export function ShareButton({ text, label = 'Teilen', game }: ShareButtonProps) 
   async function handleShare() {
     const result = await share(text);
     setFeedback(result);
-    if (result === 'copied') showToast('Kopiert!');
+    if (result === 'shared') showToast('Geteilt!');
+    else if (result === 'copied') showToast('Kopiert!');
     if (game) {
       trackGameShared(game, result === 'shared' ? 'share_api' : 'clipboard');
     }
