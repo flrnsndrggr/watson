@@ -16,12 +16,18 @@ const GAME_TABLE: Record<GameType, string> = {
   verbindige: 'verbindige_puzzles',
   zaemesetzli: 'zaemesetzli_puzzles',
   schlagloch: 'schlagloch_puzzles',
+  quizzhuber: 'quizzhuber_puzzles',
+  aufgedeckt: 'aufgedeckt_puzzles',
+  quizzticle: 'quizzticle_puzzles',
 };
 
 const GAME_SELECT: Record<GameType, string> = {
   verbindige: '*',
   zaemesetzli: '*',
   schlagloch: '*',
+  quizzhuber: '*',
+  aufgedeckt: '*',
+  quizzticle: '*',
 };
 
 interface PuzzleRow {

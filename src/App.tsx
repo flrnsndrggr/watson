@@ -23,6 +23,9 @@ const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ defaul
 const VerbindigePage = lazy(() => import('@/games/verbindige/VerbindigePage').then(m => ({ default: m.VerbindigePage })));
 const ZaemesetzliPage = lazy(() => import('@/games/zaemesetzli/ZaemesetzliPage').then(m => ({ default: m.ZaemesetzliPage })));
 const SchlaglochPage = lazy(() => import('@/games/schlagloch/SchlaglochPage').then(m => ({ default: m.SchlaglochPage })));
+const QuizzhuberPage = lazy(() => import('@/games/quizzhuber/QuizzhuberPage').then(m => ({ default: m.QuizzhuberPage })));
+const AufgedecktPage = lazy(() => import('@/games/aufgedeckt/AufgedecktPage').then(m => ({ default: m.AufgedecktPage })));
+const QuizzticlePage = lazy(() => import('@/games/quizzticle/QuizzticlePage').then(m => ({ default: m.QuizzticlePage })));
 const ProfilPage = lazy(() => import('@/pages/ProfilPage').then(m => ({ default: m.ProfilPage })));
 const ArchivPage = lazy(() => import('@/pages/ArchivPage').then(m => ({ default: m.ArchivPage })));
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -54,6 +57,9 @@ export default function App() {
               <Route path="verbindige/edition/:slug" element={<VerbindigeEditionPage />} />
               <Route path="zaemesetzli" element={<ZaemesetzliPage />} />
               <Route path="schlagloch" element={<SchlaglochPage />} />
+              <Route path="quizzhuber" element={<QuizzhuberPage />} />
+              <Route path="aufgedeckt" element={<AufgedecktPage />} />
+              <Route path="quizzticle" element={<QuizzticlePage />} />
               {/* Redirects from the old Schlagziil name so deep links don't 404. */}
               <Route path="schlagziil" element={<Navigate to="/schlagloch" replace />} />
               <Route path="profil" element={<ProfilPage />} />

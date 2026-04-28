@@ -13,6 +13,13 @@
   --color-green: #7BD400;
   --color-blue: #0F6CF5;
 
+  /* Watson extended brand — verified from production CSS:
+     - aubergine is the official press/hover for any magenta surface
+     - watson-red is a true red (#FF0F00), distinct from magenta, used
+       only for breaking/alert states. */
+  --color-pink-hover: #8E0456;
+  --color-watson-red: #FF0F00;
+
   /* Neutrals — watson.ch parity values verified against the live page CSS.
      `--color-nav-bg` matches their `bg-black-90` chrome (#1D1E20).
      `--color-surface-soft` is the light grey watson uses for muted card

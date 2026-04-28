@@ -12,9 +12,15 @@ const GAME_META: Record<GameType, { name: string; emoji: string; color: string }
   verbindige: { name: 'Verbindige', emoji: '🇨🇭', color: 'var(--color-cyan)' },
   zaemesetzli: { name: 'Zämesetzli', emoji: '🧩', color: 'var(--color-green)' },
   schlagloch: { name: 'Schlagloch', emoji: '📰', color: 'var(--color-pink)' },
+  quizzhuber: { name: 'Quizzhuber', emoji: '🤔', color: 'var(--color-blue)' },
+  aufgedeckt: { name: 'Aufgedeckt', emoji: '🔍', color: 'var(--color-cyan)' },
+  quizzticle: { name: 'Quizzticle', emoji: '⏱', color: 'var(--color-pink)' },
 };
 
-const ALL_GAMES: GameType[] = ['verbindige', 'zaemesetzli', 'schlagloch'];
+const ALL_GAMES: GameType[] = [
+  'verbindige', 'zaemesetzli', 'schlagloch',
+  'quizzhuber', 'aufgedeckt', 'quizzticle',
+];
 
 function getToday(): string {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });

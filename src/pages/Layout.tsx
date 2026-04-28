@@ -69,6 +69,9 @@ const NAV_ITEMS = [
   { path: '/verbindige', label: 'Verbindige' },
   { path: '/zaemesetzli', label: 'Zämesetzli' },
   { path: '/schlagloch', label: 'Schlagloch' },
+  { path: '/quizzhuber', label: 'Quizzhuber' },
+  { path: '/aufgedeckt', label: 'Aufgedeckt' },
+  { path: '/quizzticle', label: 'Quizzticle' },
 ];
 
 function LoginModal({ onClose }: { onClose: () => void }) {

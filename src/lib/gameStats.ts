@@ -87,16 +87,33 @@ const ZAEMESETZLI_BUCKETS = [
 type BucketParser = (result: DailyResult) => string;
 type BucketTemplate = { key: string; label: string }[];
 
+// Generic score-string parser used by formats whose summaries are "X/N".
+const parseScoreFractionBucket: BucketParser = (r) => {
+  const m = /^(\d+)\/(\d+)/.exec(r.summary);
+  return m ? `${m[1]}` : '';
+};
+
+const generic10Buckets: BucketTemplate = Array.from({ length: 11 }, (_, i) => ({
+  key: String(i),
+  label: `${i}`,
+}));
+
 const PARSERS: Record<GameType, BucketParser> = {
   verbindige: parseVerbindigeBucket,
   schlagloch: parseSchlaglochBucket,
   zaemesetzli: parseZaemesetzliBucket,
+  quizzhuber: parseScoreFractionBucket,
+  aufgedeckt: parseScoreFractionBucket,
+  quizzticle: parseScoreFractionBucket,
 };
 
 const TEMPLATES: Record<GameType, BucketTemplate> = {
   verbindige: VERBINDIGE_BUCKETS,
   schlagloch: SCHLAGLOCH_BUCKETS,
   zaemesetzli: ZAEMESETZLI_BUCKETS,
+  quizzhuber: generic10Buckets,
+  aufgedeckt: generic10Buckets,
+  quizzticle: generic10Buckets,
 };
 
 /**

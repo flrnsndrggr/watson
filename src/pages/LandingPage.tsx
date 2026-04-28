@@ -47,6 +47,27 @@ const GAMES: GameConfig[] = [
     description: 'Errate die fehlenden W\u00F6rter in watson-Schlagzeilen.',
     gameType: 'schlagloch',
   },
+  {
+    path: '/quizzhuber',
+    name: 'Quizzhuber',
+    emoji: '\u{1F914}',
+    description: '10 Fragen quer durch die Schweiz. Beweg deinen Stolz.',
+    gameType: 'quizzhuber',
+  },
+  {
+    path: '/aufgedeckt',
+    name: 'Aufgedeckt',
+    emoji: '\u{1F50D}',
+    description: 'Erkennst du das Bild, bevor zu viele Felder fallen?',
+    gameType: 'aufgedeckt',
+  },
+  {
+    path: '/quizzticle',
+    name: 'Quizzticle',
+    emoji: '\u23F1',
+    description: 'Schreib alles, was du weisst — gegen die Uhr.',
+    gameType: 'quizzticle',
+  },
 ];
 
 interface GameStatus {
@@ -73,7 +94,10 @@ function hasInProgressForToday(game: GameType, today: string): boolean {
 function loadStatuses(): Record<GameType, GameStatus> {
   const today = getTodayDateCET();
   const dailyResults = getDailyResults();
-  const gameTypes: GameType[] = ['verbindige', 'zaemesetzli', 'schlagloch'];
+  const gameTypes: GameType[] = [
+    'verbindige', 'zaemesetzli', 'schlagloch',
+    'quizzhuber', 'aufgedeckt', 'quizzticle',
+  ];
   const result = {} as Record<GameType, GameStatus>;
   for (const gt of gameTypes) {
     const streak = getStreak(gt);
