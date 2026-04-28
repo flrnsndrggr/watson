@@ -251,19 +251,13 @@ a:focus-visible,
 }
 
 /* ===== DARK MODE ===== */
-/* Respect OS / browser preference. Brand accents (cyan/pink/green/blue)
-   stay immutable; only the neutral white→black track flips. The watson nav
-   is already `--color-nav-bg` (#1A1A1A) so it stays consistent across
-   themes. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-white:    #14161a;  /* page bg */
-    --color-black:    #ECECEC;  /* primary ink */
-    --color-gray-bg:  #2A2D32;  /* surfaces, dividers */
-    --color-gray-text: #9AA0A6; /* secondary ink */
-  }
-  body { color-scheme: dark; }
-}
+/* Auto dark mode is disabled. The page mixes token-backed surfaces with
+   hardcoded Tailwind utilities (bg-white, bg-gray-50, text-black, status
+   palettes), so flipping only the four neutral tokens leaves dozens of
+   surfaces with broken contrast. Pinning to light here until a deliberate
+   dark-mode design pass; OS dark preference no longer toggles inputs or
+   scrollbars either. */
+:root { color-scheme: only light; }
 
 /* ErrorDots pulse on latest filled dot */
 @keyframes error-dot-pulse {
