@@ -145,10 +145,14 @@ export function Layout() {
       {/* Watson-style nav */}
       <header className="sticky top-0 z-40 bg-[var(--color-nav-bg)]">
         <div className="mx-auto flex h-[56px] max-w-[1026px] items-center px-4">
-          <Link to="/" className="mr-6 flex items-center gap-2">
-            <span className="text-lg font-bold text-[var(--color-cyan)]">watson</span>
-            <span className="rounded bg-[var(--color-pink)] px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
-              Spiele
+          <Link to="/" className="mr-6 flex items-baseline gap-1.5">
+            {/* Wordmark mirrors watson.ch chrome: lowercase "watson" in white
+                on black, with a magenta "spiele" suffix marking the sub-brand. */}
+            <span className="font-[family-name:var(--font-heading)] text-xl font-black tracking-tight text-white">
+              watson
+            </span>
+            <span className="font-[family-name:var(--font-heading)] text-xl font-black tracking-tight text-[var(--color-pink)]">
+              spiele
             </span>
           </Link>
           <NavScroller>

@@ -4,6 +4,7 @@ import { GameShell } from '@/components/shared/GameShell';
 import { AdSlot } from '@/components/shared/AdSlot';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { StreakFreezeModal } from '@/components/shared/StreakFreezeModal';
+import { useUserAuth } from '@/lib/userAuthContext';
 import {
   getStreak,
   getStreakRaw,
@@ -169,6 +170,15 @@ export function LandingPage() {
   const statuses = useGameStatuses(statusesNonce);
   const [freezeModalGame, setFreezeModalGame] = useState<GameConfig | null>(null);
   const reloadStatuses = () => setStatusesNonce((n) => n + 1);
+  const { user } = useUserAuth();
+  // First-letter-cased greeting from email local-part — keeps it personal
+  // even before the user has set a username. "max@…" → "Max".
+  const greetingName = (() => {
+    if (!user?.email) return null;
+    const local = user.email.split('@')[0]?.replace(/[._-]+/g, ' ').trim() ?? '';
+    if (!local) return null;
+    return local.charAt(0).toUpperCase() + local.slice(1);
+  })();
   const playedCount = GAMES.filter((g) => statuses[g.gameType].playedToday).length;
   const totalStreak = GAMES.reduce((sum, g) => sum + statuses[g.gameType].streak.current, 0);
   const allPlayed = playedCount === GAMES.length;
@@ -236,8 +246,13 @@ export function LandingPage() {
     <GameShell>
       {/* Hero */}
       <div className="mb-5 text-center">
-        <h1 className="font-[family-name:var(--font-heading)] text-3xl font-bold">
-          watson <span className="text-[var(--color-cyan)]">Spiele</span>
+        {greetingName && (
+          <p className="mb-1 text-sm text-[var(--color-gray-text)]">
+            Hoi, <span className="font-semibold text-[color:var(--ink,var(--color-black))]">{greetingName}</span>!
+          </p>
+        )}
+        <h1 className="font-[family-name:var(--font-heading)] text-3xl font-black tracking-tight">
+          watson <span className="text-[var(--color-pink)]">spiele</span>
         </h1>
         <p className="mt-1 text-sm text-[var(--color-gray-text)] italic">
           Spiel, aber deep.

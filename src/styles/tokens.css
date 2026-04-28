@@ -13,12 +13,22 @@
   --color-green: #7BD400;
   --color-blue: #0F6CF5;
 
-  /* Neutrals */
-  --color-nav-bg: #1A1A1A;
+  /* Neutrals — watson.ch parity values verified against the live page CSS.
+     `--color-nav-bg` matches their `bg-black-90` chrome (#1D1E20).
+     `--color-surface-soft` is the light grey watson uses for muted card
+     surfaces; we previously had no equivalent. */
+  --color-nav-bg: #1D1E20;
   --color-white: #FFFFFF;
   --color-gray-bg: #ECECEC;
+  --color-surface-soft: #F6F6F6;
   --color-black: #000000;
-  --color-gray-text: #777777;
+  --color-gray-text: #8A8A8A;
+
+  /* Page layout — watson.ch uses a 1026px content column. We previously
+     constrained at the game level (600px); keep that for in-game canvases
+     but expose a wider page-level cap so chrome (nav, hero, hub) lines up
+     with the parent site. */
+  --page-max-width: 1026px;
 
   /* Verbindige difficulty — watson palette, not NYT Connections clone.
      cyan → green → blue → pink, from easy to trickiest. Pink is hottest
