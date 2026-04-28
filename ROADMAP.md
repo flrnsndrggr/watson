@@ -291,7 +291,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/components/shared/RankBar.tsx` (lines 57-86), `src/games/zaemesetzli/useZaemesetzli.ts` (submitWord/setRank logic)
     - Evidence: JS DOM read at 2026-04-28 returned `{rankBar:["0 Pkt · noch 8 bis Geselle"]}` while `watson_daily_results` for the same session stored `2026-04-28.zaemesetzli.summary = "3/9 · Lehrling"`. Found list shows Apfelbaum 1pt, Bergsee 1pt, Bergblume 2pt minus 1 Tipp = 3 absolute. Results screen on the same page later shows `Lehrling · 3 Pkt · noch 5 bis Geselle`. Observed 2026-04-28.
 
-13. [ ] P2 - Invalid-combo toast renders over emoji pool, partly obscuring next-click targets
+13. [x] P2 - Invalid-combo toast renders over emoji pool, partly obscuring next-click targets
     - Agent: watson-qa-zaemesetzli
     - Scenario: Invalid Combinations — submitted 🔥+🪨 (Feuer + Stein), no valid compound
     - Problem: The "Keine Kombination gefunden" toast container is positioned at `top-[100px]` (`Toast.tsx:48`). On the Zämesetzli page at desktop widths the toast lands directly over the emoji pool grid. The screenshot from this run shows the toast covering the 🍎 (Apfel), 🏔️ (Berg), and 🌊 (Wasser) buttons for 2.5s. A user who wants to immediately try another combo can't see those emojis and may click through the toast (`pointer-events: auto` on inner div). On mobile (~390px viewport) the visual collision is tighter still since the pool is closer to the top.
