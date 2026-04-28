@@ -8,6 +8,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Stub out unused Supabase submodules to exclude them from the bundle.
+      // The app only uses auth + postgrest; realtime, storage, and functions
+      // are dead weight (~300 KB raw) pulled in by the SupabaseClient constructor.
+      '@supabase/realtime-js': path.resolve(__dirname, './src/lib/stubs/supabase-realtime-stub.ts'),
+      '@supabase/storage-js': path.resolve(__dirname, './src/lib/stubs/supabase-storage-stub.ts'),
+      '@supabase/functions-js': path.resolve(__dirname, './src/lib/stubs/supabase-functions-stub.ts'),
     },
   },
   build: {
