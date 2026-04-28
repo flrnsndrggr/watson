@@ -125,8 +125,25 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
       : await fetchTodaysPuzzle<SchlaglochPuzzleWithAnswers>('schlagloch');
     const fallbackDate = archiveDate ?? getTodayDateCET();
     const puzzle: SchlaglochPuzzle = fetched ?? { ...SAMPLE_SCHLAGLOCH, date: fallbackDate };
-    const answers = fetched?.answers ?? DEMO_ANSWERS;
-    const displayAnswers = fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS;
+    // Each fetched headline carries its own `accepted_answers` + `blanked_word`
+    // — derive the per-headline arrays from those rather than expecting
+    // top-level `answers` / `display_answers` fields (which the DB schema
+    // doesn't have). Fall back to DEMO_* only when no remote puzzle was
+    // returned at all (offline / RLS / network).
+    const headlines = puzzle.headlines as Array<{
+      accepted_answers?: string[];
+      blanked_word?: string;
+    }>;
+    const fromHeadlines =
+      Array.isArray(headlines) &&
+      headlines.length > 0 &&
+      headlines.every((h) => Array.isArray(h.accepted_answers) && h.blanked_word);
+    const answers = fromHeadlines
+      ? headlines.map((h) => h.accepted_answers!)
+      : (fetched?.answers ?? DEMO_ANSWERS);
+    const displayAnswers = fromHeadlines
+      ? headlines.map((h) => h.blanked_word!)
+      : (fetched?.display_answers ?? DEMO_DISPLAY_ANSWERS);
     const isRueckblick = puzzle.headlines.length > STANDARD_HEADLINE_COUNT;
     const maxErrors = isRueckblick ? RUECKBLICK_MAX_ERRORS : STANDARD_MAX_ERRORS;
 

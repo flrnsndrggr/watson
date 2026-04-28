@@ -16,8 +16,10 @@
 // pick up the corrected JS bundle that actually loads today's DB puzzles.
 // v4 = web push handlers (push + notificationclick) — bump so existing SWs
 // install the new handlers on next visit.
-const CACHE_VERSION = 'watson-v4-web-push';
-const API_CACHE = 'watson-api-v4-web-push';
+// v5 = schlagloch reveal fix (DB-derived display answers) — without bump,
+// users with a v4 SW keep showing seed answers on lost-game review.
+const CACHE_VERSION = 'watson-v5-schlagloch-reveal-fix';
+const API_CACHE = 'watson-api-v5-schlagloch-reveal-fix';
 
 // Minimal app-shell URLs cached on install.
 // Vite hashed assets are cached at runtime via fetch handler.
