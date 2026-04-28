@@ -5,7 +5,6 @@
  * Insert-only, fire-and-forget. Failures never block the UI.
  */
 import { supabase } from './supabase';
-import type { GameType } from '@/types';
 
 const ANON_ID_KEY = 'watson_anon_id';
 
@@ -23,7 +22,8 @@ function getAnonId(): string {
 }
 
 interface LogEventOptions {
-  gameType?: GameType;
+  /** Free-form game tag — accepts GameType or any leaderboard variant. */
+  gameType?: string;
   payload?: Record<string, unknown>;
 }
 

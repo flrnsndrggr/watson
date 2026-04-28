@@ -121,3 +121,94 @@ export async function fetchLeaderboard(
     return { entries: [], userRank: null };
   }
 }
+
+// ===== Period leaderboards (week / month / all-time) =====
+
+export type LeaderboardPeriod = 'today' | 'week' | 'month' | 'all';
+
+export interface LeaderboardSummaryEntry {
+  display_name: string;
+  total_score: number;
+  plays: number;
+  is_current_user: boolean;
+  rank: number;
+}
+
+export interface LeaderboardSummary {
+  entries: LeaderboardSummaryEntry[];
+  totalParticipants: number;
+  userRank: number | null;
+  userPercentile: number | null;
+}
+
+/** Returns YYYY-MM-DD for "N days ago" in Europe/Zurich. */
+function cetDaysAgo(days: number): string {
+  return new Date(Date.now() - days * 86_400_000).toLocaleDateString('sv-SE', {
+    timeZone: 'Europe/Zurich',
+  });
+}
+
+function periodWindow(period: LeaderboardPeriod): { start: string; end: string } {
+  const today = getTodayDateCET();
+  if (period === 'today') return { start: today, end: today };
+  if (period === 'week') return { start: cetDaysAgo(6), end: today };
+  if (period === 'month') return { start: cetDaysAgo(29), end: today };
+  // 'all' — start of unix epoch is fine; puzzle_date is text so we need a
+  // sortable lower bound that precedes any real puzzle date.
+  return { start: '1970-01-01', end: today };
+}
+
+/**
+ * Fetch the period leaderboard via the get_leaderboard_summary RPC.
+ * Sums score across the window; ties broken by play count, then by rank
+ * order returned by the SQL window function.
+ */
+export async function fetchLeaderboardSummary(
+  gameType: LeaderboardGameType,
+  period: LeaderboardPeriod,
+  limit: number = 10,
+): Promise<LeaderboardSummary> {
+  try {
+    const { start, end } = periodWindow(period);
+
+    const [{ data: rows }, { data: total }] = await Promise.all([
+      supabase.rpc('get_leaderboard_summary', {
+        p_game_type: gameType,
+        p_start_date: start,
+        p_end_date: end,
+        p_limit: limit,
+      }),
+      supabase.rpc('get_leaderboard_total', {
+        p_game_type: gameType,
+        p_start_date: start,
+        p_end_date: end,
+      }),
+    ]);
+
+    const entries: LeaderboardSummaryEntry[] = (rows ?? []).map((r: {
+      display_name: string;
+      total_score: number | string;
+      plays: number | string;
+      is_current_user: boolean;
+      rank: number | string;
+    }) => ({
+      display_name: r.display_name,
+      total_score: Number(r.total_score),
+      plays: Number(r.plays),
+      is_current_user: r.is_current_user,
+      rank: Number(r.rank),
+    }));
+
+    const totalParticipants = Number(total ?? 0);
+    const me = entries.find((e) => e.is_current_user);
+    const userRank = me?.rank ?? null;
+    const userPercentile =
+      userRank && totalParticipants > 0
+        ? Math.max(1, Math.round((userRank / totalParticipants) * 100))
+        : null;
+
+    return { entries, totalParticipants, userRank, userPercentile };
+  } catch {
+    return { entries: [], totalParticipants: 0, userRank: null, userPercentile: null };
+  }
+}
