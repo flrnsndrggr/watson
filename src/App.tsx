@@ -30,9 +30,9 @@ const ProfilPage = lazy(() => import('@/pages/ProfilPage').then(m => ({ default:
 const ArchivPage = lazy(() => import('@/pages/ArchivPage').then(m => ({ default: m.ArchivPage })));
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
-const AdminVerbindige = lazy(() => import('@/pages/admin/AdminVerbindige').then(m => ({ default: m.AdminVerbindige })));
-const AdminZaemesetzli = lazy(() => import('@/pages/admin/AdminZaemesetzli').then(m => ({ default: m.AdminZaemesetzli })));
-const AdminSchlagloch = lazy(() => import('@/pages/admin/AdminSchlagloch').then(m => ({ default: m.AdminSchlagloch })));
+const AdminSchedule = lazy(() => import('@/pages/admin/AdminSchedule').then(m => ({ default: m.AdminSchedule })));
+const AdminGameList = lazy(() => import('@/pages/admin/AdminGameList').then(m => ({ default: m.AdminGameList })));
+const AdminGameEditor = lazy(() => import('@/pages/admin/AdminGameEditor').then(m => ({ default: m.AdminGameEditor })));
 const AdminVerbindigeEditions = lazy(() => import('@/pages/admin/AdminVerbindigeEditions').then(m => ({ default: m.AdminVerbindigeEditions })));
 const VerbindigeEditionPage = lazy(() => import('@/games/verbindige/VerbindigeEditionPage').then(m => ({ default: m.VerbindigeEditionPage })));
 
@@ -67,11 +67,12 @@ export default function App() {
             </Route>
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
-              <Route path="verbindige" element={<AdminVerbindige />} />
-              <Route path="zaemesetzli" element={<AdminZaemesetzli />} />
-              <Route path="schlagloch" element={<AdminSchlagloch />} />
+              <Route path="schedule" element={<AdminSchedule />} />
               <Route path="schlagziil" element={<Navigate to="/admin/schlagloch" replace />} />
               <Route path="verbindige-editions" element={<AdminVerbindigeEditions />} />
+              <Route path=":game" element={<AdminGameList />} />
+              <Route path=":game/new" element={<AdminGameEditor />} />
+              <Route path=":game/:id" element={<AdminGameEditor />} />
             </Route>
             <Route element={<Layout />}>
               <Route path="*" element={<NotFoundPage />} />

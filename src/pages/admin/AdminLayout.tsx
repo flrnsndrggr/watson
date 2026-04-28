@@ -3,9 +3,13 @@ import { useAuth } from '@/lib/auth';
 
 const ADMIN_NAV = [
   { path: '/admin', label: 'Dashboard', end: true },
+  { path: '/admin/schedule', label: 'Schedule' },
   { path: '/admin/verbindige', label: 'Verbindige' },
   { path: '/admin/zaemesetzli', label: 'Zaemesetzli' },
   { path: '/admin/schlagloch', label: 'Schlagloch' },
+  { path: '/admin/quizzhuber', label: 'Quizzhuber' },
+  { path: '/admin/aufgedeckt', label: 'Aufgedeckt' },
+  { path: '/admin/quizzticle', label: 'Quizzticle' },
   { path: '/admin/verbindige-editions', label: 'Editions' },
 ];
 
