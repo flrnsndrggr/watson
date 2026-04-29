@@ -1,5 +1,37 @@
 # Code Review Findings
 
+## Review — 2026-04-29
+
+### Branch: cms (commits d0f5410..7b3ec76)
+
+2 commits: lost-game share gray squares for auto-revealed Verbindige groups (`7b3ec76`), weekly architecture review update (`d0f5410`).
+
+**CRITICAL** (must fix before merge):
+
+_None._
+
+**WARNING** (should fix):
+
+1. `#555555` gray for `revealedOnLoss` tiles on share card may lack sufficient contrast against `#1A1A1A` background.
+   - File: `src/lib/shareImage.ts:19,203,520`
+   - Problem: The share card background is `#1A1A1A` (dark). The `revealedOnLoss` gray is `#555555`. The contrast ratio is ~3.0:1, which falls below WCAG AA's 3:1 minimum for non-text UI components. On the text-based emoji share (`⬛⬛⬛⬛`), this is fine — black squares are universally understood. But on the canvas share image, the gray-on-dark tiles may be hard to distinguish as intentionally "lost" vs. just dimmed.
+   - Suggested fix: Use a lighter gray (e.g., `#888888` or `C.gray` which is `#777777`) for the loss tiles in the share image, or add a subtle border/pattern to differentiate them from the background.
+
+2. `revealedOnLoss` is optional (`revealedOnLoss?: boolean`) in the `ShareCardGrid` type but not guarded in the emoji path.
+   - File: `src/games/verbindige/VerbindigeResult.tsx:151`
+   - Problem: The ternary `g.revealedOnLoss ? '⬛⬛⬛⬛' : ...` correctly handles `undefined` (falsy → colored emoji). However, the `ShareCardGrid` type at `shareImage.ts:49` marks `revealedOnLoss` as optional. If a future caller constructs a grid without the flag, the behavior is correct (falls through to colored), but a stricter type (`revealedOnLoss: boolean`) would make the intent explicit and prevent accidental omissions.
+   - Suggested fix: Change `revealedOnLoss?: boolean` to `revealedOnLoss: boolean` in the `ShareCardGrid` type, and ensure all callers set it explicitly.
+
+**NOTE** (consider):
+
+1. Architecture review findings in `ROADMAP.md` and `docs/agent/architect-report.md` are documentation-only changes — no code review concerns.
+
+2. The `docs/polish-checklist.md` correctly marks the lost-game share item as completed with date `2026-04-29`. Consistent with the implementation in this branch.
+
+3. The implementation cleanly threads `revealedOnLoss` through the existing data flow: `useVerbindige.ts` sets the flag → `VerbindigeBoard.tsx` filters by it → `VerbindigeResult.tsx` uses it for both emoji text and share image grid → `shareImage.ts` renders gray tiles. Good separation of concerns.
+
+---
+
 ## Review — 2026-04-19
 
 ### Branch: temp-holder (commits 29f7061..31bc00d)
@@ -116,4 +148,5 @@ _None._
 4. AdSlot uses watson design tokens correctly (`--color-gray-bg`, `--color-gray-text`, `--game-tile-radius`) — good brand compliance.
 
 ## Last Reviewed
+- cms: 7b3ec76
 - temp-holder: 87dbe18
