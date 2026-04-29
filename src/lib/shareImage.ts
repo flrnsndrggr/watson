@@ -46,7 +46,7 @@ export interface ShareCardData {
 }
 
 export type ShareCardGrid =
-  | { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4 }[] }
+  | { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4; revealedOnLoss?: boolean }[] }
   | { type: 'schlagloch'; results: ('correct' | 'wrong' | null)[]; hints: boolean[] }
   | {
       type: 'zaemesetzli';
@@ -185,7 +185,7 @@ function drawGrid(
 
 function drawVerbindigeGrid(
   ctx: CanvasRenderingContext2D,
-  grid: { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4 }[] },
+  grid: { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4; revealedOnLoss?: boolean }[] },
   cx: number,
   cy: number,
 ) {
@@ -199,7 +199,8 @@ function drawVerbindigeGrid(
   const y0 = cy - totalH / 2;
 
   for (let ri = 0; ri < rows; ri++) {
-    const color = C.diff[grid.rows[ri].difficulty] ?? C.cyan;
+    const row = grid.rows[ri];
+    const color = row.revealedOnLoss ? C.grayDark : (C.diff[row.difficulty] ?? C.cyan);
     for (let ci = 0; ci < cols; ci++) {
       ctx.fillStyle = color;
       roundRect(ctx, x0 + ci * (size + gap), y0 + ri * (size + gap), size, size, 8);
@@ -501,7 +502,7 @@ function storyDrawGrid(
 
 function storyDrawVerbindigeGrid(
   ctx: CanvasRenderingContext2D,
-  grid: { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4 }[] },
+  grid: { type: 'verbindige'; rows: { difficulty: 1 | 2 | 3 | 4; revealedOnLoss?: boolean }[] },
   cx: number,
   cy: number,
 ) {
@@ -515,7 +516,8 @@ function storyDrawVerbindigeGrid(
   const y0 = cy - totalH / 2;
 
   for (let ri = 0; ri < rows; ri++) {
-    const color = C.diff[grid.rows[ri].difficulty] ?? C.cyan;
+    const row = grid.rows[ri];
+    const color = row.revealedOnLoss ? C.grayDark : (C.diff[row.difficulty] ?? C.cyan);
     for (let ci = 0; ci < cols; ci++) {
       ctx.fillStyle = color;
       roundRect(ctx, x0 + ci * (size + gap), y0 + ri * (size + gap), size, size, 12);
