@@ -25,7 +25,7 @@ interface SolvedGroupProps {
 export function SolvedGroup({ group, isReveal = false }: SolvedGroupProps) {
   const animation = isReveal
     ? 'animate-[groupUnveil_500ms_ease-out_both]'
-    : 'animate-[popIn_var(--transition-normal)]';
+    : 'animate-[groupSlideIn_400ms_ease-out]';
 
   return (
     <div

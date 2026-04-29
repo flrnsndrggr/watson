@@ -159,8 +159,17 @@
 }
 
 @keyframes tileCorrectCollapse {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(0.4) translateY(-20px); opacity: 0; }
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-40px) scale(0.6); opacity: 0; }
+}
+
+/* Verbindige: solved group slides up from tile area with settle overshoot.
+   Tiles fly upward (tileCorrectCollapse) → group rises from below into
+   position, creating visual continuity ("tiles became the group"). */
+@keyframes groupSlideIn {
+  0% { transform: translateY(20px); opacity: 0; }
+  65% { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes shimmer {
