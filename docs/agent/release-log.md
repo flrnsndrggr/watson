@@ -1,5 +1,47 @@
 # Release Log
 
+## Release — 2026-04-29 16:30
+
+- Commits: 6b0706a..389e739 (24 commits)
+- Netlify deploy: skipped (API returned 404 for "latest" deployId)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: healthy (all 200/201, zero errors in last 24h)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl), quizzhuber ✓ (curl), aufgedeckt ✓ (curl), quizzticle ✓ (curl)
+- Skipped checks: Netlify deploy (API 404), Chrome smoke test / JS render / console errors (Chrome MCP not available)
+
+### Notable commits
+- 389e739 review: code review findings for cms branch
+- 7b3ec76 polish: lost-game share shows gray ⬛ for auto-revealed Verbindige groups
+- d0f5410 review: weekly architecture review
+- 086876e fix(lint): clean up React-Compiler-flagged setState-in-effect patterns
+- 5ffe853 feat(quizzhuber): rename display label to "Quizz den Huber"; expand puzzle agent to all six games
+- 5125fd1 fix(profil): list all six games (Quizzhuber, Aufgedeckt, Quizzticle were missing)
+- 870cc4f fix(theme): force light mode until proper dark-mode pass
+- 02f6d91 fix(verbindige): show result screen on reload after win/loss
+- df4c5b5 feat(cms): editor CMS for all six games (schedule, per-format forms, edge function)
+- 60f876f fix(aufgedeckt): replace stale Wikimedia thumbnail URLs
+- 7a8fd69 feat(games): three new recurring formats — Quizzhuber, Aufgedeckt, Quizzticle
+- 95539b1 design: tighten visual fidelity to watson.ch chrome
+- 39022a9 fix(schlagloch): derive answers + display answers from headline rows
+- a18a44f feat(gamification): phase 4 — web push subscriptions (account-agnostic)
+- 2045bc7 feat(gamification): phase 3 — period leaderboards (Heute / Woche / Monat / Allzeit)
+- 0e762bc perf: stub unused Supabase modules — vendor-supabase 48.53KB → 27.09KB gzip
+- 747c318 feat(gamification): phase 2 — achievements (11 launch badges)
+- 99f5744 copy(streaks): rename Eis-Tag → Joker (less Duolingo, more quiz-show)
+
+### Notes
+24 commits over 1 day. Major additions: three new game formats (Quizzhuber, Aufgedeckt, Quizzticle), editor CMS for all six games, gamification phases 2–4 (achievements, period leaderboards, web push). Supabase API is healthy with active real-user traffic across multiple game types and devices (desktop + mobile Safari/Chrome). Without Chrome MCP, JS rendering and console errors could not be verified.
+
+---
+
+## Last Verified
+- Commit: 389e739
+- Date: 2026-04-29
+
+---
+
 ## Release — 2026-04-28 14:00
 
 - Commits: 84370e2..6b0706a (103 commits)
