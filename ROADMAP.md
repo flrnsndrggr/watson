@@ -374,6 +374,34 @@ _Weekly architecture review findings from watson-architect_
    - Files: `src/games/verbindige/VerbindigeTile.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
    - Related: #2 (keyboard navigation) — both are accessibility issues affecting the same files; consider fixing in one pass
 
+4. [ ] P1 - Extract shared game completion hook to reduce 180 lines of duplication
+   - Agent: watson-architect
+   - Scenario: Cross-game code duplication audit (2026-04-29)
+   - Problem: All 6 game hooks duplicate a ~30-line completion chain: `recordGamePlayed()` → `submitLeaderboardEntry()` → `triggerAccountPrompt()` → `checkAchievements()` → `saveDailyResult()` → `clearGameProgress()`. Each also duplicates an identical `persist()` guard pattern.
+   - Suggested fix: Create `useGameCompletion(gameType, score, elapsed)` shared hook in `src/lib/` that handles the full completion flow. Each game hook calls it instead of inlining the chain.
+   - Files: `src/lib/useGameCompletion.ts` (create), all 6 `src/games/*/use<Game>.ts` hooks
+
+5. [ ] P1 - Zaemesetzli drag-drop has no keyboard alternative
+   - Agent: watson-architect
+   - Scenario: Accessibility audit (2026-04-29)
+   - Problem: Emoji selection in Zaemesetzli uses drag-only interaction. `EmojiPool.tsx` has drag handlers but no `onKeyDown`. `CombineSlots.tsx` has drop targets but no keyboard equivalent. Keyboard-only users cannot play.
+   - Suggested fix: Add click-to-select on emoji pool items + Enter to confirm in combine slots as keyboard alternative to drag-drop.
+   - Files: `src/games/zaemesetzli/EmojiPool.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
+
+6. [ ] P1 - Touch targets undersized in PlayCalendar and LeaderboardPanel
+   - Agent: watson-architect
+   - Scenario: Accessibility audit (2026-04-29)
+   - Problem: `PlayCalendar.tsx:168,183` month navigation buttons are ~30px (WCAG requires ≥44px). `LeaderboardPanel.tsx:64` tab buttons are ~20px height. Both are critical interactive controls.
+   - Suggested fix: Add `min-h-[44px] min-w-[44px]` and appropriate padding to these elements.
+   - Files: `src/components/shared/PlayCalendar.tsx`, `src/components/shared/LeaderboardPanel.tsx`
+
+7. [ ] P1 - Text normalization duplicated across 3 games
+   - Agent: watson-architect
+   - Scenario: Cross-game code duplication audit (2026-04-29)
+   - Problem: `normalize()` function duplicated identically in `useAufgedeckt.ts:61-67` and `useQuizzticle.ts:52-58`. `useSchlagloch.ts:74-83` has a variant with German-specific mappings (ä→ae) plus levenshtein distance.
+   - Suggested fix: Extract to `src/lib/textNormalization.ts` with a parametric function supporting both simple and German-specific normalization modes.
+   - Files: `src/lib/textNormalization.ts` (create), `src/games/aufgedeckt/useAufgedeckt.ts`, `src/games/quizzticle/useQuizzticle.ts`, `src/games/schlagloch/useSchlagloch.ts`
+
 ---
 
 ## Content Gaps
