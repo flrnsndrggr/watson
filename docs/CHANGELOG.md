@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-04-29
+
+### Features
+- Editor CMS for all six games — schedule view, per-format forms, edge function (`df4c5b5`)
+- Rename Quizzhuber display label to "Quizz den Huber"; expand puzzle agent to all six games (`5ffe853`)
+
+### Fixes
+- Show Verbindige result screen on reload after win/loss (`02f6d91`)
+- Replace stale Wikimedia thumbnail URLs in Aufgedeckt (`60f876f`)
+- Force light mode until proper dark-mode pass (`870cc4f`)
+- List all six games in Profil (Quizzhuber, Aufgedeckt, Quizzticle were missing) (`5125fd1`)
+- Lock Verbindige back to Mundart Connections / Idiotikon-only (`390fe31`)
+- Clean up React-Compiler-flagged setState-in-effect patterns (`086876e`)
+
+### Polish
+- Lost-game share shows gray ⬛ for auto-revealed Verbindige groups (`7b3ec76`)
+
 ## 2026-04-28
 
 ### Features

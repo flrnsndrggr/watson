@@ -35,7 +35,7 @@ VITE_SUPABASE_ANON_KEY=...
 
 ## Admin Panel
 
-Protected at `/admin` — requires Supabase auth. Includes puzzle editors for Verbindige, Schlagloch, and Zämesetzli.
+Protected at `/admin` — requires Supabase auth. Includes puzzle editors for all six games with schedule view and per-format forms.
 
 ## Mundart Word Sourcing
 
