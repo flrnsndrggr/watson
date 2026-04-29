@@ -147,8 +147,8 @@ export function VerbindigeResult() {
   const orderedGroups = [...solvedGroups].sort(
     (a, b) => a.guessOrder - b.guessOrder,
   );
-  const emojiRows = orderedGroups.map(
-    (g) => DIFFICULTY_EMOJIS[g.difficulty].repeat(4),
+  const emojiRows = orderedGroups.map((g) =>
+    g.revealedOnLoss ? '⬛⬛⬛⬛' : DIFFICULTY_EMOJIS[g.difficulty].repeat(4),
   );
   const emojiGrid = emojiRows.join('\n');
 
@@ -171,6 +171,7 @@ export function VerbindigeResult() {
       type: 'verbindige',
       rows: orderedGroups.map((g) => ({
         difficulty: g.difficulty as 1 | 2 | 3 | 4,
+        revealedOnLoss: g.revealedOnLoss,
       })),
     },
     stats: `${mistakes}/4 Fehler${timeSuffix}`,

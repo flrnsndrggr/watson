@@ -25,7 +25,7 @@ Items for the `watson-game-polish` agent. One item per run, commit to `polish/in
 - [x] Solved groups: show category label with difficulty color background (2026-04-20)
 - [x] Tile grid: ensure 44x44px minimum touch targets on mobile (WCAG AA) (2026-04-20)
 - [x] Deselect all: add "Auswahl löschen" button that clears all selected tiles (2026-04-20)
-- [ ] Lost-game share: auto-revealed groups should show as ⬛⬛⬛⬛ (text) and gray (image), not full color — currently a 4/4 win and a 4/4 loss render identical emoji grids. Requires adding `revealedOnLoss: boolean` to SolvedGroup state, then plumbing through `VerbindigeResult.tsx` and `shareImage.ts`.
+- [x] Lost-game share: auto-revealed groups should show as ⬛⬛⬛⬛ (text) and gray (image), not full color — currently a 4/4 win and a 4/4 loss render identical emoji grids. Requires adding `revealedOnLoss: boolean` to SolvedGroup state, then plumbing through `VerbindigeResult.tsx` and `shareImage.ts`. (2026-04-29)
 
 ## Schlagloch
 
