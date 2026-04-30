@@ -1,5 +1,37 @@
 # Release Log
 
+## Release — 2026-04-30 13:45
+
+- Commits: 389e739..b847301 (8 commits)
+- Netlify deploy: skipped (Netlify MCP not available)
+- Production health: UNKNOWN
+- HTTP status: all routes 200
+- Console errors: skipped (Chrome MCP not available)
+- Supabase: healthy (all 200/201, zero errors in last 24h)
+- Routes checked: landing ✓ (curl), verbindige ✓ (curl), schlagziil ✓ (curl), zaemesetzli ✓ (curl), buchstaebli ✓ (curl)
+- Skipped checks: Netlify deploy (MCP not available), Chrome smoke test / JS render / console errors (Chrome MCP not available)
+
+### Notable commits
+- b847301 review: update last-reviewed SHA for cms (docs-only commits, no app code)
+- 456683f triage: deduplicate and clean up roadmap findings
+- 499b583 docs: sync changelog and update documentation for 2026-04-29
+- 30b4582 release: verify deployment — UNKNOWN
+- d82957d review: code review findings for cms branch
+- 252aed7 polish: lost-game share shows gray ⬛ for auto-revealed Verbindige groups
+- b8ba379 review: weekly architecture review
+- a2445c0 feat(verbindige): slide-up animation for correct groups
+
+### Notes
+8 commits, mostly docs/review. Two app-level changes: slide-up animation for correct Verbindige groups (a2445c0) and gray ⬛ squares for auto-revealed groups in lost-game share (252aed7). Supabase API healthy with active real-user traffic across verbindige, schlagloch, zaemesetzli, quizzhuber, and gamification endpoints from desktop and mobile. Without Chrome MCP, JS rendering and console errors could not be verified.
+
+---
+
+## Last Verified
+- Commit: b847301
+- Date: 2026-04-30
+
+---
+
 ## Release — 2026-04-29 16:30
 
 - Commits: 6b0706a..389e739 (24 commits)
@@ -33,12 +65,6 @@
 
 ### Notes
 24 commits over 1 day. Major additions: three new game formats (Quizzhuber, Aufgedeckt, Quizzticle), editor CMS for all six games, gamification phases 2–4 (achievements, period leaderboards, web push). Supabase API is healthy with active real-user traffic across multiple game types and devices (desktop + mobile Safari/Chrome). Without Chrome MCP, JS rendering and console errors could not be verified.
-
----
-
-## Last Verified
-- Commit: 389e739
-- Date: 2026-04-29
 
 ---
 
