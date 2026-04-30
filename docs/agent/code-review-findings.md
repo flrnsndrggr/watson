@@ -148,5 +148,5 @@ _None._
 4. AdSlot uses watson design tokens correctly (`--color-gray-bg`, `--color-gray-text`, `--game-tile-radius`) — good brand compliance.
 
 ## Last Reviewed
-- cms: 7b3ec76
+- cms: 7cc4d52
 - temp-holder: 87dbe18
