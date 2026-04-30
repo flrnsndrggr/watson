@@ -3,6 +3,7 @@
 ## 2026-04-29
 
 ### Features
+- Verbindige slide-up animation for correct groups (`a2445c0`)
 - Editor CMS for all six games — schedule view, per-format forms, edge function (`df4c5b5`)
 - Rename Quizzhuber display label to "Quizz den Huber"; expand puzzle agent to all six games (`5ffe853`)
 
@@ -15,7 +16,7 @@
 - Clean up React-Compiler-flagged setState-in-effect patterns (`086876e`)
 
 ### Polish
-- Lost-game share shows gray ⬛ for auto-revealed Verbindige groups (`7b3ec76`)
+- Lost-game share shows gray ⬛ for auto-revealed Verbindige groups (`252aed7`)
 
 ## 2026-04-28
 
