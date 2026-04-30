@@ -392,12 +392,13 @@ _Weekly architecture review findings from watson-architect_
    - Priority adjusted from P1 to P2: click-to-select and Tab+Enter already work; this is a polish improvement for keyboard efficiency, not a complete blocker
    - Triage note (2026-04-29): Original description ("drag-only interaction", "keyboard-only users cannot play") was inaccurate. `EmojiPool.tsx:45` has `onClick={onSelect}`, `CombineSlots.tsx:103` has `onClick`, and `ZaemesetzliPage.tsx:156` has page-level keydown handler. Basic keyboard play is functional.
 
-6. [ ] P1 - Touch targets undersized in PlayCalendar and LeaderboardPanel
+6. [ ] P2 - Touch targets undersized in PlayCalendar and LeaderboardPanel
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-29)
-   - Problem: `PlayCalendar.tsx:168,183` month navigation buttons are ~30px (WCAG requires ≥44px). `LeaderboardPanel.tsx:64` tab buttons are ~20px height. Both are critical interactive controls.
+   - Problem: `PlayCalendar.tsx:168,183` month navigation buttons use `p-1.5` (~30px rendered height). `LeaderboardPanel.tsx:64` tab buttons use `px-2.5 py-1` (~20px height). Both fall below WCAG 2.5.5's ≥44px minimum.
    - Suggested fix: Add `min-h-[44px] min-w-[44px]` and appropriate padding to these elements.
-   - Files: `src/components/shared/PlayCalendar.tsx`, `src/components/shared/LeaderboardPanel.tsx`
+   - Files: `src/components/shared/PlayCalendar.tsx` (lines 168, 183), `src/components/shared/LeaderboardPanel.tsx` (line 64)
+   - Priority adjusted from P1 to P2: PlayCalendar and LeaderboardPanel are secondary post-game UI, not core gameplay surfaces; undersized targets are a polish issue, not "confusing UX blocking real gameplay"
    - Related: #5 — both are accessibility issues; consider fixing together
 
 7. [ ] P2 - Text normalization duplicated across 3 games
