@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { GameShell } from '@/components/shared/GameShell';
 import { GameHeader } from '@/components/shared/GameHeader';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { useAufgedeckt } from './useAufgedeckt';
 import { AufgedecktResult } from './AufgedecktResult';
 
@@ -11,6 +12,7 @@ const DEFAULT_ROWS = 5;
 export function AufgedecktPage() {
   const [params] = useSearchParams();
   const archiveDate = params.get('date') ?? undefined;
+  const reducedMotion = usePrefersReducedMotion();
   const {
     puzzle,
     currentIndex,
@@ -24,6 +26,74 @@ export function AufgedecktPage() {
     skipRound,
     next,
   } = useAufgedeckt();
+
+  // Track tiles currently animating their flip
+  const [flippingTiles, setFlippingTiles] = useState<Set<number>>(new Set());
+  // Track tiles being wave-cleared on correct answer
+  const [waveClearTiles, setWaveClearTiles] = useState<Set<number>>(new Set());
+  // Track whether we just got a correct answer (for image border pulse)
+  const [correctFlash, setCorrectFlash] = useState(false);
+
+  // Reset animation state when round changes
+  useEffect(() => {
+    setFlippingTiles(new Set());
+    setWaveClearTiles(new Set());
+    setCorrectFlash(false);
+  }, [currentIndex]);
+
+  const handleRevealTile = useCallback((tileIndex: number) => {
+    if (reducedMotion) {
+      revealTile(tileIndex);
+      return;
+    }
+    // Start flip animation, then actually reveal after it completes
+    setFlippingTiles((prev) => new Set(prev).add(tileIndex));
+    setTimeout(() => {
+      revealTile(tileIndex);
+      setFlippingTiles((prev) => {
+        const next = new Set(prev);
+        next.delete(tileIndex);
+        return next;
+      });
+    }, 300);
+  }, [revealTile, reducedMotion]);
+
+  // Wrap submitGuess to trigger wave-clear + confetti on correct
+  const handleSubmit = useCallback((guess: string): boolean => {
+    const ok = submitGuess(guess);
+    if (ok && puzzle) {
+      const round = puzzle.rounds[currentIndex];
+      const cols = round.cols ?? DEFAULT_COLS;
+      const rows = round.rows ?? DEFAULT_ROWS;
+      const tilesTotal = cols * rows;
+      const revealed = new Set(revealedTiles[currentIndex] ?? []);
+
+      // Green pulse on image container
+      setCorrectFlash(true);
+      setTimeout(() => setCorrectFlash(false), 800);
+
+      if (!reducedMotion) {
+        // Wave-clear remaining tiles with staggered delay
+        const remaining = Array.from({ length: tilesTotal }, (_, i) => i)
+          .filter((i) => !revealed.has(i));
+
+        remaining.forEach((tileIdx, order) => {
+          const delay = order * 40; // 40ms stagger per tile
+          setTimeout(() => {
+            setWaveClearTiles((prev) => new Set(prev).add(tileIdx));
+          }, delay);
+        });
+
+        // Confetti after wave starts
+        setTimeout(() => {
+          void import('canvas-confetti').then(({ default: confetti }) => {
+            void confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
+          });
+        }, 200);
+      }
+    }
+    return ok;
+  }, [submitGuess, puzzle, currentIndex, revealedTiles, reducedMotion]);
 
   useEffect(() => {
     void loadPuzzle(archiveDate);
@@ -54,8 +124,6 @@ export function AufgedecktPage() {
   const total = puzzle.rounds.length;
   const isLast = currentIndex >= total - 1;
 
-  // No-op — handleSubmit lives inside the GuessForm child.
-
   return (
     <GameShell>
       <GameHeader title="Aufgedeckt" puzzleId={String(puzzle.episode)} />
@@ -67,7 +135,13 @@ export function AufgedecktPage() {
       </div>
 
       {/* Image with tile grid overlay */}
-      <div className="relative mx-auto overflow-hidden rounded-lg border-2 border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]" style={{ aspectRatio: `${cols} / ${rows}` }}>
+      <div
+        className="relative mx-auto overflow-hidden rounded-lg border-2 border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]"
+        style={{
+          aspectRatio: `${cols} / ${rows}`,
+          ...(correctFlash ? { animation: 'imageCorrectPulse 800ms ease-out' } : {}),
+        }}
+      >
         <img
           src={round.image_url}
           alt={result ? round.answer : 'Verstecktes Bild'}
@@ -79,20 +153,46 @@ export function AufgedecktPage() {
             style={{
               gridTemplateColumns: `repeat(${cols}, 1fr)`,
               gridTemplateRows: `repeat(${rows}, 1fr)`,
+              perspective: '600px',
             }}
             aria-label="Felder"
           >
             {Array.from({ length: tilesTotal }, (_, i) => {
               const isRevealed = revealed.has(i);
+              const isFlipping = flippingTiles.has(i);
+              const isWaveClearing = waveClearTiles.has(i);
+
+              if (isRevealed && !isWaveClearing) {
+                // Already revealed — invisible placeholder to maintain grid
+                return (
+                  <div
+                    key={i}
+                    className="border border-transparent"
+                    aria-label="Feld aufgedeckt"
+                  />
+                );
+              }
+
               return (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => revealTile(i)}
-                  disabled={isRevealed}
-                  className={`border border-white/20 transition-opacity ${
-                    isRevealed ? 'opacity-0' : 'bg-[var(--color-nav-bg)] hover:opacity-90'
+                  onClick={() => handleRevealTile(i)}
+                  disabled={isRevealed || isFlipping || isWaveClearing}
+                  className={`border border-white/20 bg-[var(--color-nav-bg)] ${
+                    !isFlipping && !isWaveClearing ? 'hover:brightness-125 active:scale-95' : ''
                   }`}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    backfaceVisibility: 'hidden',
+                    transition: 'transform 0.1s ease, filter 0.15s ease',
+                    ...(isFlipping ? {
+                      animation: 'tileFlip 300ms ease-in forwards',
+                    } : {}),
+                    ...(isWaveClearing ? {
+                      animation: 'tileWaveClear 400ms ease-in forwards',
+                    } : {}),
+                  }}
                   aria-label={isRevealed ? 'Feld aufgedeckt' : `Feld ${i + 1} aufdecken`}
                 />
               );
@@ -113,7 +213,7 @@ export function AufgedecktPage() {
       {!result ? (
         <GuessForm
           key={currentIndex}
-          onSubmit={submitGuess}
+          onSubmit={handleSubmit}
           onSkip={skipRound}
         />
       ) : (
@@ -149,19 +249,28 @@ function GuessForm({
 }) {
   const [guess, setGuess] = useState('');
   const [feedback, setFeedback] = useState<'wrong' | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const ok = onSubmit(guess);
-    if (!ok) {
+    if (ok) {
+      setGuess('');
+    } else {
       setFeedback('wrong');
       setTimeout(() => setFeedback(null), 600);
     }
   }
 
+  // Auto-focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
       <input
+        ref={inputRef}
         type="text"
         value={guess}
         onChange={(e) => setGuess(e.target.value)}

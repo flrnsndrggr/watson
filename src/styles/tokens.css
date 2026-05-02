@@ -307,6 +307,27 @@ a:focus-visible,
   to { opacity: 0; transform: translateX(-24px) scale(0.97); }
 }
 
+/* Aufgedeckt: tile flips over to reveal image beneath */
+@keyframes tileFlip {
+  0% { transform: rotateY(0deg); opacity: 1; }
+  50% { transform: rotateY(90deg); opacity: 1; }
+  100% { transform: rotateY(90deg); opacity: 0; }
+}
+
+/* Aufgedeckt: wave-clear — tiles flip away when answer is correct */
+@keyframes tileWaveClear {
+  0% { transform: scale(1) rotateY(0deg); opacity: 1; }
+  40% { transform: scale(1.06) rotateY(40deg); opacity: 1; }
+  100% { transform: scale(0.8) rotateY(90deg); opacity: 0; }
+}
+
+/* Aufgedeckt: image border pulses green on correct answer */
+@keyframes imageCorrectPulse {
+  0% { box-shadow: 0 0 0 0 rgba(123, 212, 0, 0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(123, 212, 0, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(123, 212, 0, 0); }
+}
+
 /* Reduced motion — neuter animations/transitions but preserve layout transforms (e.g. translateX(-50%) for centering) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
