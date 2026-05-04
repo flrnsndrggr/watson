@@ -3,12 +3,9 @@ import type { AufgedecktPuzzle, StreakData } from '@/types';
 import { SAMPLE_AUFGEDECKT } from './aufgedeckt.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { getTodayDateCET } from '@/lib/dateUtils';
-import { recordGamePlayed, getStreak } from '@/lib/streaks';
-import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { saveDailyResult } from '@/lib/dailyResults';
+import { getStreak } from '@/lib/streaks';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
-import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
-import { checkAchievements } from '@/lib/achievements';
+import { completeGame } from '@/lib/completeGame';
 
 const DEFAULT_COLS = 5;
 const DEFAULT_ROWS = 5;
@@ -171,15 +168,16 @@ export const useAufgedeckt = create<AufgedecktState>((set, get) => ({
     const elapsed = startedAt ? Math.round((Date.now() - startedAt) / 1000) : null;
 
     if (!isArchive) {
-      const streak = recordGamePlayed('aufgedeckt');
-      void submitLeaderboardEntry('aufgedeckt', correct, totalRevealed);
-      triggerAccountPrompt(streak.current);
-      setTimeout(() => { void checkAchievements(); }, 0);
-      saveDailyResult('aufgedeckt', {
-        outcome: correct >= total / 2 ? 'won' : 'lost',
-        summary: `${correct}/${total} · ${totalRevealed} Felder`,
-        timeSeconds: elapsed,
-        perfect: correct === total,
+      const streak = completeGame({
+        gameType: 'aufgedeckt',
+        score: correct,
+        elapsed: totalRevealed,
+        dailyResult: {
+          outcome: correct >= total / 2 ? 'won' : 'lost',
+          summary: `${correct}/${total} · ${totalRevealed} Felder`,
+          timeSeconds: elapsed,
+          perfect: correct === total,
+        },
       });
       set({ streak });
     }

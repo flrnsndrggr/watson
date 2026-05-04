@@ -3,12 +3,9 @@ import type { QuizzticlePuzzle, StreakData } from '@/types';
 import { SAMPLE_QUIZZTICLE } from './quizzticle.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { getTodayDateCET } from '@/lib/dateUtils';
-import { recordGamePlayed, getStreak } from '@/lib/streaks';
-import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { saveDailyResult } from '@/lib/dailyResults';
+import { getStreak } from '@/lib/streaks';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
-import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
-import { checkAchievements } from '@/lib/achievements';
+import { completeGame } from '@/lib/completeGame';
 
 interface QuizzticleState {
   puzzle: QuizzticlePuzzle | null;
@@ -145,15 +142,16 @@ export const useQuizzticle = create<QuizzticleState>((set, get) => ({
     const elapsed = startedAt ? Math.round((Date.now() - startedAt) / 1000) : null;
 
     if (!isArchive) {
-      const streak = recordGamePlayed('quizzticle');
-      void submitLeaderboardEntry('quizzticle', score, elapsed);
-      triggerAccountPrompt(streak.current);
-      setTimeout(() => { void checkAchievements(); }, 0);
-      saveDailyResult('quizzticle', {
-        outcome: score === puzzle.items.length ? 'won' : 'lost',
-        summary: `${score}/${puzzle.items.length}`,
-        timeSeconds: elapsed,
-        perfect: score === puzzle.items.length,
+      const streak = completeGame({
+        gameType: 'quizzticle',
+        score,
+        elapsed,
+        dailyResult: {
+          outcome: score === puzzle.items.length ? 'won' : 'lost',
+          summary: `${score}/${puzzle.items.length}`,
+          timeSeconds: elapsed,
+          perfect: score === puzzle.items.length,
+        },
       });
       set({ streak });
     }

@@ -375,7 +375,7 @@ _Weekly architecture review findings from watson-architect_
    - Files: `src/games/verbindige/VerbindigeTile.tsx`, `src/games/zaemesetzli/CombineSlots.tsx`
    - Related: #2 (keyboard navigation) — both are accessibility issues affecting the same files; consider fixing in one pass
 
-4. [ ] P2 - Extract shared game completion hook to reduce 180 lines of duplication
+4. [x] P2 - Extract shared game completion hook to reduce 180 lines of duplication
    - Agent: watson-architect
    - Scenario: Cross-game code duplication audit (2026-04-29)
    - Problem: All 6 game hooks duplicate a ~30-line completion chain: `recordGamePlayed()` → `submitLeaderboardEntry()` → `triggerAccountPrompt()` → `checkAchievements()` → `saveDailyResult()` → `clearGameProgress()`. Each also duplicates an identical `persist()` guard pattern.
