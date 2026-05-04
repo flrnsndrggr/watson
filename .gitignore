@@ -11,8 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Env vars — never commit secrets. Allow a public template.
 .env
-.env.local
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -27,3 +30,13 @@ dist-ssr
 
 # Supabase CLI scratch
 supabase/.temp/
+
+# Netlify CLI scratch. Keep state.json tracked — it links the repo to the
+# Netlify site, not a secret.
+.netlify/*
+!.netlify/state.json
+
+# Claude Code workspace scratch. Keep launch.json tracked (preview-server
+# config, shared with the team); ignore per-user settings and worktrees.
+.claude/*
+!.claude/launch.json

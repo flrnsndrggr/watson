@@ -1,53 +1,63 @@
-Subject: watson Spiele — Admin login is changing (action needed before next deploy)
+Subject: watson Spiele — admin auth migrated to real accounts (action needed: editor list)
 
 Hi team,
 
-Quick heads-up on a change to how /admin works on watson-spiele, and two
-small things I need from you.
+Heads-up on a security cleanup that's now live on watson-spiele, and one
+small thing I need from you.
 
-**What's changing**
+**What changed**
 
-Until now, every editor used the same shared password to get into /admin
-(`letsplayagame`). That password was visible to anyone who opened devtools
-on the site — not really a secret. I've replaced it with proper Supabase
-accounts: each editor signs in with their own e-mail and password, and an
-"admin" role on their account unlocks the editor.
+The `/admin` editor used to be gated by a single shared password
+(`letsplayagame`) that was visible to anyone who opened devtools. The
+backend Edge Function had the same problem with a matching shared secret,
+and the branded-editions table allowed any logged-in player to write to
+it. All three holes are now closed.
 
-Functionally nothing about the editor UI changes — same dashboards, same
-flows. The only difference is the login screen now asks for an e-mail
-instead of a username.
+**The new flow** — same as the player login:
+
+1. Click "Anmelden" in the header (or "Admin" in the footer — they do the
+   same thing now).
+2. Enter your email → click the magic link in your inbox.
+3. If your account has been granted admin access, an "Admin" chip
+   appears in the header. Click it to enter the editor.
+
+There is no password and no shared secret anywhere. Admin status is set
+server-side per account (`app_metadata.role = 'admin'`) and can only be
+written with the service-role key, so a regular signed-up player cannot
+promote themselves.
 
 **What I need from you**
 
-1. **A list of who needs admin access.** Send me the e-mail addresses of
-   anyone on the team who should be able to edit puzzles. I'll provision
-   them in Supabase and they'll get an invitation e-mail to set a password.
+**Send me a list of editor email addresses.** For each one, I'll grant
+admin access in Supabase. Two cases:
 
-2. **Stop sharing the old password.** Once we deploy, `letsplayagame` no
-   longer works. Anyone who tries it will just see a generic "invalid
-   credentials" error.
+- If they already use watson-spiele as a player (already signed up via
+  magic-link), promotion is instant — they'll see the Admin chip on
+  their next sign-in.
+- If they don't have an account yet, they sign up via the regular
+  Anmelden flow first; ping me and I'll promote them. Or I can invite
+  them from the Supabase dashboard, which sends a sign-up email.
 
-**Two follow-ups on my end**
+**Stop sharing the old password.** `letsplayagame` no longer works —
+anyone who tries it gets a generic "invalid credentials" error.
 
-There are two server-side hardening steps still to land — most importantly,
-locking down direct writes to the branded `verbindige_editions` table and
-retiring the last shared secret from the bundle. I've documented both in
-the repo (docs/admin-auth-rls.md) and I'll schedule them for the next
-sprint. The login change shipping now is independent of those — no regression
-vs. today, and it's the prerequisite for the rest.
+**What's already shipped (no action from you)**
 
-Happy to walk through any of this on a call. Two small open questions where
-your input would help:
+- Magic-link admin login replacing the shared password.
+- The Edge Function (`cms-mutate`) verifies the caller's identity and
+  rejects anyone whose role isn't `admin`.
+- Row-level security on the puzzle tables and the editions table —
+  admin-only writes, defence-in-depth on top of the Edge Function.
+- First admin (me) provisioned and verified end-to-end.
 
-- **Magic-link vs password for admin login** — I went with password for
-  speed, but we could match the player flow (e-mail-only magic links) if
-  you'd prefer the consistency. Small change either way.
-- **Self-serve admin user management** — currently I add/remove admins via
-  SQL. Worth building a tiny UI for it, or fine to keep it as an engineer
-  task for now?
+**One open question**
 
-Let me know on (1) and (2) above when you have a sec — I'd like to deploy
-this in the next couple of days.
+We currently manage the admin list via SQL — me running an `update` per
+editor. Fine for a fixed team of 2–5. If editor turnover is high or you
+want to manage admins yourselves without me in the loop, I can ship a
+small admin-user-management UI (~half a day). Worth doing now or later?
+
+Happy to walk through any of this on a call.
 
 Thanks,
 F
