@@ -5,6 +5,17 @@
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+    # CSP: strict script-src (no inline JS), permissive img-src (admin-supplied URLs),
+    # 'unsafe-inline' on style-src for Tailwind/React inline styles.
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://digital.idiotikon.ch; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

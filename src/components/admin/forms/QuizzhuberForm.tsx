@@ -23,6 +23,13 @@ export function QuizzhuberForm({ value, onChange }: { value: QuizzhuberPayload; 
   const updateQ = (i: number, patch: Partial<QuizzhuberQuestion>) =>
     onChange({ ...value, questions: value.questions.map((q, j) => j === i ? { ...q, ...patch } : q) });
 
+  // Only https:// URLs are accepted — blocks javascript:, data:, http: at the input boundary.
+  const sanitizeImageUrl = (raw: string): string | undefined => {
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    return /^https:\/\//i.test(trimmed) ? trimmed : undefined;
+  };
+
   return (
     <JsonModeToggle value={value} onChange={onChange}>
       <div className="space-y-4">
@@ -56,8 +63,9 @@ export function QuizzhuberForm({ value, onChange }: { value: QuizzhuberPayload; 
               className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm font-semibold" />
             <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-2">
               <input type="url" value={q.image_url ?? ''}
-                onChange={(e) => updateQ(i, { image_url: e.target.value || undefined })}
-                placeholder="Bild-URL (optional)"
+                onChange={(e) => updateQ(i, { image_url: sanitizeImageUrl(e.target.value) })}
+                placeholder="Bild-URL (https://…, optional)"
+                pattern="https://.*"
                 className="rounded border border-gray-200 px-2 py-1.5 text-xs" />
               <input type="text" value={q.image_alt ?? ''}
                 onChange={(e) => updateQ(i, { image_alt: e.target.value || undefined })}

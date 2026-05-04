@@ -156,6 +156,8 @@ export function QuizzhuberPage() {
           <img
             src={q.image_url}
             alt={q.image_alt ?? ''}
+            referrerPolicy="no-referrer"
+            loading="lazy"
             className="mt-2 max-h-48 w-full rounded-lg border border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]/30 object-contain"
           />
         )}
