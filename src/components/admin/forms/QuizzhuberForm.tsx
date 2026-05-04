@@ -54,6 +54,16 @@ export function QuizzhuberForm({ value, onChange }: { value: QuizzhuberPayload; 
             <textarea value={q.prompt} onChange={(e) => updateQ(i, { prompt: e.target.value })}
               placeholder="Frage" rows={2}
               className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm font-semibold" />
+            <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-2">
+              <input type="url" value={q.image_url ?? ''}
+                onChange={(e) => updateQ(i, { image_url: e.target.value || undefined })}
+                placeholder="Bild-URL (optional)"
+                className="rounded border border-gray-200 px-2 py-1.5 text-xs" />
+              <input type="text" value={q.image_alt ?? ''}
+                onChange={(e) => updateQ(i, { image_alt: e.target.value || undefined })}
+                placeholder="Alt-Text (optional)"
+                className="rounded border border-gray-200 px-2 py-1.5 text-xs" />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {q.options.map((opt, oi) => (
                 <label key={oi} className={`flex items-center gap-2 rounded border px-2 py-1.5 cursor-pointer ${

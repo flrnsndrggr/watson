@@ -140,6 +140,10 @@ export interface QuizzhuberQuestion {
   correct_index: number;
   explanation?: string;
   category?: string;
+  /** Optional illustration shown above the prompt (engagement, not a puzzle element). */
+  image_url?: string;
+  /** Alt text for the illustration. Empty/missing = decorative. */
+  image_alt?: string;
 }
 
 // ===== Aufgedeckt (image-tile reveal, weekly) =====

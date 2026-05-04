@@ -51,6 +51,8 @@ export const SAMPLE_QUIZZHUBER: QuizzhuberPuzzle = {
       correct_index: 1,
       category: 'Musik',
       explanation: 'Züri West — trotz dem irreführenden Namen — ist die Berner Mundart-Rockband schlechthin.',
+      image_url: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Musikinstrumenten-Museum_Berlin_-_Alphorn_in_Fis_-_1108187.jpg',
+      image_alt: 'Alphorn — Schweizer Musikinstrument',
     },
     {
       prompt: 'Welcher Schweizer gewann 2022 Tour-de-Suisse?',

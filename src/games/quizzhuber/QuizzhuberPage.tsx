@@ -152,6 +152,13 @@ export function QuizzhuberPage() {
             {q.category}
           </span>
         )}
+        {q.image_url && (
+          <img
+            src={q.image_url}
+            alt={q.image_alt ?? ''}
+            className="mt-2 max-h-48 w-full rounded-lg border border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]/30 object-contain"
+          />
+        )}
         <h2 className="mt-2 font-[family-name:var(--font-heading)] text-lg font-bold leading-snug">
           {currentIndex + 1}. {q.prompt}
         </h2>
