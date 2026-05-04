@@ -299,7 +299,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Files: `src/components/shared/Toast.tsx` (line 48)
     - Evidence: Screenshot taken immediately after submitting 🔥+🪨 shows the dark "Keine Kombination gefunden" pill horizontally centered at y≈155, covering the row of emoji tiles. Toast dwell time is 2.5s + 0.5s fade per `Toast.tsx:32-37`. Observed 2026-04-28.
 
-14. [ ] P2 - 🌲 (Tanne) emoji used as "Wald" in 3 of 9 compounds with no in-UI guidance
+14. [!] P2 - 🌲 (Tanne) emoji used as "Wald" in 3 of 9 compounds with no in-UI guidance
     - Agent: watson-qa-zaemesetzli
     - Scenario: Completion + Share — viewed full word list after finishing
     - Problem: The 2026-04-28 puzzle's `valid_compounds` includes Bergwald (🏔️+🌲, 1pt), Waldblume (🌲+🌼, 2pt), and Waldfeuer (🌲+🔥, 2pt) — three of nine compounds where 🌲 must be read as "Wald" (forest), not its canonical "Tanne" (fir). The accessibility name on the button is "Tanne" (`read_page` confirmed `button "Tanne"`), so a logical player tries "Tannenwald" or skips these. The Tipp button reveals the emoji pair but never surfaces the alt-noun "Wald", leaving the player guessing. This is the same anti-pattern as Zämesetzli #7/#8 (🔑→Schein/Schloss, ☀️→Sonntag) but fresh in the live puzzle data.
@@ -308,6 +308,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Evidence: "Nicht gefunden" list at game-end showed Bergwald 🏔️🌲, Waldblume 🌲🌼, Waldfeuer 🌲🔥. Live `read_page` returned `button "Tanne"` for the 🌲 button. 3/9 compounds depend on this stand-in. Observed 2026-04-28.
     - Related: Zämesetzli #7, #8 — same root cause; expanding alt_nouns + tooltip patch would fix all three
     - Triage note (2026-04-28): Valid P2. This is a per-puzzle data issue in Supabase, same anti-pattern as #7/#8. Fix requires updating the `zaemesetzli_puzzles` row in Supabase for 2026-04-28 to add "Wald" to 🌲's alt_nouns. The long-term hint-text fix is already tracked in #7.
+    - Note: Requires manual review — Supabase data fix for past puzzle date (2026-04-28); no local code change possible
 
 15. [x] P2 - "Ergebnis teilen" on desktop has no visible feedback when share dialog is dismissed or unavailable
     - Agent: watson-qa-zaemesetzli
@@ -319,7 +320,7 @@ _Items from watson-qa-zaemesetzli agent_
     - Related: Zämesetzli #2 — same surface; this finding extends the fix to the `navigator.share` path
     - Triage note (2026-04-28): Valid P2. `share.ts` already has try/catch on `navigator.share` (fixed since #2). The gap is narrower than described: `ShareButton.tsx:19` shows toast only for `'copied'`, not for `'shared'`. On share-dialog dismiss, clipboard fallback fires and "Kopiert!" toast appears — so the dismiss path works. Only the successful `navigator.share` path is silent (browser share dialog is arguably sufficient feedback). One-line fix in ShareButton.tsx.
 
-16. [ ] P2 - Streak pill "🔥 1 Tag" on results screen lacks label or tooltip
+16. [x] P2 - Streak pill "🔥 1 Tag" on results screen lacks label or tooltip
     - Agent: watson-qa-zaemesetzli
     - Scenario: Completion + Share — read post-game results panel
     - Problem: The results screen shows a pink pill containing only `🔥 1 Tag` with no surrounding caption (e.g. "Tagesstreak"). A first-time player sees this number and has no way to know it represents a play-day streak. The pill is visually prominent (brand pink) so users will look at it; the missing context makes it feel like a random badge. On desktop there's no native tooltip (`title` attribute) either, so even `:hover` reveals nothing.
@@ -383,7 +384,7 @@ _Weekly architecture review findings from watson-architect_
    - Priority adjusted from P1 to P2: pure code deduplication with no user-facing impact — not confusing UX or broken gameplay
    - Related: #7 — both are cross-game code dedup tasks; consider fixing together
 
-5. [ ] P2 - Zaemesetzli emoji pool lacks arrow-key grid navigation
+5. [x] P2 - Zaemesetzli emoji pool lacks arrow-key grid navigation
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-29)
    - Problem: `EmojiPool.tsx` emoji items are `<button>` elements with `onClick` and `draggable` — click and Tab+Enter already work for keyboard users. `CombineSlots.tsx` also has `onClick` handlers. Page-level `keydown` listener exists in `ZaemesetzliPage.tsx:156`. The remaining gap is arrow-key grid navigation between emoji buttons (Tab-cycling through 8+ buttons is slow). No `onKeyDown` on individual emoji buttons for directional movement.
@@ -392,7 +393,7 @@ _Weekly architecture review findings from watson-architect_
    - Priority adjusted from P1 to P2: click-to-select and Tab+Enter already work; this is a polish improvement for keyboard efficiency, not a complete blocker
    - Triage note (2026-04-29): Original description ("drag-only interaction", "keyboard-only users cannot play") was inaccurate. `EmojiPool.tsx:45` has `onClick={onSelect}`, `CombineSlots.tsx:103` has `onClick`, and `ZaemesetzliPage.tsx:156` has page-level keydown handler. Basic keyboard play is functional.
 
-6. [ ] P2 - Touch targets undersized in PlayCalendar and LeaderboardPanel
+6. [x] P2 - Touch targets undersized in PlayCalendar and LeaderboardPanel
    - Agent: watson-architect
    - Scenario: Accessibility audit (2026-04-29)
    - Problem: `PlayCalendar.tsx:168,183` month navigation buttons use `p-1.5` (~30px rendered height). `LeaderboardPanel.tsx:64` tab buttons use `px-2.5 py-1` (~20px height). Both fall below WCAG 2.5.5's ≥44px minimum.
