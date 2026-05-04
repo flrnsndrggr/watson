@@ -23,7 +23,6 @@ export function QuizzhuberForm({ value, onChange }: { value: QuizzhuberPayload; 
   const updateQ = (i: number, patch: Partial<QuizzhuberQuestion>) =>
     onChange({ ...value, questions: value.questions.map((q, j) => j === i ? { ...q, ...patch } : q) });
 
-  // Only https:// URLs are accepted — blocks javascript:, data:, http: at the input boundary.
   const sanitizeImageUrl = (raw: string): string | undefined => {
     const trimmed = raw.trim();
     if (!trimmed) return undefined;

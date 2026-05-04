@@ -26,6 +26,23 @@ function getToday(): string {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
 }
 
+function NavButton({ onClick, disabled, label, children }: { onClick: () => void; disabled: boolean; label: string; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`rounded p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-sm font-semibold transition-colors ${
+        disabled
+          ? 'text-[var(--color-gray-text)]/30 cursor-default'
+          : 'text-[var(--color-black)] hover:bg-[var(--color-gray-bg)] cursor-pointer'
+      }`}
+      aria-label={label}
+    >
+      {children}
+    </button>
+  );
+}
+
 function getMonthDays(year: number, month: number): { date: number; dayOfWeek: number }[] {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days: { date: number; dayOfWeek: number }[] = [];
@@ -162,33 +179,11 @@ export function PlayCalendar() {
 
       {/* Month navigation */}
       <div className="flex items-center justify-between mb-3">
-        <button
-          onClick={() => navigateMonth(-1)}
-          disabled={!canGoPrev}
-          className={`rounded p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-sm font-semibold transition-colors ${
-            canGoPrev
-              ? 'text-[var(--color-black)] hover:bg-[var(--color-gray-bg)] cursor-pointer'
-              : 'text-[var(--color-gray-text)]/30 cursor-default'
-          }`}
-          aria-label="Vorheriger Monat"
-        >
-          ←
-        </button>
+        <NavButton onClick={() => navigateMonth(-1)} disabled={!canGoPrev} label="Vorheriger Monat">←</NavButton>
         <span className="text-sm font-bold">
           {MONTH_NAMES[viewMonth]} {viewYear}
         </span>
-        <button
-          onClick={() => navigateMonth(1)}
-          disabled={!canGoNext}
-          className={`rounded p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-sm font-semibold transition-colors ${
-            canGoNext
-              ? 'text-[var(--color-black)] hover:bg-[var(--color-gray-bg)] cursor-pointer'
-              : 'text-[var(--color-gray-text)]/30 cursor-default'
-          }`}
-          aria-label="Nächster Monat"
-        >
-          →
-        </button>
+        <NavButton onClick={() => navigateMonth(1)} disabled={!canGoNext} label="Nächster Monat">→</NavButton>
       </div>
 
       {/* Weekday headers */}

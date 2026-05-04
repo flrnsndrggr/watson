@@ -12,7 +12,6 @@ export function StreakBadge({ streak }: StreakBadgeProps) {
       <div
         className="flex items-center gap-1.5 rounded-full bg-[var(--color-pink)]/10 px-3 py-1.5"
         aria-label={`Aktuelle Serie: ${streak.current} ${streak.current === 1 ? 'Tag' : 'Tage'}`}
-        title="Aufeinanderfolgende Spieltage"
       >
         <span className="text-xs text-[var(--color-pink)]/70">Serie</span>
         <span className="text-lg" role="img" aria-hidden="true">🔥</span>

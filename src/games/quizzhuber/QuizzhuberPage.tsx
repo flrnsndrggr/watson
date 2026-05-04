@@ -156,9 +156,12 @@ export function QuizzhuberPage() {
           <img
             src={q.image_url}
             alt={q.image_alt ?? ''}
+            width={800}
+            height={192}
             referrerPolicy="no-referrer"
             loading="lazy"
-            className="mt-2 max-h-48 w-full rounded-lg border border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]/30 object-contain"
+            decoding="async"
+            className="mt-2 h-48 w-full rounded-lg border border-[var(--color-gray-bg)] bg-[var(--color-gray-bg)]/30 object-contain"
           />
         )}
         <h2 className="mt-2 font-[family-name:var(--font-heading)] text-lg font-bold leading-snug">

@@ -61,7 +61,7 @@ export function LeaderboardPanel({ gameType, puzzleDate, showTime }: Leaderboard
                     payload: { period: t.id },
                   });
                 }}
-                className={`rounded-full px-2.5 py-1 min-h-[44px] text-[11px] font-bold transition-colors ${
+                className={`inline-flex items-center justify-center rounded-full px-2.5 py-1 min-h-[44px] text-[11px] font-bold transition-colors ${
                   active
                     ? 'bg-[var(--color-cyan)] text-white'
                     : 'bg-[var(--color-gray-bg)] text-[var(--color-gray-text)] hover:text-[var(--color-black)]'
