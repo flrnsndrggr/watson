@@ -1,49 +1,49 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { supabase } from './supabase';
+import { AdminAuthContext, type AdminAuthState } from './authContext';
 
-interface AuthState {
-  isLoggedIn: boolean;
-  username: string | null;
+export { useAuth } from './authContext';
+
+// Admin status is derived from `app_metadata.role === 'admin'`. `app_metadata`
+// is only writable with the service role key, so a regular user cannot grant
+// themselves admin from the client.
+function deriveIsAdmin(user: { app_metadata?: Record<string, unknown> } | null): boolean {
+  return user?.app_metadata?.role === 'admin';
 }
-
-interface AuthContextValue extends AuthState {
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
-}
-
-const VALID_CREDENTIALS = { username: 'admin', password: 'letsplayagame' };
-
-const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [auth, setAuth] = useState<AuthState>(() => {
-    const stored = sessionStorage.getItem('watson-auth');
-    return stored ? JSON.parse(stored) : { isLoggedIn: false, username: null };
+  const [state, setState] = useState<AdminAuthState>({
+    user: null,
+    isAdmin: false,
+    loading: true,
   });
 
-  const login = useCallback((username: string, password: string) => {
-    if (username === VALID_CREDENTIALS.username && password === VALID_CREDENTIALS.password) {
-      const state = { isLoggedIn: true, username };
-      setAuth(state);
-      sessionStorage.setItem('watson-auth', JSON.stringify(state));
-      return true;
-    }
-    return false;
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user ?? null;
+      setState({ user, isAdmin: deriveIsAdmin(user), loading: false });
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user ?? null;
+      setState({ user, isAdmin: deriveIsAdmin(user), loading: false });
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const logout = useCallback(() => {
-    setAuth({ isLoggedIn: false, username: null });
-    sessionStorage.removeItem('watson-auth');
+  const signInWithPassword = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message ?? null };
+  }, []);
+
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, logout }}>
+    <AdminAuthContext.Provider value={{ ...state, signInWithPassword, signOut }}>
       {children}
-    </AuthContext.Provider>
+    </AdminAuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
 }

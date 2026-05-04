@@ -3,14 +3,14 @@ import type { ZaemesetzliPuzzle, Rank, CompoundWord, StreakData } from '@/types'
 import { SAMPLE_ZAEMESETZLI } from './zaemesetzli.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { getTodayDateCET } from '@/lib/dateUtils';
-import { recordGamePlayed, getStreak } from '@/lib/streaks';
+import { recordGamePlayed, getStreak, getStreak as readStreak } from '@/lib/streaks';
 import { submitLeaderboardEntry } from '@/lib/leaderboard';
 import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackZaemesetzliWordFound, trackZaemesetzliHintUsed } from '@/lib/analytics';
 import { saveDailyResult } from '@/lib/dailyResults';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
-import { getStreak as readStreak } from '@/lib/streaks';
 import { checkAchievements } from '@/lib/achievements';
+import { completeGame } from '@/lib/completeGame';
 
 interface FoundCompound extends CompoundWord {
   foundAt: number;
@@ -273,33 +273,27 @@ export const useZaemesetzli = create<ZaemesetzliState>((set, get) => ({
     const { puzzle, foundWords, score, currentRank, status, isArchive } = get();
     if (!puzzle || status !== 'playing' || foundWords.length === 0) return;
 
-    if (!isArchive) {
-      void submitLeaderboardEntry('zaemesetzli', score, null);
-    }
-
     const streakUpdate = !isArchive
       ? (() => {
-          const streak = recordGamePlayed('zaemesetzli');
-          checkStreakMilestone('zaemesetzli', streak.current);
-          triggerAccountPrompt(streak.current);
-          setTimeout(() => { void checkAchievements(); }, 0);
+          const rankLabel = currentRank.charAt(0).toUpperCase() + currentRank.slice(1);
+          const totalMundart = puzzle.valid_compounds.filter((c) => c.is_mundart).length;
+          const foundMundart = foundWords.filter((c) => c.is_mundart).length;
+          const streak = completeGame({
+            gameType: 'zaemesetzli',
+            score,
+            elapsed: null,
+            dailyResult: {
+              outcome: 'complete',
+              summary: `${foundWords.length}/${puzzle.valid_compounds.length} · ${rankLabel}`,
+              perfect: foundWords.length === puzzle.valid_compounds.length,
+              allMundart: totalMundart > 0 && foundMundart === totalMundart,
+            },
+          });
           return { streak };
         })()
       : {};
 
     trackGameCompleted('zaemesetzli', 'complete', isArchive, score);
-
-    if (!isArchive) {
-      const rankLabel = currentRank.charAt(0).toUpperCase() + currentRank.slice(1);
-      const totalMundart = puzzle.valid_compounds.filter((c) => c.is_mundart).length;
-      const foundMundart = foundWords.filter((c) => c.is_mundart).length;
-      saveDailyResult('zaemesetzli', {
-        outcome: 'complete',
-        summary: `${foundWords.length}/${puzzle.valid_compounds.length} · ${rankLabel}`,
-        perfect: foundWords.length === puzzle.valid_compounds.length,
-        allMundart: totalMundart > 0 && foundMundart === totalMundart,
-      });
-    }
 
     clearGameProgress('zaemesetzli');
 

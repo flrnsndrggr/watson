@@ -3,12 +3,9 @@ import type { QuizzhuberPuzzle, StreakData } from '@/types';
 import { SAMPLE_QUIZZHUBER } from './quizzhuber.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { getTodayDateCET } from '@/lib/dateUtils';
-import { recordGamePlayed, getStreak } from '@/lib/streaks';
-import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { saveDailyResult } from '@/lib/dailyResults';
+import { getStreak } from '@/lib/streaks';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
-import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
-import { checkAchievements } from '@/lib/achievements';
+import { completeGame } from '@/lib/completeGame';
 
 interface QuizzhuberState {
   puzzle: QuizzhuberPuzzle | null;
@@ -119,15 +116,16 @@ export const useQuizzhuber = create<QuizzhuberState>((set, get) => ({
     const score = correctCount(puzzle, answers);
 
     if (!isArchive) {
-      const streak = recordGamePlayed('quizzhuber');
-      void submitLeaderboardEntry('quizzhuber', score, elapsed);
-      triggerAccountPrompt(streak.current);
-      setTimeout(() => { void checkAchievements(); }, 0);
-      saveDailyResult('quizzhuber', {
-        outcome: score >= puzzle.questions.length / 2 ? 'won' : 'lost',
-        summary: `${score}/${puzzle.questions.length}`,
-        timeSeconds: elapsed,
-        perfect: score === puzzle.questions.length,
+      const streak = completeGame({
+        gameType: 'quizzhuber',
+        score,
+        elapsed,
+        dailyResult: {
+          outcome: score >= puzzle.questions.length / 2 ? 'won' : 'lost',
+          summary: `${score}/${puzzle.questions.length}`,
+          timeSeconds: elapsed,
+          perfect: score === puzzle.questions.length,
+        },
       });
       set({ streak });
     }

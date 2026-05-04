@@ -1,18 +1,30 @@
 import { lazy, Suspense, useState, useEffect, type ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/lib/auth';
 import { Layout } from '@/pages/Layout';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
-// Lazy-load UserAuthProvider so the Supabase SDK (~50KB gzip) is deferred
-// from the critical rendering path. Auth resolves asynchronously anyway.
+// Lazy-load both auth providers so the Supabase SDK (~50KB gzip) is deferred
+// from the critical rendering path. Auth resolves asynchronously anyway, and
+// admin login is rare — fine for the chunk to arrive after first paint.
 const LazyUserAuthModule = import('@/lib/userAuth');
+const LazyAdminAuthModule = import('@/lib/auth');
 
 function DeferredUserAuth({ children }: { children: ReactNode }) {
   const [Provider, setProvider] = useState<React.ComponentType<{ children: ReactNode }> | null>(null);
 
   useEffect(() => {
     LazyUserAuthModule.then((m) => setProvider(() => m.UserAuthProvider));
+  }, []);
+
+  if (!Provider) return <>{children}</>;
+  return <Provider>{children}</Provider>;
+}
+
+function DeferredAdminAuth({ children }: { children: ReactNode }) {
+  const [Provider, setProvider] = useState<React.ComponentType<{ children: ReactNode }> | null>(null);
+
+  useEffect(() => {
+    LazyAdminAuthModule.then((m) => setProvider(() => m.AuthProvider));
   }, []);
 
   if (!Provider) return <>{children}</>;
@@ -46,7 +58,7 @@ function ChunkLoader() {
 
 export default function App() {
   return (
-    <AuthProvider>
+    <DeferredAdminAuth>
       <DeferredUserAuth>
       <BrowserRouter>
         <Suspense fallback={<ChunkLoader />}>
@@ -81,6 +93,6 @@ export default function App() {
         </Suspense>
       </BrowserRouter>
       </DeferredUserAuth>
-    </AuthProvider>
+    </DeferredAdminAuth>
   );
 }

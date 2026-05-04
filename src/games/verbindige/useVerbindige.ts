@@ -3,13 +3,10 @@ import type { VerbindigeGroup, VerbindigeItem, VerbindigePuzzle, StreakData } fr
 import { SAMPLE_VERBINDIGE } from './verbindige.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { showToast } from '@/components/shared/Toast';
-import { recordGamePlayed, getStreak } from '@/lib/streaks';
-import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackVerbindigeGuess } from '@/lib/analytics';
-import { saveDailyResult } from '@/lib/dailyResults';
+import { getStreak } from '@/lib/streaks';
+import { trackGameStarted, trackGameCompleted, trackVerbindigeGuess } from '@/lib/analytics';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
-import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
-import { checkAchievements } from '@/lib/achievements';
+import { completeGame } from '@/lib/completeGame';
 
 interface SolvedGroup extends VerbindigeGroup {
   guessOrder: number;
@@ -175,29 +172,25 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
       updates.elapsedSeconds = elapsed;
       const score = 4 - get().mistakes;
       if (!get().isArchive) {
-        updates.streak = recordGamePlayed('verbindige');
-        checkStreakMilestone('verbindige', updates.streak.current);
-        void submitLeaderboardEntry('verbindige', score, elapsed);
-        triggerAccountPrompt(updates.streak.current);
-        // Run achievement detection after the daily-result write below — defer
-        // by a microtask so saveDailyResult is in localStorage by then.
-        setTimeout(() => { void checkAchievements(); }, 0);
-      }
-      trackGameCompleted('verbindige', 'won', get().isArchive, score, elapsed);
-      if (!get().isArchive) {
         const emojiMap: Record<number, string> = { 1: '\u{1F7E8}', 2: '\u{1F7E9}', 3: '\u{1F7E6}', 4: '\u{1F7EA}' };
         const emojiLine = [...newSolvedGroups]
           .sort((a, b) => a.guessOrder - b.guessOrder)
           .map((g) => (emojiMap[g.difficulty] ?? '').repeat(4))
           .join('\n');
-        saveDailyResult('verbindige', {
-          outcome: 'won',
-          summary: `${get().mistakes}/4 Fehler`,
-          emojiLine,
-          timeSeconds: elapsed,
-          perfect: get().mistakes === 0,
+        updates.streak = completeGame({
+          gameType: 'verbindige',
+          score,
+          elapsed,
+          dailyResult: {
+            outcome: 'won',
+            summary: `${get().mistakes}/4 Fehler`,
+            emojiLine,
+            timeSeconds: elapsed,
+            perfect: get().mistakes === 0,
+          },
         });
       }
+      trackGameCompleted('verbindige', 'won', get().isArchive, score, elapsed);
     }
     set(updates);
 
@@ -280,20 +273,18 @@ export const useVerbindige = create<VerbindigeState>((set, get) => ({
         const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
         lostUpdates.elapsedSeconds = elapsed;
         if (!get().isArchive) {
-          lostUpdates.streak = recordGamePlayed('verbindige');
-          checkStreakMilestone('verbindige', lostUpdates.streak.current);
-          void submitLeaderboardEntry('verbindige', 0, elapsed);
-          triggerAccountPrompt(lostUpdates.streak.current);
-          setTimeout(() => { void checkAchievements(); }, 0);
-        }
-        trackGameCompleted('verbindige', 'lost', get().isArchive, 0, elapsed);
-        if (!get().isArchive) {
-          saveDailyResult('verbindige', {
-            outcome: 'lost',
-            summary: 'Knapp daneben',
-            timeSeconds: elapsed,
+          lostUpdates.streak = completeGame({
+            gameType: 'verbindige',
+            score: 0,
+            elapsed,
+            dailyResult: {
+              outcome: 'lost',
+              summary: 'Knapp daneben',
+              timeSeconds: elapsed,
+            },
           });
         }
+        trackGameCompleted('verbindige', 'lost', get().isArchive, 0, elapsed);
       }
       set(lostUpdates);
       persistState(get());

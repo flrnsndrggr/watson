@@ -4,7 +4,7 @@ import { ToastContainer } from '@/components/shared/Toast';
 import { AccountPromptHost } from '@/components/shared/AccountPromptHost';
 import { AchievementCelebrationHost } from '@/components/shared/AchievementCelebration';
 import { StreakMilestoneCelebrationHost } from '@/components/shared/StreakMilestoneCelebration';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/lib/authContext';
 import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
 
@@ -76,20 +76,25 @@ const NAV_ITEMS = [
 ];
 
 function LoginModal({ onClose }: { onClose: () => void }) {
-  const { login } = useAuth();
+  const { signInWithPassword } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(username, password)) {
-      onClose();
-      navigate('/admin');
-    } else {
-      setError(true);
+    setSubmitting(true);
+    setError(null);
+    const { error: err } = await signInWithPassword(email.trim(), password);
+    setSubmitting(false);
+    if (err) {
+      setError('Ungueltige Anmeldedaten');
+      return;
     }
+    onClose();
+    navigate('/admin');
   };
 
   return (
@@ -98,35 +103,40 @@ function LoginModal({ onClose }: { onClose: () => void }) {
         className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-bold mb-4">Login</h2>
+        <h2 className="text-lg font-bold mb-4">Admin-Login</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Benutzer</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">E-Mail</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => { setUsername(e.target.value); setError(false); }}
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(null); }}
               className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-cyan)] focus:outline-none focus:ring-1 focus:ring-[var(--color-cyan)]"
               autoFocus
+              required
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Passwort</label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(false); }}
+              onChange={(e) => { setPassword(e.target.value); setError(null); }}
               className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-cyan)] focus:outline-none focus:ring-1 focus:ring-[var(--color-cyan)]"
+              required
             />
           </div>
           {error && (
-            <p className="text-sm text-red-600">Ungueltige Anmeldedaten</p>
+            <p className="text-sm text-red-600">{error}</p>
           )}
           <button
             type="submit"
-            className="w-full rounded bg-[var(--color-cyan)] py-2 text-sm font-bold text-white hover:opacity-90 transition-opacity cursor-pointer"
+            disabled={submitting}
+            className="w-full rounded bg-[var(--color-cyan)] py-2 text-sm font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Anmelden
+            {submitting ? 'Anmelden …' : 'Anmelden'}
           </button>
         </form>
       </div>
@@ -136,7 +146,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
 
 export function Layout() {
   const location = useLocation();
-  const { isLoggedIn } = useAuth();
+  const { isAdmin } = useAuth();
   const { user, loading: userLoading, signOut } = useUserAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -228,7 +238,7 @@ export function Layout() {
               )
             )}
             {/* Admin login */}
-            {isLoggedIn && (
+            {isAdmin && (
               <Link
                 to="/admin"
                 className="rounded bg-[var(--color-blue)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"
@@ -266,7 +276,7 @@ export function Layout() {
       {/* Footer */}
       <footer className="border-t border-[var(--color-gray-bg)] py-6 text-center text-xs text-[var(--color-gray-text)]">
         watson Spiele &middot; Spiel, aber deep. &middot; watson.ch
-        {!isLoggedIn && (
+        {!isAdmin && (
           <>
             {' '}&middot;{' '}
             <button

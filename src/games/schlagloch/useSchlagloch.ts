@@ -3,13 +3,11 @@ import type { SchlaglochPuzzle, StreakData, LeaderboardGameType } from '@/types'
 import { SAMPLE_SCHLAGLOCH, DEMO_ANSWERS, DEMO_DISPLAY_ANSWERS } from './schlagloch.data';
 import { fetchTodaysPuzzle, fetchPuzzleByDate } from '@/lib/supabase';
 import { getTodayDateCET } from '@/lib/dateUtils';
-import { recordGamePlayed, getStreak } from '@/lib/streaks';
-import { submitLeaderboardEntry } from '@/lib/leaderboard';
-import { trackGameStarted, trackGameCompleted, checkStreakMilestone, trackSchlaglochHeadlineGuess } from '@/lib/analytics';
-import { saveDailyResult } from '@/lib/dailyResults';
+import { getStreak } from '@/lib/streaks';
+import { trackGameStarted, trackGameCompleted, trackSchlaglochHeadlineGuess } from '@/lib/analytics';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
-import { triggerAccountPrompt } from '@/components/shared/AccountPromptHost';
-import { checkAchievements } from '@/lib/achievements';
+import { completeGame } from '@/lib/completeGame';
+import { normalizeText, levenshtein } from '@/lib/textNormalization';
 
 /** Standard Schlagloch has 5 headlines; Rückblick (Sunday) has more. */
 const STANDARD_HEADLINE_COUNT = 5;
@@ -71,34 +69,7 @@ function persistSchlagloch(state: SchlaglochState): void {
   });
 }
 
-function normalize(s: string): string {
-  return s
-    .trim()
-    .toLowerCase()
-    .replace(/ä/g, 'ae')
-    .replace(/ö/g, 'oe')
-    .replace(/ü/g, 'ue')
-    .replace(/ß/g, 'ss')
-    .replace(/[-\s]+/g, '');
-}
-
-function levenshtein(a: string, b: string): number {
-  const m = a.length;
-  const n = b.length;
-  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
-  for (let i = 0; i <= m; i++) dp[i][0] = i;
-  for (let j = 0; j <= n; j++) dp[0][j] = j;
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      dp[i][j] = Math.min(
-        dp[i - 1][j] + 1,
-        dp[i][j - 1] + 1,
-        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
-      );
-    }
-  }
-  return dp[m][n];
-}
+const normalize = (s: string) => normalizeText(s, 'german');
 
 export const useSchlagloch = create<SchlaglochState>((set, get) => ({
   puzzle: null,
@@ -239,26 +210,23 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
         }
         const correctCount = newResults.filter((r) => r === 'correct').length;
         const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
-        if (!get().isArchive) {
-          void submitLeaderboardEntry(getLeaderboardType(get()), correctCount, elapsed);
-        }
         const streakUpdate = get().isArchive ? {} : (() => {
-          const streak = recordGamePlayed('schlagloch');
-          checkStreakMilestone('schlagloch', streak.current);
-          triggerAccountPrompt(streak.current);
-          setTimeout(() => { void checkAchievements(); }, 0);
+          const emojiLine = newResults.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
+          const streak = completeGame({
+            gameType: 'schlagloch',
+            leaderboardType: getLeaderboardType(get()),
+            score: correctCount,
+            elapsed,
+            dailyResult: {
+              outcome: 'lost',
+              summary: `${correctCount}/${newResults.length}`,
+              emojiLine,
+              timeSeconds: elapsed,
+            },
+          });
           return { streak };
         })();
         trackGameCompleted('schlagloch', 'lost', get().isArchive, correctCount, elapsed);
-        if (!get().isArchive) {
-          const emojiLine = newResults.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-          saveDailyResult('schlagloch', {
-            outcome: 'lost',
-            summary: `${correctCount}/${newResults.length}`,
-            emojiLine,
-            timeSeconds: elapsed,
-          });
-        }
         clearGameProgress('schlagloch');
         set({
           totalErrors: newErrors,
@@ -283,27 +251,24 @@ export const useSchlagloch = create<SchlaglochState>((set, get) => ({
     if (nextIndex >= puzzle.headlines.length || results.every((r) => r !== null)) {
       const correctCount = results.filter((r) => r === 'correct').length;
       const elapsed = get().startedAt ? Math.round((Date.now() - get().startedAt!) / 1000) : null;
-      if (!get().isArchive) {
-        void submitLeaderboardEntry(getLeaderboardType(get()), correctCount, elapsed);
-      }
       const streakUpdate2 = get().isArchive ? {} : (() => {
-          const streak = recordGamePlayed('schlagloch');
-          checkStreakMilestone('schlagloch', streak.current);
-          triggerAccountPrompt(streak.current);
-          setTimeout(() => { void checkAchievements(); }, 0);
+          const emojiLine = results.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
+          const streak = completeGame({
+            gameType: 'schlagloch',
+            leaderboardType: getLeaderboardType(get()),
+            score: correctCount,
+            elapsed,
+            dailyResult: {
+              outcome: 'won',
+              summary: `${correctCount}/${puzzle.headlines.length}`,
+              emojiLine,
+              timeSeconds: elapsed,
+              perfect: correctCount === puzzle.headlines.length,
+            },
+          });
           return { streak };
         })();
       trackGameCompleted('schlagloch', 'won', get().isArchive, correctCount, elapsed);
-      if (!get().isArchive) {
-        const emojiLine = results.map((r) => r === 'correct' ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-        saveDailyResult('schlagloch', {
-          outcome: 'won',
-          summary: `${correctCount}/${puzzle.headlines.length}`,
-          emojiLine,
-          timeSeconds: elapsed,
-          perfect: correctCount === puzzle.headlines.length,
-        });
-      }
       clearGameProgress('schlagloch');
       set({ status: 'finished', elapsedSeconds: elapsed, ...streakUpdate2 });
     } else {
