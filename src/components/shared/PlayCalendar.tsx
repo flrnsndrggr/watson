@@ -165,7 +165,7 @@ export function PlayCalendar() {
         <button
           onClick={() => navigateMonth(-1)}
           disabled={!canGoPrev}
-          className={`rounded p-1.5 text-sm font-semibold transition-colors ${
+          className={`rounded p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-sm font-semibold transition-colors ${
             canGoPrev
               ? 'text-[var(--color-black)] hover:bg-[var(--color-gray-bg)] cursor-pointer'
               : 'text-[var(--color-gray-text)]/30 cursor-default'
@@ -180,7 +180,7 @@ export function PlayCalendar() {
         <button
           onClick={() => navigateMonth(1)}
           disabled={!canGoNext}
-          className={`rounded p-1.5 text-sm font-semibold transition-colors ${
+          className={`rounded p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-sm font-semibold transition-colors ${
             canGoNext
               ? 'text-[var(--color-black)] hover:bg-[var(--color-gray-bg)] cursor-pointer'
               : 'text-[var(--color-gray-text)]/30 cursor-default'

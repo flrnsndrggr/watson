@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { EmojiItem } from '@/types';
 
 interface EmojiPoolProps {
@@ -8,7 +8,7 @@ interface EmojiPoolProps {
   onSelect: (emoji: string) => void;
 }
 
-function EmojiButton({ item, isSelected, hintMode, isHintable, onSelect }: { item: EmojiItem; isSelected: boolean; hintMode: boolean; isHintable: boolean; onSelect: () => void }) {
+function EmojiButton({ item, isSelected, hintMode, isHintable, onSelect, tabIndex, onKeyDown }: { item: EmojiItem; isSelected: boolean; hintMode: boolean; isHintable: boolean; onSelect: () => void; tabIndex: number; onKeyDown: (e: React.KeyboardEvent) => void }) {
   const [showNoun, setShowNoun] = useState(false);
 
   function handleDragStart(e: React.DragEvent) {
@@ -43,6 +43,8 @@ function EmojiButton({ item, isSelected, hintMode, isHintable, onSelect }: { ite
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={onSelect}
+      onKeyDown={onKeyDown}
+      tabIndex={tabIndex}
       onMouseEnter={() => setShowNoun(true)}
       onMouseLeave={() => setShowNoun(false)}
       onTouchStart={() => {
@@ -68,10 +70,24 @@ function EmojiButton({ item, isSelected, hintMode, isHintable, onSelect }: { ite
 
 export function EmojiPool({ emojis, selectedEmojis, hintableEmojis, onSelect }: EmojiPoolProps) {
   const hintMode = !!hintableEmojis;
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  function handleKeyDown(e: React.KeyboardEvent, index: number) {
+    let next = index;
+    if (e.key === 'ArrowRight') next = (index + 1) % emojis.length;
+    else if (e.key === 'ArrowLeft') next = (index - 1 + emojis.length) % emojis.length;
+    else return;
+
+    e.preventDefault();
+    setFocusedIndex(next);
+    const buttons = containerRef.current?.querySelectorAll<HTMLButtonElement>('button');
+    buttons?.[next]?.focus();
+  }
 
   return (
-    <div className="flex flex-wrap justify-center gap-3 py-4">
-      {emojis.map((item) => (
+    <div ref={containerRef} className="flex flex-wrap justify-center gap-3 py-4" role="group" aria-label="Emoji-Auswahl">
+      {emojis.map((item, i) => (
         <EmojiButton
           key={item.emoji}
           item={item}
@@ -79,6 +95,8 @@ export function EmojiPool({ emojis, selectedEmojis, hintableEmojis, onSelect }: 
           hintMode={hintMode}
           isHintable={hintMode && hintableEmojis.has(item.emoji)}
           onSelect={() => onSelect(item.emoji)}
+          tabIndex={i === focusedIndex ? 0 : -1}
+          onKeyDown={(e) => handleKeyDown(e, i)}
         />
       ))}
     </div>
