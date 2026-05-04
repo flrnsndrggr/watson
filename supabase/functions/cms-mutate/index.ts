@@ -1,8 +1,10 @@
 // supabase/functions/cms-mutate/index.ts
 //
 // Server-side puzzle CMS mutator. Editor UIs invoke this via
-// supabase.functions.invoke('cms-mutate', { body: {...} }) with
-// `x-cms-secret` set to the shared CMS secret.
+// supabase.functions.invoke('cms-mutate', { body: {...} }) with the caller's
+// JWT in `Authorization: Bearer <access_token>`. The function verifies the
+// JWT and requires app_metadata.role === 'admin' (which is only writable
+// with the service role key, so a regular user cannot self-promote).
 //
 // Schema is intentionally minimal — no `status` column, no audit log.
 // Visibility is purely date-based via existing RLS:
@@ -10,18 +12,18 @@
 //   sentinel 9999-12-31  → hidden (treated as "draft" in the UI)
 //   today / past         → live
 //
-// Env vars (set via `supabase secrets set`):
-//   CMS_SECRET                 - shared secret
-//   SUPABASE_URL               - injected by the platform
-//   SUPABASE_SERVICE_ROLE_KEY  - injected by the platform
+// Env vars (injected by the platform):
+//   SUPABASE_URL
+//   SUPABASE_ANON_KEY              - used to verify caller JWTs
+//   SUPABASE_SERVICE_ROLE_KEY      - used for the actual writes
 
 // @ts-nocheck — Deno runtime, not the project's tsconfig.
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const CMS_SECRET = Deno.env.get('CMS_SECRET') ?? '';
 
 const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -30,8 +32,44 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cms-secret',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Verifies the Authorization: Bearer <token> header against Supabase auth and
+// confirms the user has admin role in app_metadata. Returns null if OK, or a
+// Response if the request should be rejected.
+async function requireAdmin(req: Request): Promise<Response | null> {
+  const authHeader = req.headers.get('authorization') ?? '';
+  if (!authHeader.toLowerCase().startsWith('bearer ')) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), {
+      status: 401,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { data: { user }, error } = await userClient.auth.getUser();
+  if (error || !user) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), {
+      status: 401,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const role = (user.app_metadata as Record<string, unknown> | undefined)?.role;
+  if (role !== 'admin') {
+    return new Response(JSON.stringify({ error: 'forbidden' }), {
+      status: 403,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+
+  return null;
+}
 
 const GAME_TYPES = [
   'verbindige', 'zaemesetzli', 'schlagloch', 'quizzhuber', 'aufgedeckt', 'quizzticle',
@@ -353,13 +391,8 @@ serve(async (req) => {
     });
   }
 
-  const secret = req.headers.get('x-cms-secret') ?? '';
-  if (!CMS_SECRET || secret !== CMS_SECRET) {
-    return new Response(JSON.stringify({ error: 'unauthorized' }), {
-      status: 401,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-    });
-  }
+  const reject = await requireAdmin(req);
+  if (reject) return reject;
 
   let body: any;
   try { body = await req.json(); }

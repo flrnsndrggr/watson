@@ -4,15 +4,14 @@
 // The player-facing supabase.ts continues to use the anon key for published
 // content only (filtered by date-based RLS).
 //
-// CMS_SECRET sourcing — reads `VITE_CMS_SECRET` from the build env. The
-// secret matches the Edge Function's `CMS_SECRET` env var; rotate both
-// together. Anyone with the production password can rebuild and ship a
-// matching secret, so this is no weaker than the existing shared-admin
-// gate at /admin.
+// Auth: every call sends the logged-in user's Supabase session token in the
+// `Authorization: Bearer <access_token>` header. The Edge Function verifies
+// the JWT and requires app_metadata.role === 'admin'. There is no shared
+// secret in the bundle — a non-admin caller is rejected server-side.
 
 import type { GameType } from '@/types';
+import { supabase } from './supabase';
 
-const CMS_SECRET: string = (import.meta.env.VITE_CMS_SECRET as string | undefined) ?? '';
 const SUPABASE_URL: string = (import.meta.env.VITE_SUPABASE_URL as string | undefined) ?? '';
 const SUPABASE_ANON_KEY: string = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ?? '';
 const FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, '')}/functions/v1/cms-mutate`;
@@ -36,17 +35,22 @@ type CmsResponse<T> = { ok: true; data: T } | { ok: false; status: number; error
 async function call<T>(action: string, body: object = {}): Promise<CmsResponse<T>> {
   // Direct fetch instead of supabase.functions.invoke — the bundled SDK's
   // functions client is missing .invoke in this build. Same wire format.
+  const { data: { session } } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
+  if (!accessToken) {
+    return { ok: false, status: 401, error: 'not signed in' };
+  }
+
   let res: Response;
   try {
     res = await fetch(FUNCTION_URL, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-cms-secret': CMS_SECRET,
-        // The function is deployed with verify_jwt=false, but Supabase's
-        // edge gateway still requires the apikey header to route the call.
+        // Supabase's edge gateway requires the apikey header to route the
+        // call; the actual identity is derived from the user JWT below.
         'apikey': SUPABASE_ANON_KEY,
-        'authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ action, ...body }),
     });
