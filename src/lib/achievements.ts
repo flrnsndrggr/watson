@@ -40,7 +40,11 @@ export const ACHIEVEMENTS: readonly Achievement[] = [
   { id: 'mundart_master',     name: 'Mundart-Master',   description: 'Alle Mundart-Wörter eines Zämesetzli gefunden.',  emoji: '🇨🇭', tier: 2 },
 
   // Tier 3 — commitment
+  { id: 'streak_14',          name: 'Zwei-Wochen-Streak', description: '14 Tage in Folge gespielt.',                    emoji: '💪', tier: 2 },
   { id: 'streak_30',          name: 'Monats-Streak',    description: '30 Tage in Folge gespielt.',                      emoji: '🔥', tier: 3 },
+  { id: 'streak_50',          name: 'Fünfziger-Streak', description: '50 Tage in Folge gespielt.',                      emoji: '⭐', tier: 3 },
+  { id: 'streak_100',         name: 'Hunderter-Streak', description: '100 Tage in Folge gespielt.',                     emoji: '💯', tier: 3 },
+  { id: 'streak_365',         name: 'Jahres-Streak',    description: 'Ein ganzes Jahr in Folge gespielt.',              emoji: '👑', tier: 3 },
   { id: 'plays_100',          name: 'Hundertfacher',    description: '100 Rätsel gelöst.',                              emoji: '💯', tier: 3 },
   { id: 'perfect_sweep',      name: 'Perfekter Tag',    description: 'Alle drei Spiele am gleichen Tag perfekt.',       emoji: '✨', tier: 3 },
 ] as const;
@@ -176,7 +180,11 @@ function detectNewlyUnlocked(): string[] {
   maybeUnlock('first_win', anyWin);
   maybeUnlock('streak_3', maxStreak >= 3);
   maybeUnlock('streak_7', maxStreak >= 7);
+  maybeUnlock('streak_14', maxStreak >= 14);
   maybeUnlock('streak_30', maxStreak >= 30);
+  maybeUnlock('streak_50', maxStreak >= 50);
+  maybeUnlock('streak_100', maxStreak >= 100);
+  maybeUnlock('streak_365', maxStreak >= 365);
   maybeUnlock('daily_sweep', !!allThreeToday || anySweep);
   maybeUnlock('perfect_verbindige', anyPerfectVerbindige);
   maybeUnlock('perfect_schlagloch', anyPerfectSchlagloch);

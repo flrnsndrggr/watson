@@ -2,12 +2,16 @@ import type { GameType, StreakData } from '@/types';
 import { getTodayDateCET } from '@/lib/dateUtils';
 import { supabase } from '@/lib/supabase';
 import { logEvent } from '@/lib/events';
+import { dispatchStreakMilestone } from '@/lib/streakMilestoneEvent';
 
 const STORAGE_KEY = 'watson_streaks';
 const FREEZES_KEY = 'watson_streak_freezes';
 const FREEZE_MILESTONE_KEY = 'watson_streak_freeze_milestones';
 
 const FREEZES_CAP = 2;
+
+/** Streak lengths that trigger a celebration modal. */
+const CELEBRATION_THRESHOLDS = [7, 14, 30, 50, 100, 365];
 
 type StreakStore = Partial<Record<GameType, StreakData>>;
 
@@ -116,6 +120,22 @@ export function recordGamePlayed(gameType: GameType): StreakData {
     void maybeBankFreezeForMilestone(gameType, newCurrent);
   }
   void syncStreakToServerIfAuthed(gameType, updated);
+
+  // Fire a celebration for notable milestones (deferred so result screen
+  // has time to mount first — 1.2s delay avoids competing with game-end
+  // confetti and the achievement card).
+  if (CELEBRATION_THRESHOLDS.includes(newCurrent)) {
+    const jokerEarned = newCurrent % 7 === 0;
+    setTimeout(() => {
+      const jokersBanked = loadFreezesLocal().banked;
+      dispatchStreakMilestone({
+        game: gameType,
+        streak: newCurrent,
+        jokerEarned,
+        jokersBanked,
+      });
+    }, 1200);
+  }
 
   return updated;
 }

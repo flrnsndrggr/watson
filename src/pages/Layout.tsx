@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from '@/components/shared/Toast';
 import { AccountPromptHost } from '@/components/shared/AccountPromptHost';
 import { AchievementCelebrationHost } from '@/components/shared/AchievementCelebration';
+import { StreakMilestoneCelebrationHost } from '@/components/shared/StreakMilestoneCelebration';
 import { useAuth } from '@/lib/auth';
 import { useUserAuth } from '@/lib/userAuthContext';
 import { AuthModal } from '@/components/shared/AuthModal';
@@ -252,6 +253,9 @@ export function Layout() {
 
       {/* Achievement celebration — listens to achievement-unlocked events */}
       <AchievementCelebrationHost />
+
+      {/* Streak milestone celebration — full-screen overlay for 7/14/30/50/100/365 days */}
+      <StreakMilestoneCelebrationHost />
 
       {/* Admin login modal */}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}

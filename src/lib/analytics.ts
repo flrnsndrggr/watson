@@ -147,7 +147,7 @@ export function trackStreakMilestone(game: GameType, streakLength: number): void
 
 // ---- Streak milestone detection ----
 
-const MILESTONE_THRESHOLDS = [3, 7, 14, 30, 50, 100];
+const MILESTONE_THRESHOLDS = [3, 7, 14, 30, 50, 100, 365];
 
 /**
  * Call after recording a streak. Fires streak_milestone if the new
