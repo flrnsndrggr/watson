@@ -402,7 +402,7 @@ _Weekly architecture review findings from watson-architect_
    - Priority adjusted from P1 to P2: PlayCalendar and LeaderboardPanel are secondary post-game UI, not core gameplay surfaces; undersized targets are a polish issue, not "confusing UX blocking real gameplay"
    - Related: #5 — both are accessibility issues; consider fixing together
 
-7. [ ] P2 - Text normalization duplicated across 3 games
+7. [x] P2 - Text normalization duplicated across 3 games
    - Agent: watson-architect
    - Scenario: Cross-game code duplication audit (2026-04-29)
    - Problem: `normalize()` function duplicated identically in `useAufgedeckt.ts:61-67` and `useQuizzticle.ts:52-58`. `useSchlagloch.ts:74-83` has a variant with German-specific mappings (ä→ae) plus levenshtein distance.

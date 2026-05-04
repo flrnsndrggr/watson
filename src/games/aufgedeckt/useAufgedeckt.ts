@@ -6,6 +6,7 @@ import { getTodayDateCET } from '@/lib/dateUtils';
 import { getStreak } from '@/lib/streaks';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 import { completeGame } from '@/lib/completeGame';
+import { normalizeText } from '@/lib/textNormalization';
 
 const DEFAULT_COLS = 5;
 const DEFAULT_ROWS = 5;
@@ -55,13 +56,7 @@ function persistAufgedeckt(state: AufgedecktState): void {
   });
 }
 
-function normalize(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
-    .replace(/[^a-z0-9]/g, '')
-    .trim();
-}
+const normalize = (s: string) => normalizeText(s);
 
 export const useAufgedeckt = create<AufgedecktState>((set, get) => ({
   puzzle: null,

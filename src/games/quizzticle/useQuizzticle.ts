@@ -6,6 +6,7 @@ import { getTodayDateCET } from '@/lib/dateUtils';
 import { getStreak } from '@/lib/streaks';
 import { saveGameProgress, loadGameProgress, clearGameProgress } from '@/lib/gamePersistence';
 import { completeGame } from '@/lib/completeGame';
+import { normalizeText } from '@/lib/textNormalization';
 
 interface QuizzticleState {
   puzzle: QuizzticlePuzzle | null;
@@ -46,13 +47,7 @@ function persistQuizzticle(state: QuizzticleState): void {
   });
 }
 
-function normalize(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
-    .replace(/[^a-z0-9]/g, '')
-    .trim();
-}
+const normalize = (s: string) => normalizeText(s);
 
 export const useQuizzticle = create<QuizzticleState>((set, get) => ({
   puzzle: null,
