@@ -1,5 +1,6 @@
 import { useQuizzticle } from './useQuizzticle';
 import { ShareButton } from '@/components/shared/ShareButton';
+import { PostGameSection } from '@/components/shared/PostGameSection';
 import { LeaderboardPanel } from '@/components/shared/LeaderboardPanel';
 import { generateShareText } from '@/lib/share';
 import { StreakBadge } from '@/components/shared/StreakBadge';
@@ -78,6 +79,8 @@ export function QuizzticleResult() {
       </div>
 
       <LeaderboardPanel gameType="quizzticle" puzzleDate={puzzle.date} />
+
+      <PostGameSection currentGame="quizzticle" />
     </div>
   );
 }

@@ -15,7 +15,7 @@ interface GameConfig {
   accentColor: string;
 }
 
-const ALL_GAMES: GameConfig[] = [
+const DAILY_GAMES: GameConfig[] = [
   {
     path: '/verbindige',
     key: 'verbindige',
@@ -41,6 +41,35 @@ const ALL_GAMES: GameConfig[] = [
     accentColor: 'var(--color-green)',
   },
 ];
+
+const WEEKLY_GAMES: GameConfig[] = [
+  {
+    path: '/quizzhuber',
+    key: 'quizzhuber',
+    name: 'Quizz den Huber',
+    emoji: '🤔',
+    description: '10 Fragen quer durch die Schweiz.',
+    accentColor: 'var(--color-blue)',
+  },
+  {
+    path: '/aufgedeckt',
+    key: 'aufgedeckt',
+    name: 'Aufgedeckt',
+    emoji: '🔍',
+    description: 'Erkennst du das Bild, bevor zu viele Felder fallen?',
+    accentColor: 'var(--color-cyan)',
+  },
+  {
+    path: '/quizzticle',
+    key: 'quizzticle',
+    name: 'Quizzticle',
+    emoji: '⏱',
+    description: 'Schreib alles, was du weisst — gegen die Uhr.',
+    accentColor: 'var(--color-pink)',
+  },
+];
+
+const ALL_GAMES = [...DAILY_GAMES, ...WEEKLY_GAMES];
 
 interface GameStatus {
   playedToday: boolean;
@@ -70,7 +99,7 @@ function buildSweepShareText(statuses: Record<GameType, GameStatus>): string {
     timeZone: 'Europe/Zurich',
   });
   const lines: string[] = [`watson Spiele 🇨🇭 ${today}`];
-  for (const game of ALL_GAMES) {
+  for (const game of DAILY_GAMES) {
     const s = statuses[game.key];
     if (s.result) {
       const prefix = s.result.emojiLine ? `${s.result.emojiLine} ` : `${game.emoji} `;
@@ -102,13 +131,19 @@ export function PostGameSection({ currentGame }: PostGameSectionProps) {
     };
   }, []);
 
-  const playedCount = ALL_GAMES.filter((g) => statuses[g.key].playedToday).length;
-  const allPlayed = playedCount === ALL_GAMES.length;
-  const remaining = ALL_GAMES.length - playedCount;
+  // Daily sweep only counts the 3 daily games
+  const dailyPlayedCount = DAILY_GAMES.filter((g) => statuses[g.key].playedToday).length;
+  const allDailyPlayed = dailyPlayedCount === DAILY_GAMES.length;
+  const dailyRemaining = DAILY_GAMES.length - dailyPlayedCount;
+
+  // Weekly games that haven't been played yet (cross-sell candidates)
+  const unplayedWeekly = WEEKLY_GAMES.filter(
+    (g) => !statuses[g.key].playedToday && g.key !== currentGame,
+  );
 
   // Fire confetti when daily sweep is complete
   useEffect(() => {
-    if (allPlayed && !confettiFired.current) {
+    if (allDailyPlayed && !confettiFired.current) {
       confettiFired.current = true;
       import('canvas-confetti').then(({ default: confetti }) => {
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.6, x: 0.4 } });
@@ -117,7 +152,7 @@ export function PostGameSection({ currentGame }: PostGameSectionProps) {
         }, 150);
       });
     }
-  }, [allPlayed]);
+  }, [allDailyPlayed]);
 
   return (
     <div className="mt-8">
@@ -125,15 +160,15 @@ export function PostGameSection({ currentGame }: PostGameSectionProps) {
       <div className="flex items-center gap-3 mb-4">
         <div className="flex-1 h-px bg-[var(--color-gray-bg)]" />
         <span className="text-xs font-semibold text-[var(--color-gray-text)] uppercase tracking-wide whitespace-nowrap">
-          {allPlayed ? 'Tages-Sweep!' : 'Dein Spiele-Tag'}
+          {allDailyPlayed ? 'Tages-Sweep!' : 'Dein Spiele-Tag'}
         </span>
         <div className="flex-1 h-px bg-[var(--color-gray-bg)]" />
       </div>
 
-      {/* Progress dots */}
+      {/* Progress dots — daily games only */}
       <div className="mb-4 flex items-center justify-center gap-2">
         <div className="flex items-center gap-1.5">
-          {ALL_GAMES.map((g) => (
+          {DAILY_GAMES.map((g) => (
             <div
               key={g.key}
               className={`h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
@@ -148,13 +183,13 @@ export function PostGameSection({ currentGame }: PostGameSectionProps) {
           ))}
         </div>
         <span className="text-xs font-semibold text-[var(--color-gray-text)]">
-          {playedCount}/{ALL_GAMES.length}
+          {dailyPlayedCount}/{DAILY_GAMES.length}
         </span>
       </div>
 
-      {/* Game list — shows status-aware cards */}
+      {/* Daily games — status-aware cards */}
       <div className="flex flex-col gap-2.5">
-        {ALL_GAMES.map((game) => {
+        {DAILY_GAMES.map((game) => {
           const status = statuses[game.key];
           const isCurrent = game.key === currentGame;
           const played = status.playedToday;
@@ -258,11 +293,11 @@ export function PostGameSection({ currentGame }: PostGameSectionProps) {
         })}
       </div>
 
-      {/* Sweep celebration when all games complete */}
-      {allPlayed && (
+      {/* Sweep celebration when all daily games complete */}
+      {allDailyPlayed && (
         <div className="mt-5 animate-[popIn_400ms_ease-out] rounded-xl border-2 border-[var(--color-pink)]/20 bg-gradient-to-br from-[var(--color-pink)]/[0.04] to-[var(--color-cyan)]/[0.04] p-4 text-center">
           <p className="font-[family-name:var(--font-heading)] text-base font-bold text-[var(--color-pink)]">
-            🎉 Alle {ALL_GAMES.length} Spiele geschafft!
+            🎉 Alle {DAILY_GAMES.length} Tages-Spiele geschafft!
           </p>
           <p className="mt-0.5 text-xs text-[var(--color-gray-text)]">
             Starke Leistung — teile deinen Tages-Sweep.
@@ -277,15 +312,65 @@ export function PostGameSection({ currentGame }: PostGameSectionProps) {
         </div>
       )}
 
-      {/* Motivation CTA when games remain */}
-      {!allPlayed && remaining > 0 && (
+      {/* Motivation CTA when daily games remain */}
+      {!allDailyPlayed && dailyRemaining > 0 && (
         <p className="mt-4 text-center text-xs text-[var(--color-gray-text)]">
-          {remaining === 1 ? (
+          {dailyRemaining === 1 ? (
             <>Noch <span className="font-semibold text-[var(--color-cyan)]">1 Spiel</span> bis zum Tages-Sweep! 🎯</>
           ) : (
-            <>Noch <span className="font-semibold text-[var(--color-cyan)]">{remaining} Spiele</span> bis zum Tages-Sweep! 🎯</>
+            <>Noch <span className="font-semibold text-[var(--color-cyan)]">{dailyRemaining} Spiele</span> bis zum Tages-Sweep! 🎯</>
           )}
         </p>
+      )}
+
+      {/* Weekly games cross-sell — show unplayed weekly games */}
+      {unplayedWeekly.length > 0 && (
+        <div className="mt-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex-1 h-px bg-[var(--color-gray-bg)]" />
+            <span className="text-xs font-semibold text-[var(--color-gray-text)] uppercase tracking-wide whitespace-nowrap">
+              Mehr watson Spiele
+            </span>
+            <div className="flex-1 h-px bg-[var(--color-gray-bg)]" />
+          </div>
+          <div className="flex flex-col gap-2">
+            {unplayedWeekly.map((game) => {
+              const status = statuses[game.key];
+              return (
+                <Link
+                  key={game.key}
+                  to={game.path}
+                  className="group flex items-center gap-3 rounded-lg border border-[var(--color-gray-bg)] p-3 transition-all hover:border-[var(--color-cyan)] hover:shadow-sm active:scale-[0.98]"
+                >
+                  <span
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg transition-transform group-hover:scale-105"
+                    style={{ background: `color-mix(in srgb, ${game.accentColor} 10%, transparent)` }}
+                  >
+                    {game.emoji}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-[family-name:var(--font-heading)] text-sm font-bold leading-tight">
+                        {game.name}
+                      </p>
+                      {status.streakCurrent >= 2 && (
+                        <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[var(--color-pink)]">
+                          🔥 {status.streakCurrent}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-xs text-[var(--color-gray-text)] leading-snug">
+                      {game.description}
+                    </p>
+                  </div>
+                  <span className="rounded bg-[var(--color-gray-bg)] px-2.5 py-1 text-[11px] font-bold text-[var(--color-gray-text)] transition-all group-hover:bg-[var(--color-cyan)] group-hover:text-white shrink-0">
+                    SPIELEN
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );
