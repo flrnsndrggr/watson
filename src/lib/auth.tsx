@@ -32,17 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signInWithPassword = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
-  }, []);
-
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
 
   return (
-    <AdminAuthContext.Provider value={{ ...state, signInWithPassword, signOut }}>
+    <AdminAuthContext.Provider value={{ ...state, signOut }}>
       {children}
     </AdminAuthContext.Provider>
   );

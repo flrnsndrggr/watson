@@ -7,7 +7,6 @@ export interface AdminAuthState {
 }
 
 export interface AdminAuthContextValue extends AdminAuthState {
-  signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -17,7 +16,6 @@ const DEFAULT_AUTH: AdminAuthContextValue = {
   user: null,
   isAdmin: false,
   loading: true,
-  signInWithPassword: async () => ({ error: 'Auth not loaded' }),
   signOut: async () => {},
 };
 
