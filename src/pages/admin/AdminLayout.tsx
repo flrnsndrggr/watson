@@ -1,5 +1,5 @@
-import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
-import { useAuth } from '@/lib/auth';
+import { Outlet, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/authContext';
 
 const ADMIN_NAV = [
   { path: '/admin', label: 'Dashboard', end: true },
@@ -14,10 +14,23 @@ const ADMIN_NAV = [
 ];
 
 export function AdminLayout() {
-  const { isLoggedIn, logout, username } = useAuth();
+  const { isAdmin, loading, signOut, user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  if (!isLoggedIn) return <Navigate to="/" replace />;
+  // While the lazy auth provider mounts and getSession() resolves, hold off on
+  // rendering admin chrome AND on redirecting — otherwise a logged-in admin
+  // who deep-links to /admin would briefly see a redirect to "/" before the
+  // session resolves.
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f5f5f5]">
+        <div className="h-8 w-8 animate-spin rounded-full border-3 border-[var(--color-cyan)] border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
@@ -51,7 +64,7 @@ export function AdminLayout() {
             })}
           </nav>
           <div className="ml-auto flex items-center gap-3">
-            <span className="text-xs text-white/50">{username}</span>
+            <span className="text-xs text-white/50">{user?.email}</span>
             <Link
               to="/"
               className="text-xs text-white/50 hover:text-white transition-colors"
@@ -59,7 +72,10 @@ export function AdminLayout() {
               Zur Seite
             </Link>
             <button
-              onClick={logout}
+              onClick={async () => {
+                await signOut();
+                navigate('/', { replace: true });
+              }}
               className="rounded bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20 transition-colors cursor-pointer"
             >
               Logout
